@@ -1,7 +1,8 @@
 export enum USER_TYPES {
     USER = 2,
     ADMIN = 0,
-    TECHNICAL = 3
+    TECHNICAL = 3,
+    WAREHOUSE = 4
 
 };
 export enum CONSTANTS_MAX {
@@ -13,4 +14,7 @@ export enum CONSTANTS_MAX {
 export enum CONSTANTS_MIN {
     PASSWORD_LEN = 6,
     NAME_LEN = 5
+}
+export enum PAGE_SIZE {
+    PAGE_USER = 20,
 }

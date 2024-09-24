@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 
 import { ScheduleModule } from '@nestjs/schedule';
+import { UserModule } from './user/user.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -15,7 +16,7 @@ import * as Joi from 'joi';
       }),
     }),
     ScheduleModule.forRoot(),
-    PrismaModule, AuthModule
+    PrismaModule, AuthModule, UserModule
   ]
 })
 export class AppModule { }

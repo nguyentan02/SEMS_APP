@@ -19,10 +19,18 @@ model User {
   employeeId String
   name       String?
   password   String
-  role       Int       @default(2)
+  role       Int
   user_avt   String    @default("https://res.cloudinary.com/dig0nsb6m/image/upload/v1704869331/hjv353yrt9hahuomkxey.png")
   isBan      Boolean   @default(false)
   banUntil   DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+  isDelete   Boolean   @default(false)
+  Postion    Position  @relation(fields: [role], references: [id])
+}
+
+model Position {
+  id   Int    @id @default(autoincrement())
+  name String
+  User User[]
 }

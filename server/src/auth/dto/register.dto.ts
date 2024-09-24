@@ -1,4 +1,4 @@
-import { IsEmail, isInt, IsNotEmpty, isNumber, IsString, MaxLength, MinLength } from "class-validator"
+import { IsEmail, IsNotEmpty, IsNumber, IsString, MaxLength, MinLength } from "class-validator"
 import { CONSTANTS_MAX, CONSTANTS_MIN } from "src/global"
 
 export class RegisterDto {
@@ -18,8 +18,9 @@ export class RegisterDto {
     @MinLength(CONSTANTS_MIN.NAME_LEN)
     name: string
 
-
-    role?: number
+    @IsNumber()
+    @IsNotEmpty()
+    role: number
 
 
     @IsString()
