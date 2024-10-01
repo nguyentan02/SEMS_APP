@@ -17,4 +17,4 @@ export class RolesGuard implements CanActivate {
         if (user.isBan) return false
         return roles.some(role => role == user.role)
     }
-}
+}   

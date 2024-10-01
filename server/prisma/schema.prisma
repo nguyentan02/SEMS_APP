@@ -27,10 +27,86 @@ model User {
   updatedAt  DateTime  @updatedAt
   isDelete   Boolean   @default(false)
   Postion    Position  @relation(fields: [role], references: [id])
+
+  Feedback Feedback[]
 }
 
 model Position {
   id   Int    @id @default(autoincrement())
   name String
   User User[]
+}
+
+model VerifyCode {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      Int
+  createdAt DateTime @default(now())
+}
+
+model Feedback {
+  id          Int      @id @default(autoincrement())
+  description String
+  time        Int?
+  createdAt   DateTime @default(now())
+
+  User   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Deparment {
+  id            Int    @id @default(autoincrement())
+  deparmentName String
+  rooms         Room[]
+}
+
+model Room {
+  id          Int       @id @default(autoincrement())
+  roomName    String
+  deparmentId Int
+  createAt    DateTime  @default(now())
+  deparment   Deparment @relation(fields: [deparmentId], references: [id], onDelete: Cascade)
+}
+
+model Device {
+  id            Int      @id @default(autoincrement())
+  name          String
+  serialNumber  String
+  manufacturer  String
+  purchase_Date DateTime
+  price         String
+  qr_code       String?
+  categoryId    Int
+  category      Category @relation(fields: [categoryId], references: [id])
+
+  @@map("device")
+}
+
+model Category {
+  id           Int      @id @default(autoincrement())
+  categoryName String
+  devices      Device[]
+
+  CategoryAttribyutes CategoryAttribyutes[]
+
+  @@map("category")
+}
+
+model Attribyutes_category {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  CategoryAttribyutes CategoryAttribyutes[]
+
+  @@map("attribyutes_category")
+}
+
+model CategoryAttribyutes {
+  categoryId   Int
+  attribyuteId Int
+
+  category   Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  attribyute Attribyutes_category @relation(fields: [attribyuteId], references: [id], onDelete: Cascade)
+
+  @@id([categoryId, attribyuteId])
+  @@map("category_attribyutes")
 }
