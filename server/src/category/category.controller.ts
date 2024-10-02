@@ -49,7 +49,7 @@ export class CategoryController {
     ) {
         return this.categoryService.updateCategory(id, updateCategoryDto)
     }
-    @Delete('category/:id')
+    @Delete('/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.ADMIN)
     deleteCategory(

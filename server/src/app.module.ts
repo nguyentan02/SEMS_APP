@@ -11,6 +11,7 @@ import * as Joi from 'joi';
 import { MailingModule } from './mailing/mailing.module';
 import { LocationModule } from './location/location.module';
 import { CategoryModule } from './category/category.module';
+import { DeviceModule } from './device/device.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { CategoryModule } from './category/category.module';
       }),
     }),
     ScheduleModule.forRoot(),
-    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule
+    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule
   ]
 })
 export class AppModule { }

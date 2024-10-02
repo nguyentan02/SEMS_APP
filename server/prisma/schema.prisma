@@ -66,21 +66,40 @@ model Room {
   deparmentId Int
   createAt    DateTime  @default(now())
   deparment   Deparment @relation(fields: [deparmentId], references: [id], onDelete: Cascade)
+  Device      Device[]
 }
 
 model Device {
-  id            Int      @id @default(autoincrement())
-  name          String
-  serialNumber  String
-  manufacturer  String
-  purchase_Date DateTime
-  price         String
-  qr_code       String?
-  categoryId    Int
-  category      Category @relation(fields: [categoryId], references: [id])
+  id                  Int       @id @default(autoincrement())
+  name                String
+  serialNumber        String
+  manufacturer        String
+  purchaseDate        DateTime
+  expirationDate      DateTime
+  price               Decimal
+  qrCode              String?
+  image               String
+  lastMaintenanceDate DateTime?
+  statusDevice        String    @default("INACTIVE")
+  categoryId          Int
+  roomId              Int?
+  isDelete            Boolean   @default(false)
+  room                Room?     @relation(fields: [roomId], references: [id])
+  category            Category  @relation(fields: [categoryId], references: [id])
 
   @@map("device")
 }
+
+// model UsageInformation {
+//   id          Int       @id @default(autoincrement())
+//   deviceId    Int
+//   usage_start DateTime  @default(now())
+//   usage_end   DateTime?
+//   end         DateTime?
+//   purpose     String?
+//   isHidden    Boolean   @default(false)
+//   Device      Device    @relation(fields: [deviceId], references: [id])
+// }
 
 model Category {
   id           Int      @id @default(autoincrement())

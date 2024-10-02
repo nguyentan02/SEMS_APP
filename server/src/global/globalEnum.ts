@@ -24,5 +24,12 @@ export enum CONSTANTS_MIN {
 export enum PAGE_SIZE {
     PAGE_USER = 20,
     PAGE_LOCATION = 20,
-    PAGE_CATEGORY = 20
+    PAGE_CATEGORY = 20,
+    PAGE_DEVICE = 30
+}
+export enum DEVICE_STATUS {
+    ACTIVE,
+    INACTIVE,
+    REPAIR,
+    DECOMMISSIONED,
 }
