@@ -26,16 +26,16 @@ model User {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   isDelete   Boolean   @default(false)
-  Postion    Position  @relation(fields: [role], references: [id])
+  // Postion    Position  @relation(fields: [role], references: [id])
 
   Feedback Feedback[]
 }
 
-model Position {
-  id   Int    @id @default(autoincrement())
-  name String
-  User User[]
-}
+// model Position {
+//   id   Int    @id @default(autoincrement())
+//   name String
+//   User User[]
+// }
 
 model VerifyCode {
   id        Int      @id @default(autoincrement())
@@ -67,10 +67,14 @@ model Room {
   createAt    DateTime  @default(now())
   deparment   Deparment @relation(fields: [deparmentId], references: [id], onDelete: Cascade)
   Device      Device[]
+
+  oldHistories     RotationDevice[]   @relation("OldRoom")
+  newHistories     RotationDevice[]   @relation("NewRoom")
+  UsageInformation UsageInformation[]
 }
 
 model Device {
-  id                  Int       @id @default(autoincrement())
+  id                  Int                @id @default(autoincrement())
   name                String
   serialNumber        String
   manufacturer        String
@@ -80,26 +84,117 @@ model Device {
   qrCode              String?
   image               String
   lastMaintenanceDate DateTime?
-  statusDevice        String    @default("INACTIVE")
+  statusDevice        String             @default("INACTIVE")
   categoryId          Int
   roomId              Int?
-  isDelete            Boolean   @default(false)
-  room                Room?     @relation(fields: [roomId], references: [id])
-  category            Category  @relation(fields: [categoryId], references: [id])
+  isDelete            Boolean            @default(false)
+  room                Room?              @relation(fields: [roomId], references: [id])
+  category            Category           @relation(fields: [categoryId], references: [id])
+  UsageInformation    UsageInformation[]
+  RotationDevice      RotationDevice[]
 
   @@map("device")
 }
 
-// model UsageInformation {
-//   id          Int       @id @default(autoincrement())
-//   deviceId    Int
-//   usage_start DateTime  @default(now())
-//   usage_end   DateTime?
-//   end         DateTime?
-//   purpose     String?
-//   isHidden    Boolean   @default(false)
-//   Device      Device    @relation(fields: [deviceId], references: [id])
+model UsageInformation {
+  id          Int       @id @default(autoincrement())
+  deviceId    Int
+  usage_start DateTime  @default(now())
+  usage_end   DateTime
+  end         DateTime?
+  purpose     String?
+  isDeleted   Boolean   @default(false)
+  roomId      Int
+  room        Room      @relation(fields: [roomId], references: [id])
+  Device      Device    @relation(fields: [deviceId], references: [id])
+}
+
+model RotationDevice {
+  id            Int      @id @default(autoincrement())
+  deviceId      Int
+  oldLocationId Int
+  newLocationId Int
+  reason        String
+  transferDate  DateTime @default(now())
+  Device        Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  OldRoom       Room     @relation("OldRoom", fields: [oldLocationId], references: [id], onDelete: Cascade)
+  NewRoom       Room     @relation("NewRoom", fields: [newLocationId], references: [id], onDelete: Cascade)
+}
+
+// model maintenancePlan {
+//   id                Int      @id @default(autoincrement())
+//   deviceId          Int
+//   startDate         DateTime
+//   endDate           DateTime
+//   createdAt         DateTime @default(now())
+//   maintenanceStatus String   @default("QUEUE")
+//   descriptionPlan   String?
+//   isApprove         Boolean?
 // }
+model ListMaterials {
+  id       Int        @id @default(autoincrement())
+  name     String
+  Material Material[]
+}
+
+model Material {
+  id            Int           @id @default(autoincrement())
+  name          String
+  isDelete      Boolean       @default(false)
+  quantity      Int?          @default(0)
+  note          String?
+  image         String        @default("https://res.cloudinary.com/dnhndgzes/image/upload/v1728122320/frdlrynketnd07okysmg.png")
+  categoryId    Int
+  ListMaterials ListMaterials @relation(fields: [categoryId], references: [id])
+  OrderItem     OrderItem[]
+  Waste         Waste[]
+}
+
+model Waste {
+  id          Int      @id @default(autoincrement())
+  wasteReason String?
+  wasteCode   String
+  materialId  Int
+  quantity    Int
+  createdAt   DateTime @default(now())
+  material    Material @relation(fields: [materialId], references: [id])
+}
+
+enum OrderStatus {
+  QUEUE
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+enum ActivityType {
+  EX
+  IN
+}
+
+model Order {
+  id           Int          @id @default(autoincrement())
+  orderCode    String       @unique
+  source       String
+  notes        String?
+  activityType ActivityType
+  orderDate    DateTime     @default(now())
+  orderDateEnd DateTime?
+  orderStatus  OrderStatus  @default(QUEUE)
+  totalAmount  Float        @default(0)
+  orderItems   OrderItem[]
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    Int
+  material   Material @relation(fields: [materialId], references: [id])
+  materialId Int
+  quantity   Int
+  price      Float
+  totalPrice Float    @default(0)
+}
 
 model Category {
   id           Int      @id @default(autoincrement())

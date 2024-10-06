@@ -12,6 +12,11 @@ import { MailingModule } from './mailing/mailing.module';
 import { LocationModule } from './location/location.module';
 import { CategoryModule } from './category/category.module';
 import { DeviceModule } from './device/device.module';
+import { UsageModule } from './usage/usage.module';
+import { RotationModule } from './rotation/rotation.module';
+import { MaterialModule } from './material/material.module';
+import { StorageModule } from './storage/storage.module';
+
 
 @Module({
   imports: [
@@ -22,7 +27,8 @@ import { DeviceModule } from './device/device.module';
       }),
     }),
     ScheduleModule.forRoot(),
-    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule
-  ]
+    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule, UsageModule, RotationModule, MaterialModule, StorageModule
+  ],
+
 })
 export class AppModule { }

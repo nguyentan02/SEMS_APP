@@ -17,7 +17,7 @@ export enum CONSTANTS_MAX {
 export enum CONSTANTS_MIN {
     PASSWORD_LEN = 6,
     NAME_LEN = 5,
-    DEPARMENT_LEN = 5,
+    DEPARMENT_LEN = 3,
     CATEGORY_LEN = 2
 
 }
@@ -25,7 +25,9 @@ export enum PAGE_SIZE {
     PAGE_USER = 20,
     PAGE_LOCATION = 20,
     PAGE_CATEGORY = 20,
-    PAGE_DEVICE = 30
+    PAGE_DEVICE = 20,
+    PAGE_USAGE = 20,
+    PAGE_MATERIAL = 20,
 }
 export enum DEVICE_STATUS {
     ACTIVE,

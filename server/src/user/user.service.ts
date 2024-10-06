@@ -33,9 +33,6 @@ export class UserService {
             const user = await this.prismaService.user.findFirst({
                 where: {
                     id: id
-                },
-                include: {
-                    Postion: true
                 }
             })
             if (!user) return new ResponseData<User>(null, 400, "Tài khoản không tồn tại")

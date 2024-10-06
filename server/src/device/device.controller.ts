@@ -18,6 +18,14 @@ export class DeviceController {
         return this.deviceService.getAllDevice(option)
     }
 
+    @Get('/:id')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.ADMIN)
+    getDeviceById(
+        @Param('id', ParseIntPipe) id: number
+    ) {
+        return this.deviceService.getDeviceById(id)
+    }
 
     @Post('create')
     @UseGuards(MyJWTGuard, RolesGuard)

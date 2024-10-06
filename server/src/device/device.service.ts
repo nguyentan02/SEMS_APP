@@ -3,8 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CreateDeviceDto, UpdateDeviceDto } from './dto';
 import { PAGE_SIZE, ResponseData } from '../global';
-import e from 'express';
-import { contains } from 'class-validator';
+import { Device } from '@prisma/client';
+
 
 @Injectable()
 export class DeviceService {
@@ -16,7 +16,7 @@ export class DeviceService {
         let pageSize = PAGE_SIZE.PAGE_DEVICE
         try {
             let { page, name, categoryId } = option
-            const where: any = {}
+            let where: any = { isDelete: false, }
             if (name) {
                 where.name = {
                     contains: name,
@@ -44,7 +44,27 @@ export class DeviceService {
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
-
+    async getDeviceById(id: number) {
+        try {
+            const device = await this.prismaService.device.findFirst({
+                where: {
+                    id: id
+                }
+            })
+            if (!device) return new ResponseData<any>(null, 400, "Thiết bị không tồn tại")
+            const data = await this.prismaService.device.findMany({
+                where: { id: id },
+                include: {
+                    category: true,
+                    room: true
+                }
+            })
+            return new ResponseData<Device[]>(data, 200, "Tìm thấy thiết bị")
+        } catch (error) {
+            this.logger.error(error.message)
+            return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
+        }
+    }
     async createDevice(createDeviceDto: CreateDeviceDto, imageDevice: Express.Multer.File) {
         try {
 
