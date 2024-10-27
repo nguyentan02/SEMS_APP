@@ -4,7 +4,7 @@ import { MyJWTGuard } from '../auth/guard';
 import { JwtStrategy } from '../auth/strategy';
 import { Roles } from '../auth/decoractor';
 import { USER_TYPES } from '../global';
-import { CreateCategoryMaterialDto, CreateMaterialDto, UpdateCategoryMaterialDto, UpdateMaterialDto } from './dto';
+import { ActualQuantityDto, CreateCategoryMaterialDto, CreateMaterialDto, UpdateCategoryMaterialDto, UpdateMaterialDto, WasteMaterialDto } from './dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('material')
@@ -57,6 +57,7 @@ export class MaterialController {
     ) {
         return this.materialService.createMaterial(createMaterialDto, image)
     }
+
     @Patch('/:id')
     @UseGuards(MyJWTGuard, JwtStrategy)
     @Roles(USER_TYPES.ADMIN)
@@ -68,5 +69,23 @@ export class MaterialController {
 
     ) {
         return this.materialService.updateMaterial(id, updateMaterialDto, image)
+    }
+    @Post('waste')
+    @UseGuards(MyJWTGuard, JwtStrategy)
+    @Roles(USER_TYPES.ADMIN)
+    wasteMaterial(
+        @Body() wasteMaterialDto: WasteMaterialDto
+
+    ) {
+        return this.materialService.waste(wasteMaterialDto)
+    }
+    @Post('actual')
+    @UseGuards(MyJWTGuard, JwtStrategy)
+    @Roles(USER_TYPES.ADMIN)
+    actualQuantity(
+        @Body() actualQuantityDto: ActualQuantityDto
+
+    ) {
+        return this.materialService.actualQuantity(actualQuantityDto)
     }
 }

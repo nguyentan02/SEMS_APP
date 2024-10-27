@@ -3,7 +3,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { User } from "@prisma/client";
 import { ResponseData } from "../global/globalClass";
 import { PAGE_SIZE } from "src/global";
-import { not, number, string } from "joi";
+
 
 import * as argon2 from 'argon2';
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
@@ -27,7 +27,6 @@ export class UserService {
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
-
     async getProfileUser(id: number) {
         try {
             const user = await this.prismaService.user.findFirst({
@@ -37,7 +36,6 @@ export class UserService {
             })
             if (!user) return new ResponseData<User>(null, 400, "Tài khoản không tồn tại")
             delete user.password
-            delete user.role
             delete user.updatedAt
             delete user.isDelete
             delete user.isBan
@@ -47,10 +45,16 @@ export class UserService {
             return new ResponseData<User>(null, 500, "Lỗi dịch vụ, thử lại sau")
         }
     }
-    async getAllUser(option: { page: number, name: string, role: number, isBan: boolean }) {
+    async getAllUser(option: { page: number, name: string, role?: number, isBan: boolean }) {
         let pageSize = PAGE_SIZE.PAGE_USER
         try {
-            let { page } = option
+            let { page,role} = option
+            let where:any ={}
+            if (role !== undefined) {
+                where.role = Number(role) !== 0 ? Number(role) : { not: 0 };
+            } else {
+                where.role = { not: 0 };
+            }
             const totalCount = await this.prismaService.user.count({
                 where: {
                     name: {
@@ -58,13 +62,12 @@ export class UserService {
                         mode: 'insensitive'
                     },
                     isDelete: false,
-                    role: {
-                        not: 0
-                    },
+                    role: where.role, 
                     isBan: typeof option.isBan === 'string' ? (option.isBan === 'false' ? false : true) : option.isBan
                 }
             })
             const totalPages = totalCount == 0 ? 1 : Math.ceil(totalCount / pageSize)
+           
             if (!page || page < 1) page = 1
             if (page > totalPages) page = totalPages
             let next = (page - 1) * pageSize
@@ -75,13 +78,23 @@ export class UserService {
                         mode: 'insensitive'
                     },
                     isDelete: false,
-                    role: {
-                        not: 0
-                    },
+                    role: where.role, 
                     isBan: typeof option.isBan === 'string' ? (option.isBan === 'false' ? false : true) : option.isBan
                 },
                 orderBy: {
                     id: 'asc'
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    employeeId:true,
+                    user_avt: true,
+                    isBan: true,
+                    createdAt: true,
+                    Feedback: true,
+                
+                    role: true
                 },
                 skip: next,
                 take: pageSize
@@ -90,6 +103,28 @@ export class UserService {
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<User>(null, 500, "Lỗi dịch vụ, thử lại sau")
+        }
+    }
+    async updateAvatar(userId: number, user_avt: Express.Multer.File){
+        try {
+
+            const user = await this.getUserById(userId)
+
+            if (!user) {
+                return new ResponseData<User>(null, 400, "Tài khoản không tồn tại")
+            }
+            const img = await this.cloudinaryService.uploadFile(user_avt)
+            await this.prismaService.user.update({
+                where: {
+                    id: user.id
+                }, data: {
+                    user_avt:img.url
+                }
+            })
+            return new ResponseData<any>(null, 200, "Cập nhật thành công")
+        } catch (error) {
+            this.logger.error(error.message)
+            return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
     async updateProfile(userId: number, updateProfile: UpdateProfileDto, user_avt: Express.Multer.File) {
@@ -105,6 +140,7 @@ export class UserService {
             if (user_avt) {
                 const img = await this.cloudinaryService.uploadFile(user_avt)
                 data.user_avt = img.url
+               
             }
             await this.prismaService.user.update({
                 where: {
@@ -123,8 +159,9 @@ export class UserService {
             if (!user) {
                 return new ResponseData<User>(null, 400, "Tài khoản không tồn tại")
             }
+            console.log(user);
             const passwordMather = await argon2.verify(user.password, updatePasswordDto.oldPassword)
-            if (!passwordMather) return new ResponseData<User>(null, 400, "Mật khẩu hiện tại không chính xác")
+            if (!passwordMather) return new ResponseData<string>(null, 400, "Mật khẩu hiện tại không chính xác")
             const hashedPassword = await argon2.hash(updatePasswordDto.newPassword)
             await this.prismaService.user.update({
                 where: {
@@ -134,7 +171,7 @@ export class UserService {
                 }
             }
             )
-            return new ResponseData<User>(null, 200, "Cập nhật mật khẩu thành công")
+            return new ResponseData<any>(null, 200, "Cập nhật mật khẩu thành công")
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
@@ -176,7 +213,7 @@ export class UserService {
         try {
             const user = await this.getUserById(id)
             if (!user) return new ResponseData<User>(null, 400, "Tài khoản không tồn tại")
-            if (user.isBan) return new ResponseData<User>(null, 400, "Tài khoản đang bị khoá")
+            if (user.isBan) return new ResponseData<string>(null, 400, "Tài khoản đang bị khoá")
             await this.prismaService.feedback.create({
                 data: {
                     description: banUserDto.feedback,
@@ -198,7 +235,7 @@ export class UserService {
                     banUntil: lockUntil
                 }
             })
-            return new ResponseData<User>(null, 200, "Khoá tài khoản thành công")
+            return new ResponseData<string>(null, 200, "Khoá tài khoản thành công")
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
@@ -209,7 +246,7 @@ export class UserService {
         try {
             const user = await this.getUserById(id)
             if (!user) return new ResponseData<User>(null, 400, "Tài khoản không tồn tại")
-            if (!user.isBan) return new ResponseData<User>(null, 400, "Tài khoản không bị khoá")
+            if (!user.isBan) return new ResponseData<string>(null, 400, "Tài khoản không bị khoá")
 
 
             await this.prismaService.user.update({
@@ -220,7 +257,7 @@ export class UserService {
                     banUntil: null
                 }
             })
-            return new ResponseData<User>(null, 200, "Mở khoá tài khoản thành công")
+            return new ResponseData<string>(null, 200, "Mở khoá tài khoản thành công")
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')

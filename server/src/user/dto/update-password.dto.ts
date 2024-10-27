@@ -18,4 +18,5 @@ export class UpdatePasswordDto {
     })
     @IsNotEmpty({ message: 'Mật khẩu mới không được để trống' })
     newPassword: string
+   
 }

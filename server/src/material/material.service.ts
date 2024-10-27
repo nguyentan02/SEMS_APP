@@ -1,10 +1,11 @@
 import { Injectable, Logger, Res } from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateCategoryMaterialDto, CreateMaterialDto, WasteMaterialDto } from './dto';
+import { ActualQuantityDto, CreateCategoryMaterialDto, CreateMaterialDto, WasteMaterialDto } from './dto';
 import { PAGE_SIZE, ResponseData } from 'src/global';
 import { UpdateCategoryMaterialDto, UpdateMaterialDto } from './dto/update.dto';
 import { Material } from '@prisma/client';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class MaterialService {
@@ -179,28 +180,30 @@ export class MaterialService {
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
-    async waste(id: number, wasteMaterialDto: WasteMaterialDto) {
+    async waste(wasteMaterialDto: WasteMaterialDto) {
         try {
             const material = await this.prismaService.material.findFirst({
                 where: {
-                    id: id
+                    id: wasteMaterialDto.materialId
                 }
             })
             if (!material) return new ResponseData<any>(null, 400, "Vật tư không tồn tại")
             await this.prismaService.material.update({
                 where: {
-                    id: id
+                    id: wasteMaterialDto.materialId
                 }, data: {
                     quantity: {
                         decrement: wasteMaterialDto.wasteNumber
                     }
                 }
             })
+            const code = this.generateOrderCode()
             const newWaste = await this.prismaService.waste.create({
                 data: {
-                    materialId: id,
+                    materialId: wasteMaterialDto.materialId,
+                    wasteCode: code,
                     quantity: wasteMaterialDto.wasteNumber,
-                    scrapReason: wasteMaterialDto.scrapReason
+                    wasteReason: wasteMaterialDto.scrapReason
                 }
             })
             return new ResponseData<any>(newWaste, 200, 'Tạo phế phẩm thành công')
@@ -209,5 +212,43 @@ export class MaterialService {
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
+    async updatewaste(id: number, upWasteMaterialDto: WasteMaterialDto) {
+        try {
 
+        } catch (error) {
+
+        }
+    }
+    async actualQuantity(actualQuantityDto: ActualQuantityDto) {
+        try {
+            const material = await this.prismaService.material.findFirst({
+                where: { id: actualQuantityDto.materialId }
+            })
+            if (!material) return new ResponseData<any>(null, 400, "Vật tư không tồn tại")
+            let total: number = actualQuantityDto.quantity - material.quantity;
+
+            await this.prismaService.actualQuantity.create({
+                data: {
+                    materialId: actualQuantityDto.materialId,
+                    quantity: total,
+                    userId: actualQuantityDto.userId
+                }
+            })
+            await this.prismaService.material.update({
+                where: {
+                    id: actualQuantityDto.materialId
+                }, data: {
+                    quantity: material.quantity + total
+                }
+            })
+            return new ResponseData<any>(null, 200, "Cập nhật số lượng thành công");
+        } catch (error) {
+            this.logger.error(error.message)
+            return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
+        }
+    }
+    private generateOrderCode(): string {
+        const randomSuffix = randomBytes(2).toString('hex').toUpperCase();
+        return `SP-${randomSuffix}`;
+    }
 }

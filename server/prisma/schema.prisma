@@ -28,7 +28,9 @@ model User {
   isDelete   Boolean   @default(false)
   // Postion    Position  @relation(fields: [role], references: [id])
 
-  Feedback Feedback[]
+  Feedback        Feedback[]
+  ActualQuantity  ActualQuantity[]
+  maintenancePlan maintenancePlan[]
 }
 
 // model Position {
@@ -92,6 +94,7 @@ model Device {
   category            Category           @relation(fields: [categoryId], references: [id])
   UsageInformation    UsageInformation[]
   RotationDevice      RotationDevice[]
+  maintenancePlan     maintenancePlan[]
 
   @@map("device")
 }
@@ -121,16 +124,41 @@ model RotationDevice {
   NewRoom       Room     @relation("NewRoom", fields: [newLocationId], references: [id], onDelete: Cascade)
 }
 
-// model maintenancePlan {
-//   id                Int      @id @default(autoincrement())
-//   deviceId          Int
-//   startDate         DateTime
-//   endDate           DateTime
-//   createdAt         DateTime @default(now())
-//   maintenanceStatus String   @default("QUEUE")
-//   descriptionPlan   String?
-//   isApprove         Boolean?
-// }
+model Notification {
+  id        Int      @id @default(autoincrement())
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notification")
+}
+
+enum StatusMaintenance {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum PriorityLevel {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model maintenancePlan {
+  id                Int               @id @default(autoincrement())
+  deviceId          Int
+  userId            Int
+  requestDate       DateTime
+  startDate         DateTime
+  endDate           Int
+  priority          PriorityLevel     @default(LOW)
+  maintenanceStatus StatusMaintenance @default(PENDING)
+  descriptionPlan   String?
+  User              User              @relation(fields: [userId], references: [id])
+  Device            Device            @relation(fields: [deviceId], references: [id])
+}
+
 model ListMaterials {
   id       Int        @id @default(autoincrement())
   name     String
@@ -138,16 +166,17 @@ model ListMaterials {
 }
 
 model Material {
-  id            Int           @id @default(autoincrement())
-  name          String
-  isDelete      Boolean       @default(false)
-  quantity      Int?          @default(0)
-  note          String?
-  image         String        @default("https://res.cloudinary.com/dnhndgzes/image/upload/v1728122320/frdlrynketnd07okysmg.png")
-  categoryId    Int
-  ListMaterials ListMaterials @relation(fields: [categoryId], references: [id])
-  OrderItem     OrderItem[]
-  Waste         Waste[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  isDelete       Boolean          @default(false)
+  quantity       Int?             @default(0)
+  note           String?
+  image          String           @default("https://res.cloudinary.com/dnhndgzes/image/upload/v1728122320/frdlrynketnd07okysmg.png")
+  categoryId     Int
+  ListMaterials  ListMaterials    @relation(fields: [categoryId], references: [id])
+  OrderItem      OrderItem[]
+  Waste          Waste[]
+  ActualQuantity ActualQuantity[]
 }
 
 model Waste {
@@ -158,6 +187,16 @@ model Waste {
   quantity    Int
   createdAt   DateTime @default(now())
   material    Material @relation(fields: [materialId], references: [id])
+}
+
+model ActualQuantity {
+  id         Int      @id @default(autoincrement())
+  materialId Int
+  quantity   Int
+  createdAt  DateTime @default(now())
+  userId     Int
+  User       User     @relation(fields: [userId], references: [id])
+  Material   Material @relation(fields: [materialId], references: [id])
 }
 
 enum OrderStatus {

@@ -1,8 +1,9 @@
-import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+
 
 @Module({
     imports: [
@@ -11,18 +12,17 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
             useFactory: async (confirmService: ConfigService) => ({
                 transport: {
                     host: confirmService.get('MAIL_HOST'),
-                    port: 465,
                     secure: false,
                     auth: {
                         user: confirmService.get('MAIL_USER'),
-                        pass: confirmService.get('MAIL_PASS')
+                        pass: confirmService.get('MAIL_PASSWORD')
                     }
                 },
                 defaults: {
-                    from: `Ứng dụng quản lý thiết bị trong trường học`
+                    from: `Ứng dụng quản lý thiết bị`
                 },
                 template: {
-                    dir: join(__dirname, 'templates'),
+                    dir: './src/mailing/templates',
                     adapter: new HandlebarsAdapter(),
                     options: {
                         strict: true
@@ -33,4 +33,5 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
         })
     ]
 })
+
 export class MailingModule { }

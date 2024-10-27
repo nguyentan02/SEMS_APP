@@ -1,8 +1,8 @@
 export enum USER_TYPES {
-    USER = 2,
+    USER = 1,
     ADMIN = 0,
-    TECHNICAL = 3,
-    WAREHOUSE = 4
+    TECHNICAL = 2,
+    WAREHOUSE = 3
 
 };
 export enum CONSTANTS_MAX {
@@ -16,18 +16,18 @@ export enum CONSTANTS_MAX {
 
 export enum CONSTANTS_MIN {
     PASSWORD_LEN = 6,
-    NAME_LEN = 5,
+    NAME_LEN = 10,
     DEPARMENT_LEN = 3,
     CATEGORY_LEN = 2
 
 }
 export enum PAGE_SIZE {
-    PAGE_USER = 20,
-    PAGE_LOCATION = 20,
-    PAGE_CATEGORY = 20,
-    PAGE_DEVICE = 20,
-    PAGE_USAGE = 20,
-    PAGE_MATERIAL = 20,
+    PAGE_USER = 10,
+    PAGE_LOCATION = 10,
+    PAGE_CATEGORY = 10,
+    PAGE_DEVICE = 10,
+    PAGE_USAGE = 10,
+    PAGE_MATERIAL = 10,
 }
 export enum DEVICE_STATUS {
     ACTIVE,

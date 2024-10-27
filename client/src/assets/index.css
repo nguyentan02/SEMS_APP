@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input-custom {
+    @apply w-9/12 block bg-transparent border-b border-gray-300 focus:outline-none focus:border-gray-500 text-black text-base py-2 rounded-lg
+}
+.label-custom {
+    @apply block mb-2 text-sm font-medium text-gray-800
+}
+.btn-login {
+    @apply bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 w-9/12 rounded-full
+}
+
+.error {
+    @apply text-red-600 text-sm
+}
+
+.tracking-in-expand {
+    -webkit-animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+    animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+}
+.form-info{
+   @apply h-10 relative flex items-center border-b-2 border-gray-200 mb-4 p-5
+}
+.input-form {
+    @apply border-none bg-gray-50 outline-none
+}
+
+@-webkit-keyframes tracking-in-expand {
+    0% {
+        letter-spacing: -0.5em;
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes tracking-in-expand {
+    0% {
+        letter-spacing: -0.5em;
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

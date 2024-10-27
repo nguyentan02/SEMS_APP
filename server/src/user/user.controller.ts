@@ -5,16 +5,23 @@ import { Roles, GetUser } from "../auth/decoractor";
 import { USER_TYPES } from "../global";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ForgotPasswordDto, UpdatePasswordDto, UpdateProfileDto, UpdateUserDto, VerifyCodeDto, } from "./dto";
-import { number } from "joi";
 import { User } from "@prisma/client";
 import { BanUserDto } from "./dto/ban-user.dto";
+
 
 @Controller('user')
 
 export class UserController {
     constructor(private userService: UserService) { }
-
+    @Get('me')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.ADMIN, USER_TYPES.USER, USER_TYPES.TECHNICAL, USER_TYPES.WAREHOUSE)
+    getUser(@GetUser() user: User) {
+        return this.userService.getUser(user)
+    }
     @Get('profile/:id')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.ADMIN, USER_TYPES.USER, USER_TYPES.TECHNICAL, USER_TYPES.WAREHOUSE)
     getProfile(@Param('id', ParseIntPipe) id: number) {
         return this.userService.getProfileUser(id)
     }
@@ -31,12 +38,19 @@ export class UserController {
     updateProfile(@Param('id', ParseIntPipe) id: number, @Body() updateProfile: UpdateProfileDto, @UploadedFile() user_avt: Express.Multer.File) {
         return this.userService.updateProfile(id, updateProfile, user_avt)
     }
+    @Patch('update-avatar')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER, USER_TYPES.TECHNICAL, USER_TYPES.ADMIN,USER_TYPES.WAREHOUSE)
+    @UseInterceptors(FileInterceptor('user_avt'))
+    updateAvatar(@GetUser() user: User, @UploadedFile() user_avt: Express.Multer.File) {
+        return this.userService.updateAvatar(user.id, user_avt)
+    }
     @Patch('update-user/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.ADMIN)
-    @UseInterceptors(FileInterceptor('user_avt'))
-    updateUser(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto, @UploadedFile() user_avt: Express.Multer.File) {
-        return this.userService.updateUser(id, updateUserDto, user_avt)
+    @UseInterceptors(FileInterceptor('image'))
+    updateUser(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto, @UploadedFile() image: Express.Multer.File) {
+        return this.userService.updateUser(id, updateUserDto, image)
     }
 
     @Patch('update-password/:id')

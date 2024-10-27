@@ -24,7 +24,7 @@ export class AuthService {
                         {
                             email: registerDto.email
                         },
-                        { employeeId: registerDto.employeeId.toLowerCase() }
+                        { employeeId: registerDto.employeeId }
                     ]
                 }
             })
@@ -34,7 +34,7 @@ export class AuthService {
             const hashPassword = await argon2.hash(registerDto.password)
             const newAccount = await this.prismaService.user.create({
                 data: {
-                    employeeId: registerDto.employeeId.toLowerCase(),
+                    employeeId: registerDto.employeeId.toUpperCase(),
                     email: registerDto.email,
                     name: registerDto.name,
                     password: hashPassword,
@@ -44,7 +44,7 @@ export class AuthService {
             delete newAccount.password
             delete newAccount.id
             const data = { ...newAccount }
-            return new ResponseData<any>(data, 200, "Tạo tài khoản thành công")
+            return new ResponseData<User>(data, 200, "Tạo tài khoản thành công")
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
@@ -65,7 +65,7 @@ export class AuthService {
 
             if (user.isBan) return new ResponseData<string>(null, 400, "Tài khoản đã bị khoá")
             const data = await this.signJwtToken(user.id, user.email)
-            return new ResponseData<any>(data, 400, "Đăng nhập thành công")
+            return new ResponseData<any>(data, 200, "Đăng nhập thành công")
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
