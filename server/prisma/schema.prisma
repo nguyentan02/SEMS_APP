@@ -59,17 +59,17 @@ model Feedback {
 model Deparment {
   id            Int    @id @default(autoincrement())
   deparmentName String
+  symbol        String
   rooms         Room[]
 }
 
 model Room {
-  id          Int       @id @default(autoincrement())
-  roomName    String
-  deparmentId Int
-  createAt    DateTime  @default(now())
-  deparment   Deparment @relation(fields: [deparmentId], references: [id], onDelete: Cascade)
-  Device      Device[]
-
+  id               Int                @id @default(autoincrement())
+  roomName         String
+  deparmentId      Int
+  createAt         DateTime           @default(now())
+  deparment        Deparment          @relation(fields: [deparmentId], references: [id], onDelete: Cascade)
+  Device           Device[]
   oldHistories     RotationDevice[]   @relation("OldRoom")
   newHistories     RotationDevice[]   @relation("NewRoom")
   UsageInformation UsageInformation[]

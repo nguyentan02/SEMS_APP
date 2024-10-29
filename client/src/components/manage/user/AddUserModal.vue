@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup>
 import { ref, reactive } from "vue";
 import { FwbButton, FwbModal } from "flowbite-vue";
 import { useUserStore } from "@/stores/user.store";
@@ -23,7 +23,7 @@ const formSchemaUser = yup.object().shape({
   name: yup
     .string()
     .required("Tên phải có giá trị.")
-    .min(1, "Tên phải ít nhất 1 ký tự.")
+    .min(8, "Tên phải ít nhất 8 ký tự.")
     .max(50, "Tên có nhiều nhất 50 ký tự."),
   email: yup
     .string()
@@ -36,7 +36,7 @@ const formSchemaUser = yup.object().shape({
   password: yup
     .string()
     .required("Mật khẩu phải có giá trị.")
-    .min(6, "Tên phải ít nhất 6 ký tự."),
+    .min(6, "Mật phải ít nhất 6 ký tự."),
 });
 const resetForm = () => {
   user.name = "";

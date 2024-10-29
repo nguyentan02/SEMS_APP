@@ -34,6 +34,15 @@ export class CategoryService {
                         mode: 'insensitive'
                     }
                 },
+                select:{
+                    id:true,
+                    categoryName:true,
+                    CategoryAttribyutes:{
+                        select:{
+                            attribyute:true
+                        }
+                    }
+                },
                 skip: next,
                 take: pageSize
             })

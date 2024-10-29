@@ -13,7 +13,7 @@ const routes = [
         meta: { title: 'Trang Chủ' },
         beforeEnter: async (to, from, next) => {
             const userStore = useUserStore()
-            await userStore.getMe()
+            userStore.getMe()
             if (!userStore.user?.id) next('login')
             if (userStore.user?.role == 0) next('manage')
             else next()
@@ -29,27 +29,18 @@ const routes = [
         //     if ()
         // }
     }
-    , {
-        path: '/test',
-        name: 'test',
-        component: () => import('../components/manage/user/ds.vue'),
-        meta: { title: 'Đăng Nhập' },
-        // beforeEnter: (to, from, next) => {
-        //     const userStore = useUserStore()
-        //     if ()
-        // }
-    },
+    , 
     {
         path: '/manage',
         name: 'manage',
         component: () => import('../views/ManageView.vue'),
         meta: { title: 'Quản lý' },
-        // beforeEnter: async (to, from, next) => {
-        //     const userStore = useUserStore()
-        //     await userStore.getMe()
-        //     if (userStore.user?.role != 0) next('home')
-        //     else next()
-        // },
+        beforeEnter: async (to, from, next) => {
+            const userStore = useUserStore()
+            userStore.getMe()
+            if (userStore.user?.role != 0) next('home')
+            else next()
+        },
         children: [
             {
                 path: '/profile/:id',
@@ -58,7 +49,7 @@ const routes = [
                 meta: { title: 'Thông tin cá nhân' },
                 beforeEnter: async (to, from, next) => {
                     const userStore = useUserStore()
-                    await userStore.getMe()
+                    userStore.getMe()
                     if (!userStore.user?.id) next('login')
                     else next()
                 },
@@ -68,6 +59,18 @@ const routes = [
                 name: 'user-manager',
         meta: { title: 'Quản lý thành viên' },
                 component: () => import('../components/manage/user/Usermanage.vue'),
+            },
+            {
+                path: 'category',
+                name: 'category-manage',
+                 meta: { title: 'Quản lý danh muc' },
+                component: () => import('../components/manage/category/ManageCategory.vue'),
+            },
+            {
+                path: 'location',
+                name: 'location-manage',
+                 meta: { title: 'Quản lý danh muc' },
+                component: () => import('../components/manage/location/ManageLocation.vue'),
             }
         ]
     }

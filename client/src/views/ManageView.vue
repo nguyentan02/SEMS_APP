@@ -43,7 +43,7 @@ const visible = ref(false);
               :to="{ name: 'profile', params: { id: userStore.user.id } }"
               class="block border-b p-2 text-sm hover:text-gray-400"
             >
-              <i class="fa-solid fa-user"></i>
+              <i class="fa-regular fa-address-card"></i>
               Thông tin cá nhân
             </router-link>
           </li>
@@ -53,16 +53,25 @@ const visible = ref(false);
               class="block border-b p-2 text-sm hover:text-gray-400"
             >
               <i class="fa-solid fa-users"></i>
-              Quản lý thành viên
+              Thành viên
             </router-link>
           </li>
           <li class="mb-2">
             <router-link
-              :to="{ name: 'user-manager' }"
+              :to="{ name: 'category-manage' }"
               class="block border-b p-2 text-sm hover:text-gray-400"
             >
               <i class="fa-solid fa-users"></i>
-              Quản lý thành viên
+              Danh mục thiết bị
+            </router-link>
+          </li>
+          <li class="mb-2">
+            <router-link
+              :to="{ name: 'location-manage' }"
+              class="block border-b p-2 text-sm hover:text-gray-400"
+            >
+              <i class="fa-solid fa-house"></i>
+              Phòng ban
             </router-link>
           </li>
         </ul>

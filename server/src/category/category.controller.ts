@@ -10,8 +10,6 @@ import { Roles } from '../auth/decoractor';
 export class CategoryController {
     constructor(private categoryService: CategoryService) { }
     @Get()
-    @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
     getAllCategory(@Query() option: { page: number, name: string }) {
         return this.categoryService.getCategory(option)
     }
