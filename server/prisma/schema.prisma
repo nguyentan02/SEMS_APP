@@ -99,6 +99,25 @@ model Device {
   @@map("device")
 }
 
+model Category {
+  id                  Int                   @id @default(autoincrement())
+  categoryName        String
+  description         String?
+  devices             Device[]
+  AttribyutesCategory AttribyutesCategory[]
+
+  @@map("category")
+}
+
+model AttribyutesCategory {
+  id         Int      @id @default(autoincrement())
+  name       String
+  categoryId Int
+  Category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("attribute_category")
+}
+
 model UsageInformation {
   id          Int       @id @default(autoincrement())
   deviceId    Int
@@ -235,31 +254,13 @@ model OrderItem {
   totalPrice Float    @default(0)
 }
 
-model Category {
-  id           Int      @id @default(autoincrement())
-  categoryName String
-  devices      Device[]
+// model CategoryAttribyutes {
+//   categoryId   Int
+//   attribyuteId Int
 
-  CategoryAttribyutes CategoryAttribyutes[]
+//   category   Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+//   attribyute Attribyutes_category @relation(fields: [attribyuteId], references: [id], onDelete: Cascade)
 
-  @@map("category")
-}
-
-model Attribyutes_category {
-  id                  Int                   @id @default(autoincrement())
-  name                String
-  CategoryAttribyutes CategoryAttribyutes[]
-
-  @@map("attribyutes_category")
-}
-
-model CategoryAttribyutes {
-  categoryId   Int
-  attribyuteId Int
-
-  category   Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  attribyute Attribyutes_category @relation(fields: [attribyuteId], references: [id], onDelete: Cascade)
-
-  @@id([categoryId, attribyuteId])
-  @@map("category_attribyutes")
-}
+//   @@id([categoryId, attribyuteId])
+//   @@map("category_attribyutes")
+// }

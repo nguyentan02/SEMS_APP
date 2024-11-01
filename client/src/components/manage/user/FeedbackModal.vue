@@ -37,28 +37,28 @@ const sumitFeedback = () => {
   >
     <fwb-modal @close="manageStore.closeFeedbackModal" :persistent="true">
       <template #header>
-        <div class="flex items-center text-lg">Khoá tài khoản</div>
+        <div class="flex items-center text-lg text-black">Khoá tài khoản</div>
       </template>
       <template #body>
         <div>
           <div class="flex gap-2 items-center mb-2">
-            <label for="email" class="label-custom"> Họ và tên: </label>
+            <label for="name" class="label-custom"> Họ và tên: </label>
             <Field
               name="name"
               id="name"
               type="text"
-              class="w-9/12 bg-gray-300 border-none rounded-lg"
+              class="w-9/12 bg-[rgb(var(--color-primary))] border-none rounded-lg"
               v-model="props.user.name"
               disabled
             />
           </div>
           <div class="flex gap-2 items-center">
-            <label for="email" class="mr-8"> Email: </label>
+            <label for="email" class="mr-8 label-custom"> Email: </label>
             <Field
               name="email"
               id="email"
               type="text"
-              class="w-9/12 bg-gray-300 border-none rounded-lg"
+              class="w-9/12 bg-[rgb(var(--color-primary))] border-none rounded-lg"
               v-model="props.user.email"
               disabled
             />

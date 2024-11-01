@@ -60,7 +60,7 @@ watchEffect(async () => {
   >
     <fwb-modal @close="manageStore.closeEdituserModal" :persistent="true">
       <template #header>
-        <div class="flex items-center text-lg">
+        <div class="flex items-center text-lg text-black">
           <i class="fa-solid fa-user-pen mr-2"></i>
           Cập nhật tài khoản
         </div>
@@ -68,7 +68,7 @@ watchEffect(async () => {
       <template #body>
         <div class="w-full">
           <div class="">
-            <label for="email" class="mr-8"> Email: </label>
+            <label for="email" class="mr-8 label-custom"> Email: </label>
             <Field
               name="email"
               id="email"
@@ -90,7 +90,9 @@ watchEffect(async () => {
             <ErrorMessage name="name" class="error" />
           </div>
           <div class="">
-            <label for="employeeId" class="mr-8"> Mã nhân viên: </label>
+            <label for="employeeId" class="mr-8 label-custom">
+              Mã nhân viên:
+            </label>
             <Field
               name="employeeId"
               id="employeeId"

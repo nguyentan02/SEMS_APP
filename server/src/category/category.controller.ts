@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { USER_TYPES } from '../global';
-import { CreateAttribyutesDto, CreateCategoryAttribyute, CreateCategoryDto, UpdateCategory, UpdateAttribyutesDto } from './dto';
+import {  CreateCategoryDto, UpdateCategory } from './dto';
 import { MyJWTGuard, RolesGuard } from '../auth/guard';
 import { Roles } from '../auth/decoractor';
 
@@ -26,12 +26,12 @@ export class CategoryController {
     createCategory(@Body() createCategoryDto: CreateCategoryDto) {
         return this.categoryService.createCategory(createCategoryDto)
     }
-    @Post('create-attribyute')
-    @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
-    createAttribyute(@Body() createAttribyuteDto: CreateAttribyutesDto) {
-        return this.categoryService.createAttribute(createAttribyuteDto)
-    }
+    // @Post('create-attribyute')
+    // @UseGuards(MyJWTGuard, RolesGuard)
+    // @Roles(USER_TYPES.ADMIN)
+    // createAttribyute(@Body() createAttribyuteDto: CreateAttribyutesDto) {
+    //     return this.categoryService.createAttribute(createAttribyuteDto)
+    // }
     // @Post('add-attribyute')
     // @UseGuards(MyJWTGuard, RolesGuard)
     // @Roles(USER_TYPES.ADMIN)
@@ -39,7 +39,7 @@ export class CategoryController {
     //     return this.categoryService.createCategoryAttribute(createCategoryAttDto)
     // }
 
-    @Patch('update-category/:id')
+    @Patch('update/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.ADMIN)
     updateCategory(
@@ -55,22 +55,22 @@ export class CategoryController {
     ) {
         return this.categoryService.deleteCategory(id)
     }
-    @Patch('update-attri/:id')
-    @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
-    updateAttribyute(
-        @Param('id', ParseIntPipe) id: number, @Body() updateAttribyuteDto: UpdateAttribyutesDto
-    ) {
-        return this.categoryService.updateAttribyute(id, updateAttribyuteDto)
-    }
-    @Delete('attribyute/:id')
-    @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
-    deleteAttri(
-        @Param('id', ParseIntPipe) id: number,
-    ) {
-        return this.categoryService.deleteAttribyute(id)
-    }
+    // @Patch('update-attri/:id')
+    // @UseGuards(MyJWTGuard, RolesGuard)
+    // @Roles(USER_TYPES.ADMIN)
+    // updateAttribyute(
+    //     @Param('id', ParseIntPipe) id: number, @Body() updateAttribyuteDto: UpdateAttribyutesDto
+    // ) {
+    //     return this.categoryService.updateAttribyute(id, updateAttribyuteDto)
+    // }
+    // @Delete('attribyute/:id')
+    // @UseGuards(MyJWTGuard, RolesGuard)
+    // @Roles(USER_TYPES.ADMIN)
+    // deleteAttri(
+    //     @Param('id', ParseIntPipe) id: number,
+    // ) {
+    //     return this.categoryService.deleteAttribyute(id)
+    // }
 
 }
 

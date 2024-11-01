@@ -1,32 +1,27 @@
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsString, MaxLength, MinLength } from "class-validator";
-import { CONSTANTS_MAX, CONSTANTS_MIN } from "src/global";
+import { IsString, IsNotEmpty, MaxLength, MinLength, ValidateNested, IsArray, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CONSTANTS_MAX, CONSTANTS_MIN } from 'src/global';
 
+export class CreateAttributeDto {
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(CONSTANTS_MAX.CATEGORY_LEN)
+    @MinLength(CONSTANTS_MIN.CATEGORY_LEN)
+    name: string;
+ 
+}
 
 export class CreateCategoryDto {
     @IsString()
     @IsNotEmpty()
     @MaxLength(CONSTANTS_MAX.CATEGORY_LEN)
     @MinLength(CONSTANTS_MIN.CATEGORY_LEN)
-    categoryName: string
-
-    @IsArray()
-    @ArrayNotEmpty()
-    @IsNumber({}, { each: true })
-    attribyuteId: number[];
-}
-export class CreateAttribyutesDto {
+    categoryName: string;
     @IsString()
-    @IsNotEmpty()
-    @MaxLength(CONSTANTS_MAX.CATEGORY_LEN)
-    @MinLength(CONSTANTS_MIN.CATEGORY_LEN)
-    name: string
-}
-export class CreateCategoryAttribyute {
-    @IsNumber()
-    @IsNotEmpty()
-    categoryId: number
-
-    @IsNumber()
-    @IsNotEmpty()
-    attributeId: number
+    @IsOptional()
+    description: string;
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CreateAttributeDto)
+    attributes: CreateAttributeDto[];
 }

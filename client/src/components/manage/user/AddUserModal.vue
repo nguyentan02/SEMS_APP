@@ -69,9 +69,15 @@ const addUser = async (user) => {
     @submit="addUser"
     :validation-schema="formSchemaUser"
   >
-    <fwb-modal @close="manageStore.closeAddUserModal" :persistent="true">
-      <template #header>
-        <div class="flex items-center text-lg">Thêm tài khoản</div>
+    <fwb-modal
+      @close="manageStore.closeAddUserModal"
+      :persistent="true"
+      class=""
+    >
+      <template #header class="">
+        <div class="flex items-center text-lg text-black">
+          <i class="fa-solid fa-user-plus mr-2"></i>Thêm tài khoản
+        </div>
       </template>
       <template #body>
         <div v-if="!userStore.isLoading" class="w-full">
@@ -136,13 +142,13 @@ const addUser = async (user) => {
       </template>
 
       <template #footer>
-        <div class="flex justify-between">
-          <fwb-button color="green"> I accept </fwb-button>
+        <div class="flex justify-end gap-2">
+          <fwb-button color="green">Thêm</fwb-button>
           <fwb-button
             @click="manageStore.closeAddUserModal"
             color="alternative"
           >
-            Decline
+            Huỷ
           </fwb-button>
         </div>
       </template>

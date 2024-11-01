@@ -1,7 +1,9 @@
 import { reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useAuthStore } from './auth.store'
 import categoryService from '@/services/category.service'
 export const useCategoryStore = defineStore('category', ()=>{
+    const authStore = useAuthStore()
     const err = ref(null)
     const result = ref(null)
     const isLoading = ref(false)
@@ -29,5 +31,50 @@ export const useCategoryStore = defineStore('category', ()=>{
             isLoading.value= false
         }
     }
-    return {err,result,isLoading,name,categorys,totalCount,totalPages,currentPage,getCategory}
+    const createCategory = async (data) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await categoryService.createCategory(authStore.token, data)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+          
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    const updateCategory = async (id,data) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            console.log(id);
+            let res = await categoryService.updateCategory(authStore.token,id, data)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    const deleteCategory = async (id) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            console.log(id);
+            let res = await categoryService.deleteCategory(authStore.token,id)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    return {err,result,isLoading,name,categorys,totalCount,totalPages,currentPage,getCategory,createCategory,updateCategory,deleteCategory}
 })

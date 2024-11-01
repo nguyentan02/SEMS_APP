@@ -19,7 +19,7 @@ class locationService {
         })).data
     }
     async updateDepartment(token,id,data) {
-        return (await this.api.post(`up-department/${id}`,data, {
+        return (await this.api.patch(`up-department/${id}`,data, {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",

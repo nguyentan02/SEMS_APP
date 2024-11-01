@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { LocationService } from './location.service';
 import { CreateDeparmentDto, CreateRoomDto, UpdateDeparmentDto, UpdateRoomDto } from './dto';
 import { USER_TYPES } from '../global';
@@ -24,7 +24,7 @@ export class LocationController {
         return this.locationService.createDeparment(createDeparmentDto)
     }
 
-    @Post('up-department/:id')
+    @Patch('up-department/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.ADMIN)
     updateDeparment(

@@ -69,8 +69,8 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <h1 class="text-2xl font-bold mb-10">Quản lý thành viên</h1>
-  <div class="flex items-center">
+  <h1 class="text-2xl font-bold my-10">Quản lý thành viên</h1>
+  <div class="flex items-center justify-between mb-5">
     <Seach
       :title="'Nhập tên'"
       @key="
@@ -84,7 +84,7 @@ onMounted(async () => {
       <select
         name=""
         id="isban"
-        class="rounded-xl p-1"
+        class="rounded-xl p-1 bg-[rgb(var(--color-primary))]"
         v-model="userStore.isBan"
       >
         <option value="null">Tất cả</option>
@@ -94,7 +94,12 @@ onMounted(async () => {
     </div>
     <div class="">
       <label for="role">Vai trò: </label>
-      <select name="" id="role" class="rounded-xl p-1" v-model="userStore.role">
+      <select
+        name=""
+        id="role"
+        class="rounded-xl p-1 bg-[rgb(var(--color-primary))]"
+        v-model="userStore.role"
+      >
         <option value="null">Tất cả</option>
         <option :value="1">Nhân viên quản lý</option>
         <option :value="2">Nhân viên kỹ thuật</option>
@@ -103,14 +108,16 @@ onMounted(async () => {
     </div>
     <div>
       <button
-        class="p-2 px-8 bg-blue-600 rounded-lg transition duration-300 ease-in-out hover:bg-blue-500"
+        class="p-2 px-8 bg-emerald-600 rounded-lg transition duration-300 ease-in-out hover:bg-emerald-400"
         @click="manageStore.showAddUserModal"
       >
         <i class="fa-solid fa-user-plus text-white"></i>
       </button>
     </div>
   </div>
-  <table class="table-auto w-full text-sm text-left">
+  <table
+    class="bg-[rgb(var(--color-primary))] table-auto w-full text-sm text-left rounded-md"
+  >
     <thead class="border-b border-black font-medium">
       <tr class="text-left">
         <th class="p-2">Thành viên</th>
@@ -126,9 +133,9 @@ onMounted(async () => {
         v-if="userStore.users?.length"
         v-for="(user, i) in userStore.users"
         :key="user.id"
-        class="border-b transition duration-300 ease-in-out hover:bg-gray-300"
+        class="border-b transition duration-300 ease-in-out hover:bg-[#bbb8b8]"
       >
-        <td class="flex items-center whitespace-nowrap">
+        <td class="flex items-center whitespace-nowrap ml-2 mt-[10px]">
           <div
             class="w-10 h-10 overflow-hidden flex items-center justify-center rounded-full mt-2"
           >
@@ -169,7 +176,7 @@ onMounted(async () => {
         </td>
         <td v-else class="whitespace-nowrap text-red-500 text-center">Khóa</td>
 
-        <td class="whitespace-nowrap flex gap-2 items-center justify-center">
+        <td class="whitespace-nowrap flex items-center justify-center">
           <button
             v-if="!user.isBan"
             class="p-2 text-red-600 hover:text-red-700 text-2xl"
@@ -223,7 +230,7 @@ onMounted(async () => {
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td colspan="7" class="h-screen">
+        <td colspan="7">
           <Loading />
         </td>
       </tr>

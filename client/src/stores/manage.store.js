@@ -59,6 +59,18 @@ export const useManageStore = defineStore("manage", () => {
   const closeEditLocationModal = () => {
     isShow.editLocation = false;
   };
+  const showAddCategoryModal = () => {
+    isShow.addCategory = true;
+  };
+  const closeAddCategoryModal = () => {
+    isShow.addCategory = false;
+  };
+  const showEditCategoryModal = () => {
+    isShow.editCategory = true;
+  };
+  const closeEditCategoryModal = () => {
+    isShow.editCategory = false;
+  };
   return {
     isShow,
     closeFeedbackModal,
@@ -74,6 +86,10 @@ export const useManageStore = defineStore("manage", () => {
     showAddLocationModal,
     closeAddLocationModal,
     showEditLocationModal,
-    closeEditLocationModal
+    closeEditLocationModal,
+    showAddCategoryModal,
+    closeAddCategoryModal,
+    showEditCategoryModal,
+    closeEditCategoryModal
   };
 });

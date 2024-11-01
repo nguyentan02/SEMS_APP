@@ -5,7 +5,6 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "../../stores/user.store";
 import { useToast } from "vue-toast-notification";
 import Loading from "../common/Loading.vue";
-const isShowModal = ref(false);
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -38,7 +37,7 @@ const submitImage = async () => {
     @close="userStore.closeUpdateAvatarModal"
   >
     <template #header>
-      <div class="flex items-center text-xl gap-2">
+      <div class="flex items-center text-black text-xl gap-2">
         <i class="fa-solid fa-camera"></i>
         Cập nhật ảnh đại diện
       </div>
@@ -53,7 +52,7 @@ const submitImage = async () => {
             class="cursor-pointer h-full w-full flex justify-center items-center"
           >
             <div v-if="url == null" class="flex flex-col items-center gap-2">
-              <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+              <i class="fa-solid fa-cloud-arrow-up text-black text-2xl"></i>
               Chọn hình ảnh
             </div>
             <img v-else :src="url" alt="" class="object-cover" />

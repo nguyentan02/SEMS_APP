@@ -15,7 +15,6 @@ const routes = [
             const userStore = useUserStore()
             userStore.getMe()
             if (!userStore.user?.id) next('login')
-            if (userStore.user?.role == 0) next('manage')
             else next()
         },
     },
@@ -38,7 +37,7 @@ const routes = [
         beforeEnter: async (to, from, next) => {
             const userStore = useUserStore()
             userStore.getMe()
-            if (userStore.user?.role != 0) next('home')
+            if (userStore.user?.role != 0) next('login')
             else next()
         },
         children: [
@@ -56,9 +55,15 @@ const routes = [
             },
             {
                 path: 'users',
-                name: 'user-manager',
+                name: 'user-manage',
         meta: { title: 'Quản lý thành viên' },
                 component: () => import('../components/manage/user/Usermanage.vue'),
+            },
+            {
+                path: 'dashboard',
+                name: 'dashboard-manage',
+        meta: { title: 'Thống kê' },
+                component: () => import('../components/manage/dashboardmanage/DashboardManage.vue'),
             },
             {
                 path: 'category',

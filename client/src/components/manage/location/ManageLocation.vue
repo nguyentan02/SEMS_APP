@@ -55,25 +55,29 @@ const deleteLocation = async (id) => {
         }
       "
     />
+    <fwb-button
+      color="default"
+      class="ml-2"
+      size="sm"
+      @click="
+        () => {
+          manageStore.showAddLocationModal();
+        }
+      "
+      >Thêm <i class="fa-solid fa-plus"></i
+    ></fwb-button>
   </div>
-  <fwb-button
-    color="default"
-    size="sm"
-    @click="
-      () => {
-        manageStore.showAddLocationModal();
-      }
-    "
-    >Thêm <i class="fa-solid fa-plus"></i
-  ></fwb-button>
-  <table class="table-auto border border-gray w-full mt-5">
-    <thead class="font-extralight">
+
+  <table
+    class="table-auto border-b border-black bg-[rgb(var(--color-primary))] w-full mt-5 rounded-md mx-auto"
+  >
+    <thead class="font-medium">
       <tr class="text-left border-b border-black">
         <th class="text-center pb-2 w-[10%]">STT</th>
-        <th class="pb-2">Khoa</th>
-        <th class="pb-2 text-center">Kí hiệu</th>
-        <th class="pb-2 text-center">Số lượng phòng</th>
-        <th class="text-center pb-2">Tùy chọn</th>
+        <th class="p-2">Khoa</th>
+        <th class="p-2 text-center">Kí hiệu</th>
+        <th class="p-2 text-center">Số lượng phòng</th>
+        <th class="text-center p-2">Tùy chọn</th>
       </tr>
     </thead>
     <tbody v-if="!locationStore.isLoading">
@@ -81,7 +85,7 @@ const deleteLocation = async (id) => {
         v-if="locationStore.locations?.length"
         v-for="(location, i) in locationStore.locations"
         :key="location.id"
-        class="border-b transition duration-300 ease-in-out hover:bg-gray-300"
+        class="border-b transition duration-300 ease-in-out hover:bg-[#bbb8b8]"
       >
         <td class="font-medium text-center w-[10%]">
           {{ (locationStore.currentPage - 1) * 10 + i + 1 }}
@@ -140,7 +144,7 @@ const deleteLocation = async (id) => {
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td colspan="7" class="h-screen">
+        <td colspan="7">
           <Loading />
         </td>
       </tr>
