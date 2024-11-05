@@ -10,13 +10,40 @@ const routes = [
         path: '/home',
         name: 'home',
         component: () => import('../views/HomeView.vue'),
-        meta: { title: 'Trang Chủ' },
+        meta: { title: 'Quản lý thiết bị' },
         beforeEnter: async (to, from, next) => {
             const userStore = useUserStore()
-            userStore.getMe()
-            if (!userStore.user?.id) next('login')
+            await  userStore.getMe()
+            if (userStore.user?.role !== 1) next('manage')
             else next()
         },
+        children: [
+            {
+                path: '/device',
+                name: 'device',
+                component: () => import('../components/manageDevice/device/DeviceManage.vue'),
+                meta: { title: 'Thông tin cá nhân' },
+                // beforeEnter: async (to, from, next) => {
+                //     const userStore = useUserStore()
+                //     await  userStore.getMe()
+                //     if (!userStore.user?.id) next('login')
+                //     else next()
+                // },
+            },
+            {
+                path: '/transfer',
+                name: 'transfer',
+                component: () => import('../components/manageDevice/transfer/test.vue'),
+                meta: { title: 'Thông tin cá nhân' },
+                // beforeEnter: async (to, from, next) => {
+                //     const userStore = useUserStore()
+                //     await  userStore.getMe()
+                //     if (!userStore.user?.id) next('login')
+                //     else next()
+                // },
+            },
+
+        ]
     },
     {
         path: '/login',
@@ -29,6 +56,7 @@ const routes = [
         // }
     }
     , 
+
     {
         path: '/manage',
         name: 'manage',
@@ -36,8 +64,8 @@ const routes = [
         meta: { title: 'Quản lý' },
         beforeEnter: async (to, from, next) => {
             const userStore = useUserStore()
-            userStore.getMe()
-            if (userStore.user?.role != 0) next('login')
+            await  userStore.getMe()
+            if (userStore.user?.role !== 0) next('login')
             else next()
         },
         children: [
@@ -46,12 +74,12 @@ const routes = [
                 name: 'profile',
                 component: () => import('../components/common/ProfileView.vue'),
                 meta: { title: 'Thông tin cá nhân' },
-                beforeEnter: async (to, from, next) => {
-                    const userStore = useUserStore()
-                    userStore.getMe()
-                    if (!userStore.user?.id) next('login')
-                    else next()
-                },
+                // beforeEnter: async (to, from, next) => {
+                //     const userStore = useUserStore()
+                //     await  userStore.getMe()
+                //     if (!userStore.user?.id) next('login')
+                //     else next()
+                // },
             },
             {
                 path: 'users',

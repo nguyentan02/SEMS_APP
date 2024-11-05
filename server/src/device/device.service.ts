@@ -1,9 +1,9 @@
-import { Injectable, Logger, Res } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, Res } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CreateDeviceDto, UpdateDeviceDto } from './dto';
 import { PAGE_SIZE, ResponseData } from '../global';
-import { Device } from '@prisma/client';
+import { Device, Prisma } from '@prisma/client';
 
 
 @Injectable()
@@ -36,7 +36,23 @@ export class DeviceService {
             const data = await this.prismaService.device.findMany({
                 where: where,
                 skip: next,
-                take: pageSize
+                take: pageSize,
+                include:{
+                    category:{
+                        select:{
+                            categoryName:true
+                        }
+                    },
+                    DeviceAttributeValues:{
+                        include:{
+                            AttribyutesCategory:{
+                                select:{
+                                    name:true
+                                }
+                            }
+                        }
+                    }
+                }
             })
             return new ResponseData<any>({ data, totalCount, totalPages }, 200, "Tìm các thiết bị thành công")
         } catch (error) {
@@ -54,9 +70,21 @@ export class DeviceService {
             if (!device) return new ResponseData<any>(null, 400, "Thiết bị không tồn tại")
             const data = await this.prismaService.device.findMany({
                 where: { id: id },
-                include: {
-                    category: true,
-                    room: true
+                include:{
+                    category:{
+                        select:{
+                            categoryName:true
+                        }
+                    },
+                    DeviceAttributeValues:{
+                        include:{
+                            AttribyutesCategory:{
+                                select:{
+                                    name:true
+                                }
+                            }
+                        }
+                    }
                 }
             })
             return new ResponseData<Device[]>(data, 200, "Tìm thấy thiết bị")
@@ -67,26 +95,65 @@ export class DeviceService {
     }
     async createDevice(createDeviceDto: CreateDeviceDto, imageDevice: Express.Multer.File) {
         try {
-
+            const {
+                name,
+                serialNumber,
+                manufacturer,
+                purchaseDate,
+                expirationDate,
+                price,
+                categoryId,
+                attributes 
+            } = createDeviceDto;
+            console.log(createDeviceDto);
+            console.log(imageDevice);
             const exist = await this.prismaService.device.findFirst({
                 where: {
                     serialNumber: createDeviceDto.serialNumber
                 }
             })
             if (exist) return new ResponseData<any>(null, 400, "Số serial thiết bị đã được sử dụng")
-            const img = await this.cloudinaryService.uploadFile(imageDevice)
+                const category = await this.prismaService.category.findUnique({
+                    where: { id: categoryId },
+                    include: { AttribyutesCategory: true },
+                });
+                if (!category) return new ResponseData<any>(null, 400, "Không tìm thấy danh mục")
+                    const attributeValues = [];
+                for (const attribute of attributes) {
+                    const attributeCategory = category.AttribyutesCategory.find(
+                        (attr) => attr.id === attribute.id
+                    );
+                    if (!attributeCategory) {
+                        throw new BadRequestException(`Invalid attribute ID: ${attribute.id}`);
+                    }
+                    attributeValues.push({
+                        attributeId: attribute.id,
+                        value: attribute.value,
+                    });
+                }
+              let imgUrl:any 
+            if(imageDevice){
+                const img = await this.cloudinaryService.uploadFile(imageDevice)
+                 imgUrl = img.url
+            }
             const device = await this.prismaService.device.create({
                 data: {
-                    name: createDeviceDto.name,
-                    serialNumber: createDeviceDto.serialNumber,
-                    manufacturer: createDeviceDto.manufacturer,
-                    purchaseDate: new Date(createDeviceDto.purchaseDate),
-                    expirationDate: new Date(createDeviceDto.expirationDate),
-                    price: createDeviceDto.price,
-                    image: img.url,
-                    categoryId: createDeviceDto.categoryId,
-                    // roomId: createDeviceDto.roomId
-                }
+                    name: name,
+                    serialNumber: serialNumber,
+                    manufacturer: manufacturer,
+                    purchaseDate: new Date(purchaseDate),
+                    expirationDate: new Date(expirationDate),
+                    price: new Prisma.Decimal(price),
+                    image: imgUrl,
+                    categoryId: categoryId,
+                    DeviceAttributeValues:{
+                        create:attributeValues.map((attr) =>({
+                            attributeId:attr.attributeId,
+                            value:attr.value     
+                        })),
+                    },
+                },
+                include: { DeviceAttributeValues: true },
             })
             return new ResponseData<any>(device, 200, "Thêm thiết bị thành công")
         } catch (error) {

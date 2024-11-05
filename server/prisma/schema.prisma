@@ -76,25 +76,26 @@ model Room {
 }
 
 model Device {
-  id                  Int                @id @default(autoincrement())
-  name                String
-  serialNumber        String
-  manufacturer        String
-  purchaseDate        DateTime
-  expirationDate      DateTime
-  price               Decimal
-  qrCode              String?
-  image               String
-  lastMaintenanceDate DateTime?
-  statusDevice        String             @default("INACTIVE")
-  categoryId          Int
-  roomId              Int?
-  isDelete            Boolean            @default(false)
-  room                Room?              @relation(fields: [roomId], references: [id])
-  category            Category           @relation(fields: [categoryId], references: [id])
-  UsageInformation    UsageInformation[]
-  RotationDevice      RotationDevice[]
-  maintenancePlan     maintenancePlan[]
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  serialNumber          String
+  manufacturer          String
+  purchaseDate          DateTime
+  expirationDate        DateTime
+  price                 Decimal
+  qrCode                String?
+  image                 String                  @default("https://res.cloudinary.com/dig0nsb6m/image/upload/v1704869331/hjv353yrt9hahuomkxey.png")
+  lastMaintenanceDate   DateTime?
+  statusDevice          String                  @default("INACTIVE")
+  categoryId            Int
+  roomId                Int?
+  isDelete              Boolean                 @default(false)
+  room                  Room?                   @relation(fields: [roomId], references: [id])
+  category              Category                @relation(fields: [categoryId], references: [id])
+  UsageInformation      UsageInformation[]
+  RotationDevice        RotationDevice[]
+  maintenancePlan       maintenancePlan[]
+  DeviceAttributeValues DeviceAttributeValues[]
 
   @@map("device")
 }
@@ -110,12 +111,24 @@ model Category {
 }
 
 model AttribyutesCategory {
-  id         Int      @id @default(autoincrement())
-  name       String
-  categoryId Int
-  Category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  categoryId            Int
+  Category              Category                @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  DeviceAttributeValues DeviceAttributeValues[]
 
   @@map("attribute_category")
+}
+
+model DeviceAttributeValues {
+  id                  Int                 @id @default(autoincrement())
+  deviceId            Int
+  attributeId         Int
+  value               String
+  Device              Device              @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  AttribyutesCategory AttribyutesCategory @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  @@map("device_attribute_values")
 }
 
 model UsageInformation {

@@ -108,8 +108,8 @@ onMounted(async () => {
                 currentCategory = category;
               }
             "
-            >Xem chi tiết</a
-          >
+            >Chi tiết
+          </a>
         </td>
         <!-- <td
           class="flex"
@@ -129,7 +129,7 @@ onMounted(async () => {
                 }
               "
             >
-              <i class="fa-solid fa-pen"></i>
+              <i class="fa-regular fa-pen-to-square"></i>
             </button>
             <button
               class="p-2 text-red-500 hover:text-red-400 text-2xl"
@@ -145,7 +145,7 @@ onMounted(async () => {
         </td>
       </tr>
       <tr v-else class="text-center text-red-500 text-xl">
-        <td colspan="4">Không có.</td>
+        <td colspan="7">Không có.</td>
       </tr>
     </tbody>
     <tbody v-else>

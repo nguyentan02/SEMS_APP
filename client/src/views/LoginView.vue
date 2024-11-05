@@ -31,12 +31,8 @@ const submitLogin = async () => {
     return;
   }
   $toast.success(authStore.result.message, { position: "top-right" });
-  userStore.getMe();
-  if (userStore.user?.role == 1) {
-    router.push({ name: "home" });
-  } else if (userStore.user?.role == 0) {
-    router.push({ name: "manage" });
-  }
+
+  router.push({ name: "home" });
 };
 </script>
 

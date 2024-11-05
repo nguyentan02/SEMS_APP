@@ -24,7 +24,7 @@ const valueRole =
     : "Không xác định";
 
 const isEditing = ref(false);
-const nameDefault = ref(userStore.user.name);
+const nameDefault = ref(userStore.user?.name);
 const nameInputRef = ref(null);
 const toggleEdit = (event) => {
   event.stopPropagation();
@@ -39,7 +39,6 @@ const handleClickOutside = (event) => {
   const inputElement = document.getElementById("name");
   if (!inputElement.contains(event.target)) {
     isEditing.value = false;
-    userStore.user.name;
   }
 };
 
@@ -50,17 +49,17 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
-const user = reactive({
+const data = reactive({
   name: userStore.user.name,
 });
 const updateProflie = async () => {
-  await userStore.updateProfile(user, route.params.id);
+  await userStore.updateProfile(data, route.params?.id);
   if (userStore.err) {
     $toast.error(userStore.err, { position: "top-right" });
     return;
   }
-  userStore.user.name = user.name;
   $toast.success(userStore.result.message, { position: "top-right" });
+  userStore.user.name = data.name;
 };
 </script>
 <style>
@@ -114,7 +113,7 @@ const updateProflie = async () => {
             class="w-[75%] input-form bg-[rgb(var(--color-primary))]"
             :class="{ input: isEditing }"
             id="name"
-            v-model="user.name"
+            v-model="data.name"
             :disabled="!isEditing"
           />
           <i
@@ -137,7 +136,7 @@ const updateProflie = async () => {
           <p class="w-1/2 input-form ml-2">
             <span>
               {{
-                dayjs(userStore.user?.createdAt).format(
+                dayjs(userStore.user.createdAt).format(
                   "DD, MMMM, YYYY HH:mm:ss"
                 )
               }}</span

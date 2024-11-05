@@ -60,14 +60,14 @@ const submitUpdatePassword = async () => {
       :persistent="true"
     >
       <template #header>
-        <div class="flex items-center text-xl gap-1">
+        <div class="flex items-center text-lg gap-1 text-black">
           <i class="fa-solid fa-key text-2xl"></i>
           Tạo mật khẩu mới
         </div>
       </template>
       <template #body>
         <div class="w-full" v-if="!userStore.isLoading">
-          <label for="currentPassword" class="text-lg mx-2"
+          <label for="currentPassword" class="text-lg mx-2 text-black"
             >Mật khẩu hiện tại:</label
           >
           <div class="mb-3">
@@ -81,7 +81,9 @@ const submitUpdatePassword = async () => {
             />
             <ErrorMessage name="currentPassword" class="error" />
           </div>
-          <label for="newPassword" class="text-lg mx-2">Mật khẩu mới:</label>
+          <label for="newPassword" class="text-lg mx-2 text-black"
+            >Mật khẩu mới:</label
+          >
           <div class="mb-3">
             <Field
               name="newPassword"
@@ -93,7 +95,7 @@ const submitUpdatePassword = async () => {
             />
             <ErrorMessage name="newPassword" class="error" />
           </div>
-          <label for="confirmPassword" class="text-lg mx-2"
+          <label for="confirmPassword" class="text-lg mx-2 text-black"
             >Xác nhận mật khẩu mới:</label
           >
           <div class="mb-3">

@@ -2,15 +2,17 @@
 import { Form, Field, ErrorMessage } from "vee-validate";
 import { ref, reactive, nextTick } from "vue";
 import * as yup from "yup";
-import { FwbButton, FwbModal } from "flowbite-vue";
+import { FwbButton, FwbModal, FlowbiteThemable } from "flowbite-vue";
 import { useManageStore } from "@/stores/manage.store";
 import { useToast } from "vue-toast-notification";
+
 import { useLocationStore } from "@/stores/location.store";
 import Loading from "../../common/Loading.vue";
 const manageStore = useManageStore();
 const locationStore = useLocationStore();
 const $toast = useToast();
 const rooms = ref([]);
+const theme = "blue";
 const data = reactive({
   deparmentName: "",
   symbol: "",
@@ -68,9 +70,13 @@ const removeRoom = (index) => {
     @submit="createDepartment"
     :validation-schema="formSchemaLocation"
   >
-    <fwb-modal @close="manageStore.closeAddLocationModal" :persistent="true">
+    <fwb-modal
+      :style="{ backgroundColor: '#ffffff' }"
+      @close="manageStore.closeAddLocationModal"
+      :persistent="true"
+    >
       <template #header>
-        <div class="flex items-center text-lg">Thêm khoa</div>
+        <div class="flex items-center text-lg text-black">Thêm khoa</div>
       </template>
       <template #body>
         <div v-if="!locationStore.isLoading" class="w-full">

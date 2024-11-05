@@ -106,7 +106,7 @@ const deleteLocation = async (id) => {
               }
             "
           >
-            <i class="fa-regular fa-eye"></i>
+            <i class="fa-regular fa-eye hover:text-zinc-500"></i>
           </button>
         </td>
         <!-- <td class="flex" v-for="(room, i) in location.rooms" :key="room.id">
@@ -123,7 +123,7 @@ const deleteLocation = async (id) => {
                 }
               "
             >
-              <i class="fa-solid fa-pen"></i>
+              <i class="fa-regular fa-pen-to-square"></i>
             </button>
             <button
               class="p-2 text-red-500 hover:text-red-400 text-2xl"

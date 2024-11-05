@@ -88,7 +88,9 @@ watchEffect(() => {
   >
     <fwb-modal @close="manageStore.closeEditLocationModal" :persistent="true">
       <template #header>
-        <div class="flex items-center text-lg">Cập nhật phòng ban</div>
+        <div class="flex items-center text-lg text-black">
+          Cập nhật phòng ban
+        </div>
       </template>
       <template #body>
         <div v-if="!locationStore.isLoading" class="w-full">
@@ -148,7 +150,7 @@ watchEffect(() => {
               :id="'room-' + room.id"
               :name="'room-' + index"
               v-model="room.name"
-              class="w-auto input-form my-1"
+              class="w-auto input-form my-1 text-black"
               placeholder="Tên phòng"
             />
             <button

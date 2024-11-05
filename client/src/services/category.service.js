@@ -18,6 +18,15 @@ class categoryService {
             }
         })).data
     }
+    async getCategoryById(token,id) {
+        return (await this.api.get(`/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
     async updateCategory(token,id,data) {
         console.log(id);
         return (await this.api.patch(`/update/${id}`,data, {

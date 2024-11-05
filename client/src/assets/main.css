@@ -14,7 +14,7 @@ body {
 
 body {
     font-family: 'Poppins', sans-serif;
-    @apply bg-slate-900 text-white
+    @apply text-white
 }
 
 .no-scrollbar::-webkit-scrollbar {

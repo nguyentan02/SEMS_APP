@@ -16,7 +16,7 @@ export class CategoryController {
 
     @Get('/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.ADMIN,USER_TYPES.USER)
     getCategoryById(@Param('id', ParseIntPipe) id: number) {
         return this.categoryService.getCategoryById(id)
     }

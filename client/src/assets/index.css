@@ -16,8 +16,10 @@
     @apply text-red-600 text-sm
 }
 .background-manage{
+    @apply bg-gray-100 text-black
     
 }
+
 @layer base{
     :root{
         --color-primary: 61 61 78;
@@ -33,7 +35,10 @@
 .input-form {
     @apply border-none outline-none
 }
-
+.text-li{
+    @apply text-base font-semibold
+    
+}
 @-webkit-keyframes tracking-in-expand {
     0% {
         letter-spacing: -0.5em;

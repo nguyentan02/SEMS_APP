@@ -14,13 +14,13 @@ const props = defineProps(["location"]);
     @close="manageStore.closeDetailModal"
   >
     <template #header>
-      <div class="flex items-center text-xl gap-2">
+      <div class="flex items-center text-lg gap-2 text-black">
         Danh sách phòng của khoa {{ props.location.symbol }}
       </div>
     </template>
     <template #body>
       <div class="w-full max-h-60 overflow-y-scroll">
-        <table class="table-fixed w-full">
+        <table class="table-fixed w-full text-black">
           <thead class="border-b border-black font-medium">
             <tr class="text-left">
               <th class="px-2 py-2 text-center border border-black w-[20%]">

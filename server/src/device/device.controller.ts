@@ -11,7 +11,7 @@ export class DeviceController {
     constructor(private deviceService: DeviceService) { }
     @Get()
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     getAllDevice(
         @Query() option: { page: number, name: string, categoryId: number }
     ) {
@@ -20,7 +20,7 @@ export class DeviceController {
 
     @Get('/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     getDeviceById(
         @Param('id', ParseIntPipe) id: number
     ) {
@@ -29,7 +29,7 @@ export class DeviceController {
 
     @Post('create')
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER,USER_TYPES.ADMIN)
     @UseInterceptors(FileInterceptor('imageDevice'))
     createDevice(
         @Body() createDeviceDto: CreateDeviceDto, @UploadedFile() imageDevice: Express.Multer.File

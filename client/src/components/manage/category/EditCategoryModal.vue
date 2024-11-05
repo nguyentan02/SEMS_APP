@@ -84,7 +84,9 @@ watchEffect(() => {
   >
     <fwb-modal @close="manageStore.closeEditCategoryModal" :persistent="true">
       <template #header>
-        <div class="flex items-center text-lg">Cập nhật danh mục</div>
+        <div class="flex items-center text-lg text-black">
+          Cập nhật danh mục
+        </div>
       </template>
       <template #body>
         <div v-if="!categoryStore.isLoading" class="w-full">
@@ -100,6 +102,7 @@ watchEffect(() => {
           <ErrorMessage name="categoryName" class="error" />
           <fwb-textarea
             v-model="data.description"
+            class="text-black"
             label="Mô tả"
             minlength="10"
             placeholder="Viết mô tả danh mục."
@@ -121,7 +124,7 @@ watchEffect(() => {
               :id="'room-' + attribyute.id"
               :name="'room-' + index"
               v-model="attribyute.name"
-              class="w-auto input-form my-1"
+              class="w-auto input-form my-1 text-black"
               placeholder="Thuộc tính "
             />
             <button
@@ -145,12 +148,12 @@ watchEffect(() => {
 
       <template #footer>
         <div class="flex justify-between">
-          <fwb-button color="green"> I accept </fwb-button>
+          <fwb-button color="green">Cập nhật </fwb-button>
           <fwb-button
             @click="manageStore.closeEditCategoryModal"
             color="alternative"
           >
-            Decline
+            Huỷ
           </fwb-button>
         </div>
       </template>
