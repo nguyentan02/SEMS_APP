@@ -25,7 +25,6 @@ class userService {
     }
     async getAllUser(token,option) {
         const final = createQueryString(option)
-        console.log(final);
         return (await this.api.get(`/${final}`, {
             headers: {
                 "Content-Type": "application/json",

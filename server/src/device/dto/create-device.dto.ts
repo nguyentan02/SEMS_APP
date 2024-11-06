@@ -41,11 +41,11 @@ export class CreateDeviceDto {
     // @IsDateString()
     // @IsOptional()
     // lastMaintenanceDate?: Date;
-
     @IsNumber()
     @IsNotEmpty()
     categoryId: number;
     @IsArray()
+    @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => DeviceAttributeValueDto)
     attributes: DeviceAttributeValueDto[];

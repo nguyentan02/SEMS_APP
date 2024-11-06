@@ -114,12 +114,15 @@ export class DeviceService {
             })
             if (exist) return new ResponseData<any>(null, 400, "Số serial thiết bị đã được sử dụng")
                 const category = await this.prismaService.category.findUnique({
-                    where: { id: categoryId },
+                    where: { id: Number(categoryId) },
                     include: { AttribyutesCategory: true },
                 });
                 if (!category) return new ResponseData<any>(null, 400, "Không tìm thấy danh mục")
                     const attributeValues = [];
-                for (const attribute of attributes) {
+                if(!attributes){
+                    return new ResponseData<any>(null,400,"Thuộc tính không được bỏ trống !")
+                }else
+                    {for (const attribute of attributes) {
                     const attributeCategory = category.AttribyutesCategory.find(
                         (attr) => attr.id === attribute.id
                     );
@@ -130,7 +133,8 @@ export class DeviceService {
                         attributeId: attribute.id,
                         value: attribute.value,
                     });
-                }
+                }}
+                
               let imgUrl:any 
             if(imageDevice){
                 const img = await this.cloudinaryService.uploadFile(imageDevice)

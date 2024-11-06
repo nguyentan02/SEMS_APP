@@ -7,7 +7,7 @@
 
 <script setup>
 import JsBarcode from "jsbarcode";
-import { nextTick, ref } from "vue";
+import { nextTick, ref, onMounted } from "vue";
 
 const dataObject = ref({
   name: "Thiết bị A",

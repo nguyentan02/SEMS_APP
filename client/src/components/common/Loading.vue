@@ -9,7 +9,7 @@
   height: 50px;
   border-radius: 50%;
   border: 8px solid;
-  border-color: #fbfbff #0000;
+  border-color: #3eca14 #ddd6d600;
   animation: s1 3s infinite;
 }
 

@@ -22,7 +22,7 @@ export const useDeviceStore = defineStore('device', ()=>{
         isShow.qrModal= false
     }
     const getDevices = async(option)=>{
-        const authStore = useAuthStore()
+ 
         err.value = null
         result.value = null
         isLoading.value = true
@@ -48,7 +48,6 @@ export const useDeviceStore = defineStore('device', ()=>{
             let res = await deviceService.createService(authStore.token, data)
             if (res.statusCode !== 200) throw new Error(res.message)
             result.value = res
-            console.log(result.value);
         } catch (error) {
             err.value = error.message
         } finally {

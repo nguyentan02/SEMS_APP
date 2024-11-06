@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from "vue";
-import { FwbButton, FwbModal } from "flowbite-vue";
+import { FwbButton, FwbModal, FwbTooltip } from "flowbite-vue";
 import { useManageDeviceStore } from "@/stores/manageDevice.store";
 import { useDeviceStore } from "@/stores/device.store";
 import { useToast } from "vue-toast-notification";
@@ -27,17 +27,20 @@ const formSchemaUser = yup.object().shape({
   name: yup
     .string()
     .required("Tên phải có giá trị.")
-    .min(8, "Tên phải ít nhất 8 ký tự.")
+    .min(4, "Tên phải ít nhất 8 ký tự.")
     .max(50, "Tên có nhiều nhất 50 ký tự."),
-  serialNumber: yup.string().required("Email không được bỏ trống"),
-  manufacturer: yup
-    .string()
-    .required("MSSV phải có giá trị.")
-    .max(10, "MSSV tối đa 10 ký tự."),
-  purchaseDate: yup.string().required("Mật khẩu phải có giá trị."),
-  expirationDate: yup.date().required("Mật khẩu phải có giá trị."),
-  price: yup.number().required("Mật khẩu phải có giá trị."),
-  categoryId: yup.number().required("Chọn danh mục"),
+  serialNumber: yup.string().required("Số serial không được bỏ trống"),
+  manufacturer: yup.string().required("Nhà sản xuất không được bỏ trống."),
+  purchaseDate: yup.string().required("Vui lòng chọn ngày."),
+  expirationDate: yup.date().required("Vui lòng chọn ngày."),
+  price: yup.number().required("Không phải có giá trị."),
+  categoryId: yup.string().required("Chọn danh mục"),
+  attributes: yup.array().of(
+    yup.object().shape({
+      id: yup.string().required(),
+      value: yup.string().required("Không được bỏ trống."),
+    })
+  ),
 });
 
 const url = ref(null);
@@ -55,21 +58,30 @@ const createDevice = async () => {
   data.append("manufacturer", device.manufacturer);
   data.append("purchaseDate", device.purchaseDate);
   data.append("expirationDate", device.expirationDate);
+  data.append("categoryId", device.categoryId);
   data.append("price", device.price);
   device.attributes.map((attribute, index) => {
     data.append(`attributes[${index}][id]`, attribute.id);
     data.append(`attributes[${index}][value]`, attribute.value);
   });
-  // for (const [key, value] of data.entries()) {
-  //   console.log(`${key}: ${value}`);
-  // }
+  for (const [key, value] of data.entries()) {
+    console.log(`${key}: ${value}`);
+  }
   await deviceStore.createDevice(data);
   if (deviceStore.err) {
     $toast.error(deviceStore.err, { position: "top-right" });
     return;
   }
   $toast.success(deviceStore.result.message, { position: "top-right" });
-
+  await deviceStore.getDevices({ name: "", page: 1 });
+  device.name = "";
+  device.serialNumber = "";
+  device.manufacturer = "";
+  device.purchaseDate = "";
+  device.expirationDate = "";
+  device.price = "";
+  device.categoryId = "";
+  device.attributes = [];
   selectedFile.value = null;
   url.value = null;
   manageDeviceStore.closeAddDeviceModal();
@@ -102,6 +114,7 @@ watch(
       @close="manageDeviceStore.closeAddDeviceModal"
       :persistent="true"
       class=""
+      size="5xl"
     >
       <template #header class="">
         <div class="flex items-center text-lg text-black">
@@ -110,125 +123,194 @@ watch(
       </template>
       <template #body>
         <div v-if="!deviceStore.isLoading" class="w-full">
-          <label for="name" class="label-custom">Thiết bị:</label>
-          <Field
-            type="text"
-            name="name"
-            id="name"
-            class="input-custom w-auto"
-            v-model="device.name"
-          >
-          </Field>
-          <ErrorMessage name="name" class="error" />
-          <label for="serialNumber" class="label-custom">Số serial:</label>
-          <Field
-            type="text"
-            name="serialNumber"
-            id="serialNumber"
-            class="input-custom w-auto"
-            v-model="device.serialNumber"
-          >
-          </Field>
-          <ErrorMessage name="serialNumber" class="error" />
-          <label for="manufacturer" class="label-custom">Nhà sản xuất:</label>
-          <Field
-            type="text"
-            name="manufacturer"
-            id="manufacturer"
-            class="input-custom w-auto"
-            v-model="device.manufacturer"
-          >
-          </Field>
-          <ErrorMessage name="manufacturer" class="error" />
-          <label for="purchaseDate" class="label-custom">Ngày mua:</label>
-          <Field
-            type="date"
-            name="purchaseDate"
-            id="purchaseDate"
-            class="input-custom w-auto"
-            v-model="device.purchaseDate"
-          >
-          </Field>
-          <ErrorMessage name="purchaseDate" class="error" />
-          <label for="expirationDate" class="label-custom">Ngày hết hạn:</label>
-          <Field
-            type="date"
-            name="expirationDate"
-            id="expirationDate"
-            class="input-custom w-auto"
-            v-model="device.expirationDate"
-          >
-          </Field>
-          <ErrorMessage name="expirationDate" class="error" />
-          <label for="price" class="label-custom">Giá:</label>
-          <Field
-            type="number"
-            name="price"
-            id="price"
-            class="input-custom w-auto"
-            v-model="device.price"
-          >
-          </Field>
-          <ErrorMessage name="price" class="error" />
-          <div
-            class="h-36 w-36 border border-gray-400 rounded-sm overflow-hidden"
-          >
-            <label
-              for="user_avt"
-              class="cursor-pointer h-full w-full flex justify-center items-center"
-            >
-              <div v-if="url == null" class="flex flex-col items-center gap-2">
-                <img src="/image.png" alt="" class="object-cover" />
+          <div>
+            <div class="flex justify-between items-center mb-5">
+              <div class="w-full">
+                <label for="name" class="label-custom">Thiết bị:</label>
+                <Field
+                  type="text"
+                  name="name"
+                  id="name"
+                  class="input-device w-auto"
+                  placeholder="Nhập tên thiết bị"
+                  v-model="device.name"
+                >
+                </Field>
+                <ErrorMessage name="name" class="error" />
               </div>
-              <img v-else :src="url" alt="" class="object-cover" />
-            </label>
-          </div>
-          <input
-            type="file"
-            hidden
-            id="user_avt"
-            accept="image/png, image/jpeg"
-            @change="onFileSelected"
-          />
-          <label for="categoryId" class="label-custom">Loại thiết bị:</label>
-          <Field
-            as="select"
-            name="categoryId"
-            id="categoryId"
-            class="input-custom"
-            v-model="device.categoryId"
-          >
-            <option value="">Chọn trường / khoa</option>
-            <option
-              v-if="categoryStore.categorys?.length"
-              v-for="category in categoryStore.categorys"
-              :key="category.id"
-              :value="category.id"
-            >
-              {{ category.categoryName }}
-            </option>
-          </Field>
+              <div
+                class="w-[90px] h-[90px] overflow-hidden rounded-sm float-right group"
+              >
+                <label
+                  for="imageDevice"
+                  class="cursor-pointer h-full w-full flex justify-center items-center relative"
+                >
+                  <div
+                    v-if="url == null"
+                    class="flex flex-col items-center gap-2"
+                  >
+                    <img src="/image.png" alt="" class="object-cover" />
+                  </div>
+                  <img
+                    v-else
+                    :src="url"
+                    alt=""
+                    class="object-cover border border-gray-400"
+                  />
+                  <div
+                    class="absolute hidden group-hover:block bg-white rounded-full right-1 bottom-2"
+                  >
+                    <input
+                      type="file"
+                      hidden
+                      id="imageDevice"
+                      accept="image/png, image/jpeg"
+                      @change="onFileSelected"
+                    />
+                    <fwb-tooltip placement="bottom">
+                      <template #trigger>
+                        <i class="fa-regular fa-pen-to-square"></i>
+                      </template>
+                      <template #content> Chỉnh sửa</template>
+                    </fwb-tooltip>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <span class="font-semibold">Thông tin chung:</span>
+            <div class="flex justify-between">
+              <div class="grid grid-cols-1 w-1/2">
+                <div class="flex items-center mb-4">
+                  <label for="serialNumber" class="label-custom mr-10"
+                    >Số serial:</label
+                  >
+                  <div class="w-[70%]">
+                    <Field
+                      type="text"
+                      name="serialNumber"
+                      id="serialNumber"
+                      class="input-device w-auto"
+                      v-model="device.serialNumber"
+                    >
+                    </Field>
+                    <ErrorMessage name="serialNumber" class="error" />
+                  </div>
+                </div>
 
-          <ErrorMessage name="categoryId" class="error" />
-          <div v-if="categoryStore.category?.length" class="mt-4">
-            <h3>Các thuộc tính:</h3>
-            <div
-              v-for="(attribute, index) in categoryStore.category"
-              :key="attribute.id"
-              class="mb-4"
-            >
-              <label :for="`attribute-${attribute.id}`" class="label-custom">
-                {{ attribute.name }}:
-              </label>
-              <Field
-                v-if="device.attributes[index]"
-                v-model="device.attributes[index].value"
-                :id="`attribute-${attribute.id}`"
-                :name="`attribute-${attribute.name}`"
-                class="input-custom"
-                :placeholder="`Nhập giá trị cho ${attribute.name}`"
-              />
-              <ErrorMessage :name="`attribute-${attribute.id}`" class="error" />
+                <div class="flex items-center mb-4">
+                  <label for="manufacturer" class="label-custom mr-2"
+                    >Nhà sản xuất:</label
+                  >
+                  <div class="w-[70%]">
+                    <Field
+                      type="text"
+                      name="manufacturer"
+                      id="manufacturer"
+                      class="input-device w-auto"
+                      v-model="device.manufacturer"
+                    >
+                    </Field>
+                    <ErrorMessage name="manufacturer" class="error" />
+                  </div>
+                </div>
+                <div class="flex items-center mb-4">
+                  <label for="purchaseDate" class="label-custom mr-6"
+                    >Ngày mua:</label
+                  >
+                  <div class="w-[70%]">
+                    <Field
+                      type="date"
+                      name="purchaseDate"
+                      id="purchaseDate"
+                      class="input-device w-auto"
+                      v-model="device.purchaseDate"
+                    >
+                    </Field>
+                    <ErrorMessage name="purchaseDate" class="error" />
+                  </div>
+                </div>
+                <div class="flex items-center mb-4">
+                  <label for="expirationDate" class="label-custom mr-6"
+                    >Ngày mua:</label
+                  >
+                  <div class="w-[70%]">
+                    <Field
+                      type="date"
+                      name="expirationDate"
+                      id="expirationDate"
+                      class="input-device w-auto"
+                      v-model="device.expirationDate"
+                    >
+                    </Field>
+                    <ErrorMessage name="expirationDate" class="error" />
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <label for="price" class="label-custom mr-20">Giá:</label>
+                  <div>
+                    <Field
+                      type="number"
+                      name="price"
+                      id="price"
+                      class="input-device w-auto"
+                      v-model="device.price"
+                    >
+                    </Field>
+                    <ErrorMessage name="price" class="error" />
+                  </div>
+                </div>
+              </div>
+              <div class="w-1/2">
+                <label for="categoryId" class="label-custom"
+                  >Loại thiết bị:</label
+                >
+                <Field
+                  as="select"
+                  name="categoryId"
+                  id="categoryId"
+                  class="input-custom"
+                  v-model="device.categoryId"
+                >
+                  <option value="">Loại thiết bị</option>
+                  <option
+                    v-if="categoryStore.categorys?.length"
+                    v-for="category in categoryStore.categorys"
+                    :key="category.id"
+                    :value="category.id"
+                  >
+                    {{ category.categoryName }}
+                  </option>
+                </Field>
+
+                <ErrorMessage name="categoryId" class="error" />
+                <div v-if="categoryStore.category?.length" class="mt-4">
+                  <h3>Thuộc tính:</h3>
+                  <div
+                    v-for="(attribute, index) in categoryStore.category"
+                    :key="attribute.id"
+                    class="mb-4"
+                  >
+                    <label
+                      :for="`attribute-${attribute.id}`"
+                      class="label-custom"
+                    >
+                      {{ attribute.name }}:
+                    </label>
+                    <Field
+                      v-if="device.attributes[index]"
+                      v-model="device.attributes[index].value"
+                      :id="`attribute-${attribute.id}`"
+                      :name="`attribute-${attribute.name}`"
+                      class="input-device"
+                      :placeholder="`Nhập giá trị cho ${attribute.name}`"
+                    />
+                    <ErrorMessage
+                      :name="`attributes.${index}.value`"
+                      class="error"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -237,7 +319,7 @@ watch(
         </div>
       </template>
       <template #footer>
-        <div class="flex gap-2">
+        <div class="flex gap-2 justify-end">
           <fwb-button color="green">Thêm</fwb-button>
           <fwb-button
             @click="manageDeviceStore.closeAddDeviceModal"
