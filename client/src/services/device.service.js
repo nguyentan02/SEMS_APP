@@ -27,6 +27,25 @@ class deviceService{
             }
         })).data
     }
+    async createServices(token, data) {
+        return (await this.api.postForm('/devices', data, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
+    async updateDevice(token,id,data) {
+  
+        return (await this.api.patchForm(`/update/${id}`, data, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
     async getDeviceById(token,id) {
         return (await this.api.get(`/${id}`, {
             headers: {

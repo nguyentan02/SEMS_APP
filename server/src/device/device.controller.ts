@@ -36,9 +36,18 @@ export class DeviceController {
     ) {
         return this.deviceService.createDevice(createDeviceDto, imageDevice)
     }
+    @Post('devices')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER,USER_TYPES.ADMIN)
+    @UseInterceptors(FileInterceptor('file'))
+    createDevices(
+      @UploadedFile() file: Express.Multer.File
+    ) {
+        return this.deviceService.createDevices(file)
+    }
     @Patch('update/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     @UseInterceptors(FileInterceptor('imageDevice'))
     updateDevice(
         @Param('id', ParseIntPipe) id: number,

@@ -1,5 +1,14 @@
-import { IsDate, IsDateString, IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { IsArray, IsDate, IsDateString, IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
+class DeviceAttributeValueDto {
+    @IsNumber()
+    @IsNotEmpty()
+    id: number;
 
+    @IsString()
+    @IsOptional()
+    value?: string;
+}
 export class UpdateDeviceDto {
     @IsString()
     @IsOptional()
@@ -32,12 +41,12 @@ export class UpdateDeviceDto {
     // @IsDateString()
     // @IsOptional()
     // lastMaintenanceDate?: Date;
-
     @IsNumber()
-    @IsOptional()
+    @IsNotEmpty()
     categoryId: number;
-
-    // @IsNumber()
-    // @IsNotEmpty()
-    // roomId: number;
+    @IsArray()
+    @IsOptional()
+    @ValidateNested({ each: true })
+    @Type(() => DeviceAttributeValueDto)
+    attributes?: DeviceAttributeValueDto[];
 }

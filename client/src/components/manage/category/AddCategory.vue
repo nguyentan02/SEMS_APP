@@ -22,7 +22,6 @@ const formSchemaLocation = yup.object().shape({
   categoryName: yup
     .string()
     .required("Tên phải có giá trị.")
-    .min(4, "Tên phải ít nhất 6 ký tự.")
     .max(50, "Tên có nhiều nhất 50 ký tự."),
 });
 const getRoomNames = () => {
@@ -75,8 +74,7 @@ const removeRoom = (index) => {
   >
     <fwb-modal @close="manageStore.closeAddCategoryModal" :persistent="true">
       <template #header>
-        <div class="flex items-center text-lg">
-          Thêm danh mục</div>
+        <div class="flex items-center text-lg">Thêm danh mục</div>
       </template>
       <template #body>
         <div v-if="!categoryStore.isLoading" class="w-full">
@@ -113,7 +111,7 @@ const removeRoom = (index) => {
               :id="'room-' + attribyute.id"
               :name="'room-' + index"
               v-model="attribyute.name"
-              class="w-auto input-form my-1"
+              class="w-auto input-form my-1 text-black"
               placeholder="Thuộc tính "
             />
             <button

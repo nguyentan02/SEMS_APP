@@ -14,8 +14,15 @@ import { useCategoryStore } from "@/stores/category.store";
 import * as yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
 import Loading from "../../common/Loading.vue";
+import { useRoute } from "vue-router";
 import dayjs from "dayjs";
-const props = defineProps(["device"]);
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+// const props = defineProps(["device"]);
+const props = defineProps({
+  id: String,
+});
 const device = reactive({
   name: "",
   serialNumber: "",
@@ -26,31 +33,6 @@ const device = reactive({
   categoryId: "",
   attributes: [],
 });
-
-const manageDeviceStore = useManageDeviceStore();
-const deviceStore = useDeviceStore();
-const categoryStore = useCategoryStore();
-const $toast = useToast();
-const formSchemaUser = yup.object().shape({
-  name: yup
-    .string()
-    .required("Tên phải có giá trị.")
-    .min(4, "Tên phải ít nhất 8 ký tự.")
-    .max(50, "Tên có nhiều nhất 50 ký tự."),
-  serialNumber: yup.string().required("Số serial không được bỏ trống"),
-  manufacturer: yup.string().required("Nhà sản xuất không được bỏ trống."),
-  purchaseDate: yup.string().required("Vui lòng chọn ngày."),
-  expirationDate: yup.date().required("Vui lòng chọn ngày."),
-  price: yup.number().required("Không phải có giá trị."),
-  categoryId: yup.string().required("Chọn danh mục"),
-  attributes: yup.array().of(
-    yup.object().shape({
-      id: yup.string().required(),
-      value: yup.string().required("Không được bỏ trống."),
-    })
-  ),
-});
-
 const url = ref(null);
 const selectedFile = ref(null);
 const onFileSelected = (e) => {
@@ -58,7 +40,68 @@ const onFileSelected = (e) => {
   url.value = URL.createObjectURL(selectedFile.value);
 };
 
-const createDevice = async () => {
+const manageDeviceStore = useManageDeviceStore();
+const deviceStore = useDeviceStore();
+const categoryStore = useCategoryStore();
+const $toast = useToast();
+
+const deviceEdit = ref(null);
+const route = useRoute();
+const deviceId = route.params.id;
+const emit = defineEmits(["currentPage"]);
+onMounted(async () => {
+  emit("currentPage");
+  await categoryStore.getCategory({});
+  await deviceStore.getDeviceById(deviceId);
+  deviceEdit.value = deviceStore.device[0];
+});
+let previousCategoryId = null;
+watch(deviceEdit, async (newDeviceEdit) => {
+  if (newDeviceEdit) {
+    device.name = newDeviceEdit.name;
+    device.serialNumber = newDeviceEdit.serialNumber;
+    device.manufacturer = newDeviceEdit.manufacturer;
+    url.value = newDeviceEdit.image;
+    device.purchaseDate = dayjs(newDeviceEdit.purchaseDate).format(
+      "YYYY-MM-DD"
+    );
+    device.expirationDate = dayjs(newDeviceEdit.expirationDate).format(
+      "YYYY-MM-DD"
+    );
+    device.price = newDeviceEdit.price;
+    device.categoryId = newDeviceEdit.categoryId;
+    previousCategoryId = newDeviceEdit.categoryId;
+
+    device.attributes = newDeviceEdit.DeviceAttributeValues.map((attr) => ({
+      id: attr.attributeId,
+      name: attr.AttribyutesCategory.name,
+      value: attr.value,
+    }));
+  }
+});
+const attributesCache = ref({});
+watch(
+  () => device.categoryId,
+  async (newCategoryId) => {
+    if (previousCategoryId) {
+      attributesCache.value[previousCategoryId] = device.attributes;
+    }
+    if (newCategoryId && newCategoryId !== previousCategoryId) {
+      if (attributesCache.value[newCategoryId]) {
+        device.attributes = attributesCache.value[newCategoryId];
+      } else {
+        await categoryStore.getCategoryById(newCategoryId);
+        device.attributes = categoryStore.category.map((attr) => ({
+          id: attr.id,
+          name: attr.name,
+          value: "",
+        }));
+      }
+      previousCategoryId = newCategoryId;
+    }
+  }
+);
+const updateDevice = async () => {
   const data = new FormData();
   data.append("name", device.name);
   data.append("serialNumber", device.serialNumber);
@@ -75,101 +118,58 @@ const createDevice = async () => {
   for (const [key, value] of data.entries()) {
     console.log(`${key}: ${value}`);
   }
-  await deviceStore.createDevice(data);
+  await deviceStore.updateDevice(route.params?.id, data);
   if (deviceStore.err) {
     $toast.error(deviceStore.err, { position: "top-right" });
     return;
   }
   $toast.success(deviceStore.result.message, { position: "top-right" });
   await deviceStore.getDevices({ name: "", page: 1 });
-  device.name = "";
-  device.serialNumber = "";
-  device.manufacturer = "";
-  device.purchaseDate = "";
-  device.expirationDate = "";
-  device.price = "";
-  device.categoryId = "";
-  device.attributes = [];
-  selectedFile.value = null;
-  url.value = null;
-  manageDeviceStore.closeAddDeviceModal();
+  // device.name = "";
+  // device.serialNumber = "";
+  // device.manufacturer = "";
+  // device.purchaseDate = "";
+  // device.expirationDate = "";
+  // device.price = "";
+  // device.categoryId = "";
+  // device.attributes = [];
+  // selectedFile.value = null;
+  // url.value = null;
 };
-onMounted(async () => {
-  await categoryStore.getCategory({});
-});
-// Computed properties to handle date formatting
-const formattedPurchaseDate = computed({
-  get() {
-    return device.purchaseDate
-      ? dayjs(device.purchaseDate).format("YYYY-MM-DD") // format for <input type="date">
-      : "";
-  },
-  set(value) {
-    device.purchaseDate = value;
-  },
-});
-
-const formattedExpirationDate = computed({
-  get() {
-    return device.expirationDate
-      ? dayjs(device.expirationDate).format("YYYY-MM-DD") // format for <input type="date">
-      : "";
-  },
-  set(value) {
-    device.expirationDate = value;
-  },
-});
-watchEffect(async () => {
-  if (props.device) {
-    device.name = props.device?.name;
-
-    device.manufacturer = props.device?.manufacturer;
-    device.serialNumber = props.device?.serialNumber;
-    device.purchaseDate = props.device?.purchaseDate || "";
-    device.expirationDate = props.device?.expirationDate || "";
-    device.price = props.device?.price;
-    url.value = props.device?.image;
-    device.categoryId = props.device?.categoryId;
-  }
-});
-watch(
-  () => device.categoryId,
-  async (newCategoryId) => {
-    if (newCategoryId) {
-      await categoryStore.getCategoryById(newCategoryId);
-      device.attributes = categoryStore.category.map((attr) => ({
-        id: attr.id,
-        value: "",
-      })); // Khởi tạo các thuộc tính rỗng
-    } else {
-      device.attributes = [];
-    }
-  }
-);
 </script>
 <template>
-  <div>
+  <div class="flex items-center justify-between mb-5">
     <fwb-breadcrumb>
       <fwb-breadcrumb-item
         home
         href="#"
-        @click="manageDeviceStore.closeEditDeviceModal"
+        @click="
+          () => {
+            router.back();
+          }
+        "
       >
         Trở về
       </fwb-breadcrumb-item>
-      <fwb-breadcrumb-item> {{ device.name }} </fwb-breadcrumb-item>
+      <fwb-breadcrumb-item> {{ deviceEdit?.name }} </fwb-breadcrumb-item>
     </fwb-breadcrumb>
+    <fwb-button
+      color="green"
+      size="sm"
+      @click="
+        () => {
+          router.back();
+          manageDeviceStore.showAddDeviceModal();
+        }
+      "
+      >Thêm thiết bị <i class="fa-solid fa-plus"></i
+    ></fwb-button>
   </div>
-  <div class="border border-gray-200 p-5">
-    <Form
-      v-if="manageDeviceStore.isShow.editDevice"
-      @submit="createDevice"
-      :validation-schema="formSchemaUser"
-    >
+  <div class="border border-gray-200 p-5 relative">
+    <Form @submit="updateDevice">
       <div class="flex items-center text-lg text-[#25861e]">
         <i class="fa-solid fa-circle-info mr-2"></i>Thông tin thiết bị
       </div>
-
       <div v-if="!deviceStore.isLoading" class="w-full">
         <div>
           <div class="flex justify-between items-center mb-5">
@@ -179,7 +179,7 @@ watch(
                 type="text"
                 name="name"
                 id="name"
-                class="input-device w-auto"
+                class="w-auto input-edit"
                 placeholder="Nhập tên thiết bị"
                 v-model="device.name"
               >
@@ -237,7 +237,7 @@ watch(
                     type="text"
                     name="serialNumber"
                     id="serialNumber"
-                    class="input-device w-auto"
+                    class="w-auto input-edit"
                     v-model="device.serialNumber"
                   >
                   </Field>
@@ -254,7 +254,7 @@ watch(
                     type="text"
                     name="manufacturer"
                     id="manufacturer"
-                    class="input-device w-auto"
+                    class="w-auto input-edit"
                     v-model="device.manufacturer"
                   >
                   </Field>
@@ -270,8 +270,8 @@ watch(
                     type="date"
                     name="purchaseDate"
                     id="purchaseDate"
-                    class="input-device w-auto"
-                    v-model="formattedPurchaseDate"
+                    class="w-auto input-edit"
+                    v-model="device.purchaseDate"
                   >
                   </Field>
                   <ErrorMessage name="purchaseDate" class="error" />
@@ -286,8 +286,8 @@ watch(
                     type="date"
                     name="expirationDate"
                     id="expirationDate"
-                    class="input-device w-auto"
-                    v-model="formattedExpirationDate"
+                    class="w-auto input-edit"
+                    v-model="device.expirationDate"
                   >
                   </Field>
                   <ErrorMessage name="expirationDate" class="error" />
@@ -300,7 +300,7 @@ watch(
                     type="number"
                     name="price"
                     id="price"
-                    class="input-device w-auto"
+                    class="w-auto input-edit"
                     v-model="device.price"
                   >
                   </Field>
@@ -331,10 +331,10 @@ watch(
               </Field>
 
               <ErrorMessage name="categoryId" class="error" />
-              <div v-if="categoryStore.category?.length" class="mt-4">
+              <div v-if="device.attributes" class="mt-4">
                 <h3>Thuộc tính:</h3>
                 <div
-                  v-for="(attribute, index) in categoryStore.category"
+                  v-for="(attribute, index) in device.attributes"
                   :key="attribute.id"
                   class="mb-4"
                 >
@@ -349,7 +349,7 @@ watch(
                     v-model="device.attributes[index].value"
                     :id="`attribute-${attribute.id}`"
                     :name="`attribute-${attribute.name}`"
-                    class="input-device"
+                    class="input-edit p-2"
                     :placeholder="`Nhập giá trị cho ${attribute.name}`"
                   />
                   <ErrorMessage
@@ -362,7 +362,7 @@ watch(
           </div>
         </div>
       </div>
-      <div v-else>
+      <div v-else class="absolute right-1/2">
         <Loading />
       </div>
 
@@ -370,12 +370,6 @@ watch(
         <fwb-button color="green"
           ><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Cập nhật</fwb-button
         >
-        <fwb-button
-          @click="manageDeviceStore.closeEditDeviceModal"
-          color="alternative"
-        >
-          Trở về
-        </fwb-button>
       </div>
     </Form>
   </div>

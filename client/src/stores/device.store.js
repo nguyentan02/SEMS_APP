@@ -8,6 +8,7 @@ export const useDeviceStore = defineStore('device', ()=>{
     const result = ref(null)
     const isLoading = ref(false)
     const devices = ref(null)
+    const device = ref(null)
     const totalPages = ref(1)
     const currentPage = ref(1)
     const totalCount = ref(0)
@@ -54,12 +55,55 @@ export const useDeviceStore = defineStore('device', ()=>{
             isLoading.value = false
         }
     }
-    // const createRoom = async (data) => {
+    const createDevices = async (data) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await deviceService.createServices(authStore.token, data)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    const getDeviceById = async (id) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await deviceService.getDeviceById(authStore.token, id)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res.data
+        device.value = res.data
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    const updateDevice = async (id,data) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await deviceService.updateDevice(authStore.token, id,data)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    // const deleteDepartment = async (id) => {
     //     err.value = null
     //     result.value = null
     //     isLoading.value = true
     //     try {
-    //         let res = await locationService.createRoom(authStore.token, data)
+    //         let res = await locationService.deleteDepartment(authStore.token, id)
     //         if (res.statusCode !== 200) throw new Error(res.message)
     //         result.value = res
     //     } catch (error) {
@@ -68,33 +112,5 @@ export const useDeviceStore = defineStore('device', ()=>{
     //         isLoading.value = false
     //     }
     // }
-    const updateDepartment = async (data,id) => {
-        err.value = null
-        result.value = null
-        isLoading.value = true
-        try {
-            let res = await locationService.updateDepartment(authStore.token, id,data)
-            if (res.statusCode !== 200) throw new Error(res.message)
-            result.value = res
-        } catch (error) {
-            err.value = error.message
-        } finally {
-            isLoading.value = false
-        }
-    }
-    const deleteDepartment = async (id) => {
-        err.value = null
-        result.value = null
-        isLoading.value = true
-        try {
-            let res = await locationService.deleteDepartment(authStore.token, id)
-            if (res.statusCode !== 200) throw new Error(res.message)
-            result.value = res
-        } catch (error) {
-            err.value = error.message
-        } finally {
-            isLoading.value = false
-        }
-    }
-    return {err,result,isLoading,name,devices,totalCount,totalPages,currentPage,getDevices,showQrCodeModal,closeQrCodeModal,isShow,createDevice}
+    return {err,result,isLoading,name,devices,device,totalCount,totalPages,currentPage,createDevices,getDevices,showQrCodeModal,closeQrCodeModal,isShow,createDevice,getDeviceById,updateDevice}
 })

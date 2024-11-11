@@ -27,13 +27,14 @@ const formSchemaLocation = yup.object().shape({
 });
 const getRoomNames = () => {
   return attributesName.value
-    .map((attribute) => ({ name: attribute.name }))
+    .map((attribute) => ({ id: attribute.id, name: attribute.name }))
     .filter((attribute) => attribute.name && attribute.name.trim() !== "");
 };
 const updateCategory = async () => {
   data.attributes = getRoomNames();
-  console.log(props.category.id);
+
   await categoryStore.updateCategory(props.category?.id, data);
+
   if (categoryStore.err) {
     $toast.error(categoryStore.err, { position: "top-right" });
     return;
@@ -52,7 +53,7 @@ const addRoom = async () => {
     return;
   }
 
-  attributesName.value.push({ id: Date.now(), name: "", inputRef: null });
+  attributesName.value.push({ id: null, name: "", inputRef: null });
   await nextTick();
 
   const newInputRef = attributesName.value[attributesName.value.length - 1];

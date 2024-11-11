@@ -8,6 +8,9 @@
 .input-device {
     @apply w-9/12 h-[24px] block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent
 }
+.input-edit {
+    @apply w-9/12  block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent
+}
 .label-custom {
     @apply block mb-2 font-medium text-gray-800
 }
@@ -22,7 +25,12 @@
     @apply bg-gray-100 text-black
     
 }
-
+.active-filter{
+    @apply rotate-180
+}
+.smiling_face{
+    @apply w-[120px] h-[140px] bg-transparent bg-no-repeat bg-center
+}
 @layer base{
     :root{
         --color-primary: 61 61 78;

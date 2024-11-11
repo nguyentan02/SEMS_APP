@@ -9,7 +9,7 @@ class DeviceAttributeValueDto {
     @IsOptional() 
     value?: string;
 }
-export class CreateDeviceDto {
+export class CreateDevicesDto {
     @IsString()
     @IsNotEmpty()
     name: string
@@ -43,8 +43,7 @@ export class CreateDeviceDto {
     // lastMaintenanceDate?: Date;
     @IsNumber()
     @IsNotEmpty()
-    categoryId: number;
-
+    categoryName: string;
     @IsArray()
     @IsOptional()
     @ValidateNested({ each: true })

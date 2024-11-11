@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '../stores/user.store'
-
+import { useAuthStore } from '@/stores/auth.store'
 const routes = [
     {
         path: '/',
@@ -22,25 +22,43 @@ const routes = [
                 path: '/device',
                 name: 'device',
                 component: () => import('../components/manageDevice/device/DeviceManage.vue'),
-                meta: { title: 'Thông tin cá nhân' },
-                // beforeEnter: async (to, from, next) => {
-                //     const userStore = useUserStore()
-                //     await  userStore.getMe()
-                //     if (!userStore.user?.id) next('login')
-                //     else next()
-                // },
+                meta: { title: 'Danh sách thiết bị' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/device/:id',
+                name: 'detailDeivce',
+                component: () => import('../components/manageDevice/device/EditDevice.vue'),
+                props: true,
+                meta: { title: 'Thông tin device' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/device/import',
+                name: 'import',
+                component: () => import('../components/manageDevice/device/AddExcelDevice.vue'),
+                props: true,
+                meta: { title: 'Nhập một tệp' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
             },
             {
                 path: '/transfer',
                 name: 'transfer',
                 component: () => import('../components/manageDevice/transfer/test.vue'),
                 meta: { title: 'Thông tin cá nhân' },
-                // beforeEnter: async (to, from, next) => {
-                //     const userStore = useUserStore()
-                //     await  userStore.getMe()
-                //     if (!userStore.user?.id) next('login')
-                //     else next()
-                // },
+         
             },
 
         ]

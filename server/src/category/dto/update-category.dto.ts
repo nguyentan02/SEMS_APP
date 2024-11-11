@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, MaxLength, MinLength, ValidateNested, IsArray, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, MinLength, ValidateNested, IsArray, IsOptional, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CONSTANTS_MAX, CONSTANTS_MIN } from 'src/global';
 
@@ -8,6 +8,9 @@ export class UpdateAttributeDto {
     @MaxLength(CONSTANTS_MAX.CATEGORY_LEN)
     @MinLength(CONSTANTS_MIN.CATEGORY_LEN)
     name: string;
+@IsNumber()
+@IsOptional()
+    id:number
 }
 
 export class UpdateCategory {

@@ -19,11 +19,15 @@ const deleteCategory = async (id) => {
   const conFirm = confirm("Bạn có chắc chắn muốn xóa?");
   if (conFirm) {
     await categoryStore.deleteCategory(id);
-    if (categoryStore.err) {
+    if (categoryStore.err && categoryStore.code === 400) {
       $toast.error(categoryStore.err, { position: "top-right" });
       return;
+    } else if (categoryStore.err && categoryStore.code === 404) {
+      $toast.warning(categoryStore.err, { position: "top-right" });
+      return;
+    } else {
+      $toast.success(categoryStore.result.message, { position: "top-right" });
     }
-    $toast.success(categoryStore.result.message, { position: "top-right" });
     await categoryStore.getCategory({
       name: categoryStore.name,
       page: categoryStore.currentPage,

@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="w-full h-full flex justify-center items-center">
     <div class="custom-loader"></div>
   </div>
@@ -18,4 +18,11 @@
     transform: rotate(0.5turn);
   }
 }
-</style>
+</style> -->
+<template>
+  <fwb-spinner size="10" color="green" />
+</template>
+
+<script setup>
+import { FwbSpinner } from "flowbite-vue";
+</script>

@@ -2,6 +2,7 @@ import { reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth.store'
 import categoryService from '@/services/category.service'
+import { CustomError } from '@/untils/statuscode';
 export const useCategoryStore = defineStore('category', ()=>{
     const authStore = useAuthStore()
     const err = ref(null)
@@ -12,6 +13,7 @@ export const useCategoryStore = defineStore('category', ()=>{
     const currentPage = ref(1)
     const totalCount = ref(0)
     const name = ref('')
+    const code = ref(null)
 const category =ref(null)
     const getCategory = async(option)=>{
         err.value = null
@@ -83,16 +85,20 @@ const category =ref(null)
         err.value = null
         result.value = null
         isLoading.value = true
+        code.value  = null
         try {
             console.log(id);
             let res = await categoryService.deleteCategory(authStore.token,id)
-            if (res.statusCode !== 200) throw new Error(res.message)
+            if (res.statusCode !== 200) throw new CustomError(res.statusCode,res.message)
             result.value = res
+            console.log(result.value);
         } catch (error) {
             err.value = error.message
+            code.value= error.statusCode
+            console.log(code.value);
         } finally {
             isLoading.value = false
         }
     }
-    return {err,result,isLoading,name,category,categorys,totalCount,totalPages,currentPage,getCategory,getCategoryById,createCategory,updateCategory,deleteCategory}
+    return {err,result,code,isLoading,name,category,categorys,totalCount,totalPages,currentPage,getCategory,getCategoryById,createCategory,updateCategory,deleteCategory}
 })

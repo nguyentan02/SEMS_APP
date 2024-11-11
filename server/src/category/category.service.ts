@@ -104,56 +104,91 @@ export class CategoryService {
         }
     }
     async updateCategory(id: number, updateCategoryDto: UpdateCategory) {
-        const { categoryName,description, attributes } = updateCategoryDto;
+        const { categoryName, description, attributes } = updateCategoryDto;
         try {
+            console.log(attributes);
             const category = await this.prismaService.category.findUnique({
-                where: {
-                    id: id
-                }
-            })
-            if (!category) return new ResponseData<any>(null, 400, "Danh mục không tồn tại")
-                if (categoryName) {
-                    const duplicateCategory = await this.prismaService.category.findFirst({
-                        where: { categoryName, NOT: { id: id } },
-                    });
-                    if (duplicateCategory) {
-                        return new ResponseData<any>(null, 400, "Tên danh mục đã tồn tại")
-                    }
-                }
-                const updatedCategory = await this.prismaService.category.update({
-                    where: { id: id },
-                    data: { categoryName,description },
+                where: { id: id },
+            });
+            if (!category) return new ResponseData<any>(null, 400, "Danh mục không tồn tại");
+    
+            if (categoryName) {
+                const duplicateCategory = await this.prismaService.category.findFirst({
+                    where: { categoryName, NOT: { id: id } },
                 });
-                if (attributes && attributes.length > 0) {
-
-                    await this.prismaService.attribyutesCategory.deleteMany({
-                        where: { categoryId: id },
-                    }) 
-                    for (const attribute of attributes) {
-                        await this.prismaService.attribyutesCategory.create({
+                if (duplicateCategory) {
+                    return new ResponseData<any>(null, 400, "Tên danh mục đã tồn tại");
+                }
+            }
+            const updatedCategory = await this.prismaService.category.update({
+                where: { id: id },
+                data: { categoryName, description },
+            });
+    
+            if (attributes) {
+                const existingAttributes = await this.prismaService.attribyutesCategory.findMany({
+                    where: { categoryId: id },
+                });
+                console.log(existingAttributes);
+                const existingAttributeIds = existingAttributes.map(attr => attr.id);
+    
+                const attributesToDelete = existingAttributes.filter(
+                    attr => !attributes.some(newAttr => newAttr.id === attr.id)
+                );
+                await this.prismaService.attribyutesCategory.deleteMany({
+                    where: { id: { in: attributesToDelete.map(attr => attr.id) } },
+                });
+    
+                for (const attribute of attributes) {
+                    if (attribute.id && existingAttributeIds.includes(attribute.id)) {
+                        await this.prismaService.attribyutesCategory.update({
+                            where: { id: attribute.id },
+                            data: { name: attribute.name ?? existingAttributes.find(attr => attr.id === attribute.id)?.name },
+                        });
+                    } else if (attribute.id === null) {
+                        const newAttribute = await this.prismaService.attribyutesCategory.create({
                             data: { name: attribute.name, categoryId: id },
                         });
+    
+                        const devices = await this.prismaService.device.findMany({
+                            where: { categoryId: id },
+                        });
+    
+                        for (const device of devices) {
+                            await this.prismaService.deviceAttributeValues.create({
+                                data: {
+                                    deviceId: device.id,
+                                    attributeId: newAttribute.id,
+                                    value: "", 
+                                },
+                            });
+                        }
                     }
-                } else {
-                    await this.prismaService.attribyutesCategory.deleteMany({
-                        where: { categoryId: id },
-                    });
                 }
-       
-            return new ResponseData<any>(updatedCategory, 200, "Cập nhật thành công")
+            }
+    
+            return new ResponseData<any>(updatedCategory, 200, "Cập nhật thành công và đồng bộ hóa thiết bị");
         } catch (error) {
-            this.logger.error(error.message)
-            return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
+            this.logger.error(error.message);
+            return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau');
         }
     }
+    
+    
     async deleteCategory(id: number) {
         try {
             const category = await this.prismaService.category.findFirst({
                 where: {
                     id: id
+                },
+                include:{
+                    devices:true
                 }
             })
             if (!category) return new ResponseData<any>(null, 400, "Danh mục không tồn tại")
+                if(category.devices.length > 0 )
+                    return new ResponseData<any>(null,404,"Tồn tại thiết bị không thế xoá danh mục")
+
             await this.prismaService.category.delete({
                 where: {
                     id: id
@@ -161,7 +196,7 @@ export class CategoryService {
             })
             return new ResponseData<any>(null, 200, "Xoá thành công")
         } catch (error) {
-            this.logger.error(error.message)
+        
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
