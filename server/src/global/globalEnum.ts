@@ -16,7 +16,7 @@ export enum CONSTANTS_MAX {
 
 export enum CONSTANTS_MIN {
     PASSWORD_LEN = 6,
-    NAME_LEN = 10,
+    NAME_LEN = 6,
     DEPARMENT_LEN = 3,
     CATEGORY_LEN = 2
 

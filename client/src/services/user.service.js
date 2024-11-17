@@ -88,6 +88,16 @@ class userService {
             }
         })).data
     }
+    async verifyCode(data) {
+        return (await this.api.post('/send-verify-code', data)).data
+    }
+    async forgotPassword(data) {
+        return (await this.api.patch('/forgot-password', data)).data
+    }
+    // async checkCode(data) {
+    //     console.log(data);
+    //     return (await this.api.post('/check-code', data)).data
+    // }
 }
 
 export default new userService()

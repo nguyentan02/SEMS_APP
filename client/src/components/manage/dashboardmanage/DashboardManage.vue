@@ -1,18 +1,75 @@
 <template>
   <div class="card flex justify-content-center">
-    <Button label="Submit" />
-  </div>
-  <div class="card flex justify-content-center text-black">
-    <InputText type="text" v-model="value" />
+    <Toast />
+    <div class="flex flex-wrap gap-2">
+      <Button label="Success" severity="success" @click="showSuccess" />
+      <Button label="Info" severity="info" @click="showInfo" />
+      <Button label="Warn" severity="warning" @click="showWarn" />
+      <Button label="Error" severity="danger" @click="showError" />
+      <Button label="Secondary" severity="secondary" @click="showSecondary" />
+      <Button label="Contrast" severity="contrast" @click="showContrast" />
+    </div>
   </div>
 </template>
+
 <script setup>
+import { useToast } from "primevue/usetoast";
+
+import Toast from "primevue/toast";
+
 import Button from "primevue/button";
+const toast = useToast();
 
-import InputText from "primevue/inputtext";
+const showSuccess = () => {
+  toast.add({
+    severity: "success",
+    detail: "Message Content",
+    life: 3000,
+  });
+};
 
-import Slider from "primevue/slider";
-import { ref } from "vue";
+const showInfo = () => {
+  toast.add({
+    severity: "info",
+    summary: "Info Message",
+    detail: "Message Content",
+    life: 3000,
+  });
+};
 
-const value = ref(null);
+const showWarn = () => {
+  toast.add({
+    severity: "warn",
+    summary: "Warn Message",
+    detail: "Message Content",
+    life: 3000,
+  });
+};
+
+const showError = () => {
+  toast.add({
+    severity: "error",
+    summary: "Error Message",
+    detail: "Message Content",
+    life: 3000,
+  });
+};
+
+const showSecondary = () => {
+  toast.add({
+    severity: "secondary",
+    summary: "Secondary Message",
+    detail: "Message Content",
+    life: 3000,
+  });
+};
+
+const showContrast = () => {
+  toast.add({
+    severity: "contrast",
+    summary: "Contrast Message",
+    detail: "Message Content",
+    life: 3000,
+  });
+};
 </script>

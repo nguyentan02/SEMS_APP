@@ -144,7 +144,7 @@ const deleteLocation = async (id) => {
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td colspan="7">
+        <td class="absolute right-[40%]">
           <Loading />
         </td>
       </tr>

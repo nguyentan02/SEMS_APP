@@ -5,7 +5,9 @@ import * as yup from "yup";
 import { useToast } from "vue-toast-notification";
 import { useUserStore } from "../stores/user.store";
 import { useRouter } from "vue-router";
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
+import ForgotPassword from "@/components/common/ForgotPassword.vue";
+
 const userStore = useUserStore();
 const authStore = useAuthStore();
 const router = useRouter();
@@ -14,6 +16,7 @@ const user = reactive({
   email: "",
   password: "",
 });
+
 const formSchemaLogin = yup.object().shape({
   email: yup
     .string()
@@ -21,8 +24,8 @@ const formSchemaLogin = yup.object().shape({
     .email("Email không đúng định dạng"),
   password: yup
     .string()
-    .required("Mật khẩu phải có giá trị.")
-    .min(6, "Tên phải ít nhất 6 ký tự."),
+    .required("Mật khẩu không được bỏ trống.")
+    .min(6, "Mật khẩu phải ít nhất 6 ký tự."),
 });
 const submitLogin = async () => {
   await authStore.login(user);
@@ -30,9 +33,8 @@ const submitLogin = async () => {
     $toast.error(authStore.err, { position: "top-right" });
     return;
   }
-  $toast.success(authStore.result.message, { position: "top-right" });
-
-  router.push({ name: "home" });
+  $toast.success("Đăng nhập thành công!", { position: "top-right" });
+  router.push({ name: "test" });
 };
 </script>
 
@@ -42,7 +44,7 @@ const submitLogin = async () => {
       class="h-full flex flex-col lg:flex-row items-center justify-center gap-6 xl:w-4/5 bg-white shadow-xl"
     >
       <div
-        class="w-full h-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-white"
+        class="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-white"
       >
         <img
           class="w-3/6 md:w-40 lg:w-full mt-4"
@@ -59,8 +61,8 @@ const submitLogin = async () => {
       <div
         class="w-full h-full lg:w-9/12 flex flex-col justify-center p-8 bg-[#ebf0f1]"
       >
-        <h2 class="text-4xl font-bold mb-5">Đăng nhập</h2>
-        <p class="mb-6">
+        <h2 class="text-4xl font-bold mb-5 text-black">Đăng nhập</h2>
+        <p class="mb-6 text-black">
           Chào mừng trở lại! Xin vui lòng nhập email và mật khẩu.
         </p>
         <Form
@@ -94,6 +96,19 @@ const submitLogin = async () => {
             />
             <ErrorMessage name="password" class="error" />
           </div>
+          <div
+            @click="
+              () => {
+                userStore.showForgotPassword();
+              }
+            "
+          >
+            <p
+              class="text-indigo-900 mr-[12rem] underline underline-offset-1 hover:text-indigo-700 cursor-pointer"
+            >
+              Quên mật khẩu ?
+            </p>
+          </div>
           <button
             type="submit"
             class="btn-login bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
@@ -104,4 +119,6 @@ const submitLogin = async () => {
       </div>
     </div>
   </section>
+
+  <ForgotPassword />
 </template>

@@ -12,7 +12,7 @@ export class UsageController {
     constructor(private usageService: UsageService) { }
     @Get()
     @UseGuards(MyJWTGuard, JwtStrategy)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     getAllUsage(
         @Query() option: { page: number, nameDevice: string, startDate: string, endDate: string, departmentId: number, roomId: number }
     ) {
@@ -20,7 +20,7 @@ export class UsageController {
     }
     @Get('/:id')
     @UseGuards(MyJWTGuard, JwtStrategy)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     getUsageById(
         @Param('id', ParseIntPipe) id: number
     ) {
@@ -28,7 +28,7 @@ export class UsageController {
     }
     @Post('create')
     @UseGuards(MyJWTGuard, JwtStrategy)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     createUsage(
         @Body() createUsageDto: CreateUsageDto
     ) {
@@ -36,7 +36,7 @@ export class UsageController {
     }
     @Patch('update/:id')
     @UseGuards(MyJWTGuard, JwtStrategy)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     updateUsage(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateUsageDto: UpdateUsageDto
@@ -46,7 +46,7 @@ export class UsageController {
 
     @Delete('/:id')
     @UseGuards(MyJWTGuard, JwtStrategy)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     deleteUsage(
         @Param('id', ParseIntPipe) id: number
     ) {

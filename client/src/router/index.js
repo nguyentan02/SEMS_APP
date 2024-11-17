@@ -6,10 +6,16 @@ const routes = [
         path: '/',
         redirect: '/home',
     },
+ {   path: '/home-tesst',
+    name: 'home-test',
+    component: () => import('../views/HomeView.vue'),
+    meta: { title: 'Quản lý thiết bị' },
+    
+},
     {
         path: '/home',
         name: 'home',
-        component: () => import('../views/HomeView.vue'),
+        component: () => import('../views/Hometesst.vue'),
         meta: { title: 'Quản lý thiết bị' },
         beforeEnter: async (to, from, next) => {
             const userStore = useUserStore()
@@ -30,11 +36,46 @@ const routes = [
                 },
             },
             {
+                path: '/test',
+                name: 'test',
+                component: () => import('../components/manageDevice/device/Test.vue'),
+                meta: { title: 'Danh sách thiết bị' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/profile/:id',
+                name: 'home-profile',
+                component: () => import('../components/common/ProfileView.vue'),
+                meta: { title: 'Thông tin cá nhân' },
+                // beforeEnter: async (to, from, next) => {
+                //     const userStore = useUserStore()
+                //     await  userStore.getMe()
+                //     if (!userStore.user?.id) next('login')
+                //     else next()
+                // },
+            },
+            {
                 path: '/device/:id',
                 name: 'detailDeivce',
                 component: () => import('../components/manageDevice/device/EditDevice.vue'),
                 props: true,
-                meta: { title: 'Thông tin device' },
+                meta: { title: 'Thông tin thiết bị' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/usage/',
+                name: 'usageDevice',
+                component: () => import('../components/manageDevice/usage/ManageUsage.vue'),
+                props: true,
+                meta: { title: 'Quản lí sử dụng' },
                 beforeEnter: async (to, from, next) => {
                     const authStore = useAuthStore()
                     if (authStore.token === null)  next('login')
@@ -72,6 +113,16 @@ const routes = [
         //     const userStore = useUserStore()
         //     if ()
         // }
+    },
+    {
+        path: '/forgotpassword',
+        name: 'forgotpassword',
+        component: () => import('../components/common/ForgotPassword.vue'),
+        meta: { title: 'Quên mật khẩu' },
+        // beforeEnter: (to, from, next) => {
+        //     const userStore = useUserStore()
+        //     if ()
+        // }
     }
     , 
 
@@ -89,8 +140,8 @@ const routes = [
         children: [
             {
                 path: '/profile/:id',
-                name: 'profile',
-                component: () => import('../components/common/ProfileView.vue'),
+                name: 'manage-profile',
+                component: () => import('../components/common/ProfileViewAdmin.vue'),
                 meta: { title: 'Thông tin cá nhân' },
                 // beforeEnter: async (to, from, next) => {
                 //     const userStore = useUserStore()

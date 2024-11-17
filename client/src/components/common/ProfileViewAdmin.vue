@@ -70,8 +70,8 @@ const updateProflie = async () => {
 }
 </style>
 <template>
-  <h1 class="text-2xl font-bold mb-10 text-[#25861e]">Thông tin cá nhân</h1>
-  <div class="w-full lg:w-[80%] mx-auto background-manage">
+  <h1 class="text-2xl font-bold mb-10 text-[#f9faf8]">Thông tin cá nhân</h1>
+  <div class="w-full p-1 lg:w-[80%] mx-auto">
     <div class="rounded p-4 shadow">
       <div class="flex flex-col">
         <div
@@ -79,12 +79,12 @@ const updateProflie = async () => {
           @click="userStore.showUpdateAvatarModal"
         >
           <img
-            class="w-32 h-32 border-2 rounded-full object-cover hover:border-sky-300 cursor-pointer"
+            class="w-32 h-32 border-2 rounded-full object-cover hover:border-indigo-700 cursor-pointer"
             :src="userStore.user.user_avt"
             alt="logo"
           />
           <div
-            class="hidden md:flex absolute bottom-4 mb-2 mr-6 rounded-full h-6 w-6 justify-center items-center text-lg hover:bg-blue-500 cursor-pointer"
+            class="hidden md:flex absolute bottom-4 mb-2 mr-6 bg-black rounded-full h-6 w-6 justify-center items-center text-lg hover:bg-indigo-700 cursor-pointer"
           >
             <i class="fa-solid fa-camera"></i>
           </div>
@@ -94,7 +94,7 @@ const updateProflie = async () => {
             {{ userStore.user.name }}
           </h1>
         </div>
-        <div class="mb-5">
+        <div class="my-5">
           <fwb-button
             color="alternative"
             @click="userStore.showUpdatePasswordModal"
@@ -113,7 +113,7 @@ const updateProflie = async () => {
           <label class="w-[100px] label" for="name">Họ và tên:</label>
           <input
             ref="nameInputRef"
-            class="w-[75%] input-form"
+            class="w-[75%] input-form bg-[rgb(var(--color-primary))]"
             :class="{ input: isEditing }"
             id="name"
             v-model="data.name"

@@ -23,11 +23,17 @@ export const useUserStore = defineStore('user', () => {
     const isShow = reactive({
         updatePassword: false,
         updateAvatar: false,
+        forgotPassword:false,
+        resetPassword:false
     })
     const closeUpdateAvatarModal = () => { isShow.updateAvatar = false }
     const showUpdateAvatarModal = () => { isShow.updateAvatar = true }
     const closeUpdatePasswordModal = () => { isShow.updatePassword = false }
     const showUpdatePasswordModal = () => { isShow.updatePassword = true }
+    const closeForgotPassword = () => { isShow.forgotPassword = false }
+    const showForgotPassword = () => { isShow.forgotPassword = true }
+    const closeResetPassword = () => { isShow.resetPassword = false }
+    const showResetPassword =  () => { isShow.resetPassword = true }
 
 
     const getMe = async () => {
@@ -164,7 +170,36 @@ export const useUserStore = defineStore('user', () => {
             isLoading.value = false
         }
     }
-    return { user, err, result,isShow,isLoading,isLoadingUpdate,users,totalPages, currentPage,key,isBan,name,getMe,role,updateUser, updateAvatar,unBanUser,banUser,getAllUser,getProfileUser,updateProfile,closeUpdateAvatarModal,showUpdateAvatarModal,closeUpdatePasswordModal,showUpdatePasswordModal,updatePassword}
+    const verifyCode= async ( data) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await userService.verifyCode(data)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+        } catch (error) {
+            err.value = error.message
+        } finally{
+            isLoading.value = false
+        }
+    }
+    const forgotPassword= async ( data) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await userService.forgotPassword(data)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+        console.log(result.value);
+        } catch (error) {
+            err.value = error.message
+        } finally{
+            isLoading.value = false
+        }
+    }
+    return { user, err, result,isShow,isLoading,isLoadingUpdate,users,totalPages, currentPage,key,isBan,name,getMe,role,updateUser,forgotPassword,closeResetPassword,showForgotPassword, updateAvatar,unBanUser,banUser,getAllUser,getProfileUser,updateProfile,closeUpdateAvatarModal,showUpdateAvatarModal,closeUpdatePasswordModal,showUpdatePasswordModal,updatePassword,closeForgotPassword,showForgotPassword,verifyCode}
 }, {
     persist: {
         key: 'user',

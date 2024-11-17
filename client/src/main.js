@@ -6,6 +6,8 @@ import PrimeVue from 'primevue/config';
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import ToastService from 'primevue/toastservice';
+import StyleClass from "primevue/styleclass";
 
 import './assets/main.css'
 import './assets/index.css'
@@ -24,4 +26,4 @@ const pinia = createPinia()
 
 
 pinia.use(piniaPluginPersistedstate)
-createApp(App).use(pinia).use(router).use(PrimeVue).mount('#app')
+createApp(App).use(pinia).use(router).use(PrimeVue).use(ToastService).directive('styleclass', StyleClass).mount('#app')

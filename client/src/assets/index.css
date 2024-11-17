@@ -3,79 +3,78 @@
 @tailwind utilities;
 
 .input-custom {
-    @apply w-9/12 block bg-transparent border-b border-gray-300 focus:outline-none focus:border-gray-500 text-black text-base py-2 rounded-lg
+  @apply w-9/12 block bg-transparent border-b border-gray-300 focus:outline-none focus:border-gray-500 text-black text-base py-2 rounded-lg;
 }
 .input-device {
-    @apply w-9/12 h-[24px] block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent
+  @apply w-9/12 h-[24px] block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent;
 }
 .input-edit {
-    @apply w-9/12  block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent
+  @apply w-9/12  block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent;
 }
 .label-custom {
-    @apply block mb-2 font-medium text-gray-800
+  @apply block mb-2 font-medium text-gray-800;
 }
 .btn-login {
-    @apply bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 w-9/12 rounded-full
+  @apply bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 w-9/12 rounded-full;
 }
 
 .error {
-    @apply text-red-600 text-sm
+  @apply text-red-600 text-sm;
 }
-.background-manage{
-    @apply bg-gray-100 text-black
-    
+.background-manage {
+  @apply bg-white text-black;
 }
-.active-filter{
-    @apply rotate-180
+.active-filter {
+  @apply rotate-180;
 }
-.smiling_face{
-    @apply w-[120px] h-[140px] bg-transparent bg-no-repeat bg-center
+.smiling_face {
+  @apply w-[120px] h-[140px] bg-transparent bg-no-repeat bg-center;
 }
-@layer base{
-    :root{
-        --color-primary: 61 61 78;
-    }
+@layer base {
+  :root {
+    --color-primary: 61 61 78;
+  }
 }
 .tracking-in-expand {
-    -webkit-animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
-    animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+  -webkit-animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.61, 0.355, 1)
+    both;
+  animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.61, 0.355, 1) both;
 }
-.form-info{
-   @apply h-10 relative flex items-center border-b-2 border-gray-200 mb-4 p-5
+.form-info {
+  @apply h-10 relative flex items-center border-b-2 border-gray-200 mb-4 p-5;
 }
 .input-form {
-    @apply border-none outline-none
+  @apply border-none outline-none;
 }
-.text-li{
-    @apply text-base font-semibold
-    
+.text-li {
+  @apply text-base font-semibold;
 }
 @-webkit-keyframes tracking-in-expand {
-    0% {
-        letter-spacing: -0.5em;
-        opacity: 0;
-    }
+  0% {
+    letter-spacing: -0.5em;
+    opacity: 0;
+  }
 
-    40% {
-        opacity: 0.6;
-    }
+  40% {
+    opacity: 0.6;
+  }
 
-    100% {
-        opacity: 1;
-    }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes tracking-in-expand {
-    0% {
-        letter-spacing: -0.5em;
-        opacity: 0;
-    }
+  0% {
+    letter-spacing: -0.5em;
+    opacity: 0;
+  }
 
-    40% {
-        opacity: 0.6;
-    }
+  40% {
+    opacity: 0.6;
+  }
 
-    100% {
-        opacity: 1;
-    }
+  100% {
+    opacity: 1;
+  }
 }

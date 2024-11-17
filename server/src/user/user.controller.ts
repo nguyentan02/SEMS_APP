@@ -4,7 +4,7 @@ import { MyJWTGuard, RolesGuard } from "../auth/guard";
 import { Roles, GetUser } from "../auth/decoractor";
 import { USER_TYPES } from "../global";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ForgotPasswordDto, UpdatePasswordDto, UpdateProfileDto, UpdateUserDto, VerifyCodeDto, } from "./dto";
+import { CheckCodeDto, ForgotPasswordDto, UpdatePasswordDto, UpdateProfileDto, UpdateUserDto, VerifyCodeDto, } from "./dto";
 import { User } from "@prisma/client";
 import { BanUserDto } from "./dto/ban-user.dto";
 
@@ -88,5 +88,10 @@ export class UserController {
     @Post('send-verify-code')
     sendVerifyCode(@Body() verifyCodeDto: VerifyCodeDto) {
         return this.userService.sendVerifyCode(verifyCodeDto)
+    }
+    @Post('check-code')
+    checkVerifyCode(@Body() checkCodeDto:CheckCodeDto) {
+        console.log(checkCodeDto);
+        return this.userService.checkVerifyCode(checkCodeDto)
     }
 }

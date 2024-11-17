@@ -165,7 +165,7 @@ const updateDevice = async () => {
       >Thêm thiết bị <i class="fa-solid fa-plus"></i
     ></fwb-button>
   </div>
-  <div class="border border-gray-200 p-5 relative">
+  <div class="border border-gray-200 p-5 bg-white rounded-lg relative">
     <Form @submit="updateDevice">
       <div class="flex items-center text-lg text-[#25861e]">
         <i class="fa-solid fa-circle-info mr-2"></i>Thông tin thiết bị

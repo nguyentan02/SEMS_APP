@@ -71,7 +71,7 @@ const submitImage = async () => {
       </div>
     </template>
     <template #footer>
-      <div class="flex justify-between">
+      <div class="flex justify-end">
         <fwb-button
           v-if="!userStore.isLoading"
           @click="

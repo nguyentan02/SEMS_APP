@@ -13,7 +13,7 @@ export class DeviceController {
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.USER)
     getAllDevice(
-        @Query() option: { page: number, name: string, categoryId: number }
+        @Query() option: { page: number, key: string, categoryId: number , groupByCategory?: boolean, sortByDate?: 'asc' | 'desc' }
     ) {
         return this.deviceService.getAllDevice(option)
     }

@@ -19,7 +19,7 @@ const formSchemaEdit = yup.object().shape({
   name: yup
     .string()
     .required("Tên không được bỏ trống.")
-    .min(10, "Tên ít nhất 10 ký tự.")
+    .min(6, "Tên ít nhất 6 ký tự.")
     .max(50, "Tên có nhiều nhất 50 ký tự."),
   employeeId: yup
     .string()

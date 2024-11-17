@@ -73,6 +73,7 @@ onMounted(async () => {
   <div class="flex items-center justify-between mb-5">
     <Seach
       :title="'Nhập tên'"
+      class="border border-gray-400"
       @key="
         (e) => {
           userStore.name = e;
@@ -230,7 +231,7 @@ onMounted(async () => {
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td colspan="7">
+        <td class="absolute right-[40%]">
           <Loading />
         </td>
       </tr>

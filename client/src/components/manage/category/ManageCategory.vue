@@ -52,6 +52,7 @@ onMounted(async () => {
   <div class="flex items-center justify-between">
     <Seach
       :title="'Tìm kiếm danh mục'"
+      class="border border-gray-500"
       @key="
         (e) => {
           categoryStore.name = e;
@@ -148,19 +149,18 @@ onMounted(async () => {
           </div>
         </td>
       </tr>
-      <tr v-else class="text-center text-red-500 text-xl">
+      <!-- <tr v-else class="text-center text-red-500 text-xl">
         <td colspan="7">Không có.</td>
-      </tr>
+      </tr> -->
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td colspan="7">
+        <td class="absolute right-[40%]">
           <Loading />
         </td>
       </tr>
     </tbody>
   </table>
-  <table></table>
   <AddCategory />
   <DetailCategory :category="currentCategory" />
   <EditCategoryModal :category="currentCategory" />

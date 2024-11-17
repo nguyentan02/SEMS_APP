@@ -75,7 +75,7 @@ const submitUpdatePassword = async () => {
               name="currentPassword"
               type="password"
               id="currentPassword"
-              class="rounded-md w-full"
+              class="rounded-md w-full text-black"
               placeholder="Nhập mật khẩu hiển tại"
               v-model="data.oldPassword"
             />
@@ -89,7 +89,7 @@ const submitUpdatePassword = async () => {
               name="newPassword"
               type="password"
               id="newPassword"
-              class="rounded-md w-full"
+              class="rounded-md w-full text-black"
               placeholder="Nhập mật khẩu mới"
               v-model="data.newPassword"
             />
@@ -103,7 +103,7 @@ const submitUpdatePassword = async () => {
               name="confirmPassword"
               type="password"
               id="confirmPassword"
-              class="rounded-md w-full"
+              class="rounded-md w-full text-black"
               placeholder="Nhập xác nhận mật khẩu mới"
               v-model="data.confirmPassword"
             />

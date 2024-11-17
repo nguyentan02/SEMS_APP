@@ -65,6 +65,7 @@ const createDevices = async () => {
   if (!file.value) return;
   const data = new FormData();
   data.append("file", file.value);
+  console.log(data);
   await deviceStore.createDevices(data);
   if (deviceStore.err) {
     $toast.error(deviceStore.err, { position: "top-right" });
@@ -72,7 +73,7 @@ const createDevices = async () => {
   }
   $toast.success(deviceStore.result.message, { position: "top-right" });
   file.value = null;
-  router.back();
+  // router.back();
 };
 const back = () => {
   router.back();

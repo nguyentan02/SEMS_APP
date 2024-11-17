@@ -12,7 +12,10 @@ export const useDeviceStore = defineStore('device', ()=>{
     const totalPages = ref(1)
     const currentPage = ref(1)
     const totalCount = ref(0)
-    const name = ref('')
+    const key = ref('')
+    const categoryId=ref('')
+ const  groupByCategory = ref(false)
+ const sortByDate = ref('asc')
     const isShow = reactive({
         qrModal:false
     })
@@ -35,6 +38,7 @@ export const useDeviceStore = defineStore('device', ()=>{
                 totalPages.value = res.data.totalPages
                 totalCount.value = res.data.totalCount
                 if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
+             
         } catch (error) {
                 err.value = error.message
         }finally{
@@ -112,5 +116,5 @@ export const useDeviceStore = defineStore('device', ()=>{
     //         isLoading.value = false
     //     }
     // }
-    return {err,result,isLoading,name,devices,device,totalCount,totalPages,currentPage,createDevices,getDevices,showQrCodeModal,closeQrCodeModal,isShow,createDevice,getDeviceById,updateDevice}
+    return {err,result,isLoading,key,devices,device,totalCount,sortByDate,totalPages,currentPage,categoryId,groupByCategory,createDevices,getDevices,showQrCodeModal,closeQrCodeModal,isShow,createDevice,getDeviceById,updateDevice}
 })

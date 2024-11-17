@@ -7,7 +7,7 @@ import { PAGE_SIZE } from "src/global";
 
 import * as argon2 from 'argon2';
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
-import { UpdatePasswordDto, UpdateUserDto, UpdateProfileDto, ForgotPasswordDto, VerifyCodeDto } from "./dto";
+import { UpdatePasswordDto, UpdateUserDto, UpdateProfileDto, ForgotPasswordDto, VerifyCodeDto, CheckCodeDto } from "./dto";
 import { BanUserDto } from "./dto/ban-user.dto";
 import { MailerService } from '@nestjs-modules/mailer';
 
@@ -271,6 +271,27 @@ export class UserService {
             }
         })
     }
+    async checkVerifyCode(checkCodeDto:CheckCodeDto) {
+        const currentDate = new Date()
+        try {
+            const verifyCode = await this.prismaService.verifyCode.findFirst({
+                where: {
+                    email: checkCodeDto.email, 
+                    code: checkCodeDto.code   
+                }
+            });
+            console.log(verifyCode);
+            if (!verifyCode)  return new ResponseData<string>(null, 400, "Mã xác minh không đúng");
+            const createAt = new Date(verifyCode.createdAt)
+            createAt.setMinutes(createAt.getMinutes() + 5)
+            if (createAt <= currentDate) return new ResponseData<string>(null, 400, "Quá thời gian của mã xác minh")
+            return new ResponseData<string>("Mã xác minh hợp lệ", 200, "Mã xác minh đúng");
+        } catch (error) {
+            this.logger.error(error.message);
+            return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau');
+        }
+    }
+    
     async forgotPassword(forgotPassword: ForgotPasswordDto) {
         const currentDate = new Date()
         try {
@@ -321,7 +342,7 @@ export class UserService {
                 }
             })
             if (!user) {
-                return new ResponseData<any>(null, 400, 'Mã số sinh viên chưa đăng ký')
+                return new ResponseData<any>(null, 400, 'Tài khoản không tồn tại')
             }
             await this.prismaService.verifyCode.deleteMany({
                 where: {

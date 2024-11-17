@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
             }
             result.value = res
             token.value = result.value.data?.accessToken
+            err.value = null
         } catch (error) {
             err.value = error.message
         } finally {

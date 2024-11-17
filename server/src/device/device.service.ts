@@ -11,16 +11,26 @@ export class DeviceService {
     private readonly logger = new Logger(DeviceService.name)
 
 
-    async getAllDevice(option: { page: number, name: string, categoryId: number }) {
+    async getAllDevice(option: { page: number, key: string, categoryId: number, groupByCategory?: boolean, sortByDate?: 'asc' | 'desc'  }) {
         let pageSize = PAGE_SIZE.PAGE_DEVICE
         try {
-            let { page, name, categoryId } = option
-            let where: any = { isDelete: false, }
-            if (name) {
-                where.name = {
-                    contains: name,
-                    mode: 'insensitive'
-                }
+            let { page, key, categoryId,groupByCategory ,sortByDate} = option
+            let where: any = { isDelete: false }
+            if (key) {
+                where.OR = [  {
+                    name: {
+                        contains: key,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    serialNumber: {
+                        contains: key,
+                        mode: 'insensitive'
+                    }
+                }]
+              
+                
             }
             if (categoryId) {
                 where.categoryId = Number(categoryId)
@@ -52,8 +62,27 @@ export class DeviceService {
                         }
                     }
                 }
+                , orderBy: {
+                    purchaseDate: sortByDate || 'asc'  // Default to 'asc' if not specified
+                }
             })
-            return new ResponseData<any>({ data, totalCount, totalPages }, 200, "Tìm các thiết bị thành công")
+            let groupedData;
+            if (groupByCategory) {
+                groupedData = data.reduce((acc, device) => {
+                    const categoryName = device.category?.categoryName || "Uncategorized";
+                    if (!acc[categoryName]) {
+                        acc[categoryName] = {
+                            categoryName: categoryName,
+                            devices: []
+                        }
+                    }
+                    acc[categoryName].devices.push(device);
+                    return acc;
+                }, {});
+            }
+    
+            const resultData = groupByCategory ? groupedData : data;
+            return new ResponseData<any>({ data:resultData, totalCount, totalPages }, 200, "Tìm các thiết bị thành công")
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
@@ -188,7 +217,7 @@ export class DeviceService {
                 }
             });
     
-            // Map rows to device objects
+         
             devices = data.map((row) => {
                 const device = {} as CreateDevicesDto;
                 for (let i = 1; i < row.length; i++) {
@@ -196,8 +225,7 @@ export class DeviceService {
                 }
                 return device;
             });
-    console.log(devices);
-            // Validate and create each device
+        
             for (const device of devices) {
                 const categoryValid = await this.prismaService.category.findFirst({
                     where:{categoryName:device.categoryName}

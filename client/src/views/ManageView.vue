@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import Header from "@/components/common/Header.vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth.store";
@@ -22,11 +22,14 @@ const router = useRouter();
 
 // function toggleSideBar() {
 //   showSide.value = !showSide.value;
-// }
+// }''
+onMounted(() => {
+  document.body.classList.add("dark-mode");
+  document.body.style.background = "#000";
+});
 const logout = () => {
   authStore.token = null;
   userStore.user = null;
-
   $toast.success("Đăng xuất thành công", { position: "top-right" });
   router.push({ name: "login" });
 };
@@ -38,7 +41,11 @@ const logout = () => {
     rgba(242, 243, 241, 0.1),
     rgba(0, 200, 100, 0)
   );
+  color: #e5e7eb;
   border-radius: 15px;
+}
+.dark-mode {
+  color: #fff;
 }
 </style>
 <template>
@@ -66,7 +73,10 @@ const logout = () => {
             <router-link
               v-if="userStore.user?.id"
               active-class="active-link"
-              :to="{ name: 'profile', params: { id: userStore.user.id } }"
+              :to="{
+                name: 'manage-profile',
+                params: { id: userStore.user.id },
+              }"
               class="block p-5 text-base hover:opacity-70"
             >
               <i class="fa-regular fa-address-card"></i>
@@ -132,14 +142,10 @@ const logout = () => {
       </nav>
     </div>
 
-    <div class="border-1 p-4 rounded-lg shadow flex-1">
-      <router-view
-        @currentPage="
-          (e) => {
-            currentPage = e;
-          }
-        "
-      />
+    <div
+      class="border-1 p-4 rounded-lg shadow flex-1 bg-[rgb(var(--color-primary))]"
+    >
+      <router-view />
     </div>
   </div>
 </template>

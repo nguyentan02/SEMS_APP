@@ -1,24 +1,21 @@
-div
 <script setup>
-import { ref, onMounted, watchEffect, onBeforeUnmount } from "vue";
+import { ref, onMounted, watchEffect, onBeforeUnmount, watch } from "vue";
 import { useDeviceStore } from "@/stores/device.store";
 import SeachDevice from "@/components/common/SeachDevice.vue";
 import Loading from "@/components/common/Loading.vue";
 import { useManageDeviceStore } from "@/stores/manageDevice.store";
+import { useCategoryStore } from "@/stores/category.store";
 import AddDeviceModal from "./AddDeviceModal.vue";
 import { useRouter } from "vue-router";
-import {
-  FwbButton,
-  FwbModal,
-  FwbInput,
-  FwbSelect,
-  FwbToast,
-  FwbPagination,
-} from "flowbite-vue";
+import { FwbButton, FwbPagination } from "flowbite-vue";
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import dayjs from "dayjs";
 const manageDeviceStore = useManageDeviceStore();
-const emit = defineEmits(["currentPage"]);
+// const emit = defineEmits(["currentPage"]);
 const currentDevice = ref(null);
 const deviceStore = useDeviceStore();
+const categoryStore = useCategoryStore();
 const router = useRouter();
 function formatPrice(price, currency = "VND") {
   return new Intl.NumberFormat("vi-VN", {
@@ -28,22 +25,20 @@ function formatPrice(price, currency = "VND") {
     maximumFractionDigits: 2,
   }).format(price);
 }
-watchEffect(async () => {
-  await deviceStore.getDevices({
-    page: deviceStore.currentPage,
-    name: deviceStore.name,
-  });
-});
+const isFilterOpen = ref(false);
+const test = ref([]);
+const filterContainer = ref(null);
+const toggleSort = ref("asc");
 onMounted(async () => {
-  emit("currentPage", "devices");
-  await deviceStore.getDevices({ name: "", page: 1 });
+  // emit("currentPage", "devices");
+  await categoryStore.getCategory({});
+  await deviceStore.getDevices({ key: "", page: 1 });
   deviceStore.currentPage = 1;
-  deviceStore.name = "";
+  deviceStore.key = "";
+  test.value = deviceStore.devices;
   document.addEventListener("click", handleClickOutside);
 });
 
-const isFilterOpen = ref(false);
-const filterContainer = ref(null);
 const toggleFilter = () => {
   isFilterOpen.value = !isFilterOpen.value;
 };
@@ -51,15 +46,39 @@ const showSide = ref(false);
 const toggleAddDevice = () => {
   showSide.value = !showSide.value;
 };
+const toggleSortOrder = () => {
+  toggleSort.value = toggleSort.value === "asc" ? "desc" : "asc";
+};
 const handleClickOutside = (event) => {
   if (filterContainer.value && !filterContainer.value.contains(event.target)) {
     isFilterOpen.value = false;
   }
 };
-
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
+watchEffect(async () => {
+  await deviceStore.getDevices({
+    page: deviceStore.currentPage,
+    key: deviceStore.key,
+    categoryId: deviceStore.categoryId,
+    sortByDate: toggleSort.value,
+  });
+});
+const selectedCategoryName = ref("");
+
+const handleCategorySelect = () => {
+  const selectedCategory = categoryStore.categorys.find(
+    (category) => category.id === deviceStore.categoryId
+  );
+  selectedCategoryName.value = selectedCategory
+    ? selectedCategory.categoryName
+    : "";
+};
+const clearSelectedCategory = () => {
+  selectedCategoryName.value = "";
+  deviceStore.categoryId = "";
+};
 </script>
 <style scoped>
 .rotate-180 {
@@ -68,8 +87,6 @@ onBeforeUnmount(() => {
 .background {
   color: #111827;
   background-color: #e6f2f3;
-  border: 1px solid #017e84;
-  border-color: #017e84;
 }
 </style>
 <template>
@@ -114,20 +131,26 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <div class="relative flex rounded-lg" ref="filterContainer">
-      <div>
+    <div
+      class="relative flex border border-gray-500 rounded-lg"
+      ref="filterContainer"
+    >
+      <div class="">
         <SeachDevice
           :title="'Tìm kiếm...'"
+          :categoryName="selectedCategoryName"
+          @removeCategory="clearSelectedCategory"
           @key="
             (e) => {
-              deviceStore.name = e;
+              deviceStore.key = e;
             }
           "
         />
       </div>
+
       <button
         @click="toggleFilter"
-        class="px-4 border-l border-l-gray-500 bg-white"
+        class="px-4 border-l border-l-gray-500"
         :class="{ background: isFilterOpen }"
       >
         <i
@@ -148,22 +171,24 @@ onBeforeUnmount(() => {
               lọc</span
             >
             <ul class="text-gray-600 space-y-2">
-              <li class="cursor-pointer hover:text-blue-600">Dịch vụ</li>
-              <li class="cursor-pointer hover:text-blue-600">Hàng hóa</li>
-              <li class="cursor-pointer hover:text-blue-600">
-                Quản lý tồn kho
-              </li>
-              <li class="cursor-pointer hover:text-blue-600">Bán hàng</li>
-              <li class="cursor-pointer hover:text-blue-600">Mua hàng</li>
-              <li class="cursor-pointer hover:text-blue-600">
-                Sản phẩm còn hàng
-              </li>
-              <li class="cursor-pointer hover:text-blue-600">
-                Số lượng dự báo âm
-              </li>
-              <li class="cursor-pointer hover:text-blue-600">Yêu thích</li>
-              <li class="cursor-pointer hover:text-blue-600">Cảnh báo</li>
-              <li class="cursor-pointer hover:text-blue-600">Đã lưu trữ</li>
+              <label for="isban">Danh mục: </label>
+              <select
+                name=""
+                id="isban"
+                class="rounded-lg p-1"
+                v-model="deviceStore.categoryId"
+                @change="handleCategorySelect"
+              >
+                <option value="">Tất cả</option>
+                <option
+                  v-if="categoryStore.categorys?.length"
+                  v-for="category in categoryStore.categorys"
+                  :key="category.id"
+                  :value="category.id"
+                >
+                  {{ category.categoryName }}
+                </option>
+              </select>
             </ul>
           </div>
 
@@ -173,42 +198,63 @@ onBeforeUnmount(() => {
               theo</span
             >
             <ul class="text-gray-600 space-y-2">
-              <li class="cursor-pointer hover:text-blue-600">Nhà sản xuất</li>
-              <li class="cursor-pointer hover:text-blue-600">
+              <label class="cursor-pointer hover:text-blue-600">
+                <input
+                  type="checkbox"
+                  v-model="deviceStore.groupByCategory"
+                  @change="handleGroupByCategoryChange"
+                  class="mr-2"
+                />
                 Danh mục sản phẩm
-              </li>
+              </label>
             </ul>
           </div>
         </div>
       </div>
     </div>
-    <div class="text-center mt-2" v-if="deviceStore.totalPages >= 2">
-      <FwbPagination
-        v-model="deviceStore.currentPage"
-        :total-pages="deviceStore.totalPages"
-        :show-icons="true"
-        :show-labels="false"
-      />
-    </div>
   </div>
 
-  <div v-if="!manageDeviceStore.isShow.editDevice">
-    <div
-      v-if="!deviceStore.devices?.length"
-      class="text-center text-red-500 text-xl"
-    >
-      <p colspan="7">Không có.</p>
+  <div
+    v-if="!manageDeviceStore.isShow.editDevice"
+    class="background-manage mt-6"
+  >
+    <div v-if="!deviceStore.devices?.length" class="text-center text-xl">
+      <div class="flex items-center justify-center h-[70vh]">
+        <div class="text-center">
+          <div
+            class="w-[120px] h-[140px] bg-no-repeat bg-center mx-auto"
+            style="
+              background-image: url('https://emsystem.odoo.com/web/static/img/smiling_face.svg');
+            "
+          ></div>
+          <p class="font-semibold text-xl mt-4">
+            Không có thiết bị nào. Hãy thêm một thiết bị mới !
+          </p>
+        </div>
+      </div>
     </div>
     <table v-else class="table-auto w-full mt-5 rounded-md mx-auto">
-      <thead class="font-medium border-b-2 border-black">
+      <thead class="font-normal border-b-2 border-black">
         <tr class="text-left">
           <th class="text-center p-2 w-[10%]">STT</th>
           <th class="p-2">Thiết bị</th>
           <th class="p-2">Hình ảnh</th>
           <th class="p-2">Serial</th>
           <th class="p-2">Nhà sản xuất</th>
+          <th @click="toggleSortOrder" class="p-2 flex">
+            Ngày mua
+            <div>
+              <i
+                :class="
+                  toggleSort === 'asc'
+                    ? 'fa-solid fa-arrow-up-wide-short'
+                    : 'fa-solid fa-arrow-down-short-wide'
+                "
+              ></i>
+            </div>
+          </th>
           <th class="p-2">Giá</th>
-          <th class="p-2">Loại thiết bị</th>
+          <th class="p-2 text-center">Loại thiết bị</th>
 
           <th class="p-2 text-center">Tùy chọn</th>
         </tr>
@@ -218,17 +264,8 @@ onBeforeUnmount(() => {
           v-for="(device, i) in deviceStore.devices"
           :key="device.id"
           class="border-b border-gray-400 transition duration-300 ease-in-out hover:bg-[#d8d6d6]"
-          @click="
-            () => {
-              // currentDevice = device;
-              router.push({
-                name: 'detailDeivce',
-                params: { id: device.id },
-              });
-            }
-          "
         >
-          <td class="font-medium text-center w-[10%]">
+          <td class="text-center w-[10%]">
             {{ (deviceStore.currentPage - 1) * 10 + i + 1 }}
           </td>
           <td class="">
@@ -244,27 +281,42 @@ onBeforeUnmount(() => {
           <td class="">
             {{ device.serialNumber }}
           </td>
-          <td class="">
+          <td class="p-2">
             {{ device.manufacturer }}
           </td>
-          <td class="text-red-700 font-extrabold">
+          <td class="">
+            {{ dayjs(device.purchaseDate).format("DD/MM/YYYY") }}
+          </td>
+          <td class="text-gray-900 font-extrabold">
             {{ formatPrice(device.price) }}
           </td>
-          <td class="">
+          <td class="text-center">
             {{ device.category.categoryName }}
           </td>
-
           <td class="">
             <div class="flex gap-2 items-center justify-center">
               <button
-                class="p-2 text-red-500 hover:text-red-400 text-2xl"
+                class="p-2 text-red-500 hover:text-red-400 text-xl"
                 @click="
                   async () => {
-                    await deleteCategory(category.id);
+                    await de(category.id);
                   }
                 "
               >
-                <i class="fa-solid fa-trash-can"></i>
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+              <button
+                class="p-2 text-lime-500 hover:text-lime-200 text-xl"
+                @click="
+                  () => {
+                    router.push({
+                      name: 'detailDeivce',
+                      params: { id: device.id },
+                    });
+                  }
+                "
+              >
+                <i class="fa-solid fa-magnifying-glass"></i>
               </button>
             </div>
           </td>
@@ -278,7 +330,15 @@ onBeforeUnmount(() => {
         </tr>
       </tbody>
     </table>
+    <div class="text-center py-2" v-if="deviceStore.totalPages >= 2">
+      <FwbPagination
+        v-model="deviceStore.currentPage"
+        :total-pages="deviceStore.totalPages"
+        :show-icons="true"
+        :show-labels="false"
+      />
+    </div>
   </div>
-  <!-- <EditDevice /> -->
+
   <AddDeviceModal />
 </template>

@@ -47,7 +47,7 @@ const sumitFeedback = () => {
               name="name"
               id="name"
               type="text"
-              class="w-9/12 bg-[rgb(var(--color-primary))] border-none rounded-lg"
+              class="w-9/12 bg-gray-400 border-none rounded-lg"
               v-model="props.user.name"
               disabled
             />
@@ -58,7 +58,7 @@ const sumitFeedback = () => {
               name="email"
               id="email"
               type="text"
-              class="w-9/12 bg-[rgb(var(--color-primary))] border-none rounded-lg"
+              class="w-9/12 bg-gray-400 border-none rounded-lg"
               v-model="props.user.email"
               disabled
             />
