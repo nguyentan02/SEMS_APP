@@ -8,6 +8,7 @@ export const useLocationStore = defineStore('location', ()=>{
     const result = ref(null)
     const isLoading = ref(false)
     const locations = ref(null)
+    const usages = ref(null)
     const totalPages = ref(1)
     const currentPage = ref(1)
     const totalCount = ref(0)
@@ -22,6 +23,26 @@ export const useLocationStore = defineStore('location', ()=>{
             if (res.statusCode !== 200) throw new Error(res.message)
                 result.value = res
             locations.value = res.data.dataWithRoomCount
+                totalPages.value = res.data.totalPages
+                totalCount.value = res.data.totalCount
+                if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
+        } catch (error) {
+                err.value = error.message
+        }finally{
+            isLoading.value= false
+        }
+    }
+
+    const getUsageInfo = async(option)=>{
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await locationService.getUsageInfo(option)
+            if (res.statusCode !== 200) throw new Error(res.message)
+           
+                result.value = res
+              usages.value = res.data.dataWithRoomAndDeviceStatus
                 totalPages.value = res.data.totalPages
                 totalCount.value = res.data.totalCount
                 if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
@@ -88,5 +109,5 @@ export const useLocationStore = defineStore('location', ()=>{
             isLoading.value = false
         }
     }
-    return {err,result,isLoading,key,locations,totalCount,totalPages,currentPage,getLocations,createDepartment,updateDepartment,deleteDepartment}
+    return {err,result,isLoading,key,locations,usages,totalCount,totalPages,currentPage,getLocations,getUsageInfo,createDepartment,updateDepartment,deleteDepartment}
 })

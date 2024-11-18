@@ -8,14 +8,14 @@ const routes = [
     },
  {   path: '/home-tesst',
     name: 'home-test',
-    component: () => import('../views/HomeView.vue'),
+    component: () => import('../views/Hometesst.vue'),
     meta: { title: 'Quản lý thiết bị' },
     
 },
     {
         path: '/home',
         name: 'home',
-        component: () => import('../views/Hometesst.vue'),
+        component: () => import('../views/HomeView.vue'),
         meta: { title: 'Quản lý thiết bị' },
         beforeEnter: async (to, from, next) => {
             const userStore = useUserStore()
@@ -62,7 +62,7 @@ const routes = [
                 path: '/device/:id',
                 name: 'detailDeivce',
                 component: () => import('../components/manageDevice/device/EditDevice.vue'),
-                props: true,
+              
                 meta: { title: 'Thông tin thiết bị' },
                 beforeEnter: async (to, from, next) => {
                     const authStore = useAuthStore()
@@ -71,11 +71,22 @@ const routes = [
                 },
             },
             {
-                path: '/usage/',
-                name: 'usageDevice',
+                path: '/usage',
+                name: 'usage',
+                props:true,
                 component: () => import('../components/manageDevice/usage/ManageUsage.vue'),
-                props: true,
                 meta: { title: 'Quản lí sử dụng' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/usageroom/:id',
+                name: 'detailUsage',
+                component: () => import('../components/manageDevice/usage/DetailUsageRoom.vue'),
+                meta: { title: 'Danh sách thiết bị sử dụng' },
                 beforeEnter: async (to, from, next) => {
                     const authStore = useAuthStore()
                     if (authStore.token === null)  next('login')

@@ -1,145 +1,129 @@
 <script setup>
 import { ref } from "vue";
-import Header from "@/components/common/Header.vue";
-import { useRouter, useRoute } from "vue-router";
-import { useAuthStore } from "../stores/auth.store";
-import { useUserStore } from "../stores/user.store";
-import { useToast } from "vue-toast-notification";
+import Footer from "@/components/common/Footer.vue";
+import Menubar from "primevue/menubar";
+import Avatar from "primevue/avatar";
+import Button from "primevue/button";
+import Badge from "primevue/badge";
+const items = ref([
+  {
+    label: "Thống kê",
+    icon: "fa-solid fa-chart-pie",
+    to: "/test", // Đường dẫn router
+  },
+  {
+    label: "Thiết bị",
+    icon: "fa-solid fa-house-laptop",
+    items: [
+      {
+        label: "Danh sách thiết bị",
+        icon: "pi pi-bolt",
+        to: "/device",
+      },
 
-const authStore = useAuthStore();
-const userStore = useUserStore();
-
-const $toast = useToast();
-const router = useRouter();
-
-const isExpanded = ref(true);
-const toggleSidebar = () => {
-  isExpanded.value = !isExpanded.value;
-};
-
-const logout = () => {
-  authStore.token = null;
-  userStore.user = null;
-
-  $toast.success("Đăng xuất thành công", { position: "top-right" });
-  router.push({ name: "login" });
-};
+      {
+        label: "Quản lý sử dụng",
+        icon: "pi pi-bol",
+        to: "/usage",
+      },
+    ],
+  },
+  // {
+  //   label: "Tin nhắn",
+  //   icon: "pi pi-envelope",
+  //   badge: 3,
+  //   to: "/messages",
+  // },
+]);
 </script>
-<style>
-.active-link {
-  /* background-color: #8ee286; */
-  background: linear-gradient(
-    to right,
-    rgba(0, 200, 100, 0.1),
-    rgba(0, 200, 100, 0)
-  );
-  color: #32c225;
-  border-radius: 15px;
-}
-
-.bg-gray-200:hover {
-  background-color: #d1d5db; /* Thay đổi màu khi hover */
-}
-.shadow-md:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm đổ bóng khi hover */
-}
-</style>
+<style scoped></style>
 <template>
-  <Header />
-  <div class="flex max-w-screen-2xl mx-auto background-manage">
-    <div class="">
-      <div
-        class="relative h-screen bg-white flex flex-col shadow-md transition duration-300"
-        :class="{ 'w-60': isExpanded, 'w-0': !isExpanded }"
-      >
-        <!-- Toggle Button -->
-        <div
-          class="absolute top-4 right-[-12px] bg-gray-200 p-1 rounded-sm cursor-pointer shadow-md z-10"
-          @click="toggleSidebar"
-        >
-          <i class="fa-solid fa-bars"></i>
-        </div>
-        <!-- Sidebar Items -->
-        <nav v-if="isExpanded" class="flex flex-col px-4">
-          <ul>
-            <li class="mb-2">
-              <!-- <router-link
-              :to="{ name: 'dashboard-manage' }"
-              active-class="active-link"
-              class="block p-2 hover:opacity-70 text-base"
+  <div class="flex flex-col md:p-0 lg:w-[80%] mx-auto min-h-screen">
+    <header class="">
+      <Menubar :model="items" class="">
+        <template #start>
+          <div>
+            <img class="h-[50px]" src="/logoMain.jpg" alt="" />
+          </div>
+        </template>
+        <template #item="{ item, props, hasSubmenu, root }">
+          <template v-if="item.to">
+            <router-link
+              :to="item.to"
+              v-ripple
+              v-bind="props.action"
+              class="flex item items-center m-2 p-2"
             >
-              <i class="fa-solid fa-chart-pie"></i>
-              Thống kê
-            </router-link> -->
-            </li>
-            <li class="mb-2 flex items-center">
-              <i class="fa-regular fa-address-card mr-2"></i>
-              <router-link
-                active-class="active-link"
-                :to="{
-                  name: 'home-profile',
-                  params: { id: userStore.user.id },
+              <span :class="item.icon" />
+              <span class="ml-2 font-semibold">{{ item.label }}</span>
+              <Badge
+                v-if="item.badge"
+                :class="{
+                  'ml-auto bg-green-600 text-white': !root,
+                  'ml-2 text-white': root,
                 }"
-                class="block p-2 text-li hover:opacity-70"
-              >
-                Thông tin cá nhân
-              </router-link>
-            </li>
-            <li class="mb-2 flex items-center">
-              <i class="fa-solid fa-house-laptop mr-2"></i>
-              <router-link
-                active-class="active-link"
-                :to="{ name: 'device' }"
-                class="block p-2 text-li hover:opacity-70"
-              >
-                Thiết bị
-              </router-link>
-              <i class="fa-solid fa-caret-down"></i>
-            </li>
-            <li class="mb-2 flex items-center">
-              <i class="fa-solid fa-users"></i>
-              <router-link
-                active-class="active-link"
-                :to="{ name: 'transfer' }"
-                class="block p-2 text-li hover:opacity-70"
-              >
-                Luân chuyển
-              </router-link>
-            </li>
-            <li
-              class="flex items-center absolute bottom-20 hover:bg-[#bbb8b8] p-2 rounded-xl cursor-pointer"
-              @click="logout"
+                :value="item.badge"
+              />
+              <!-- <span
+              v-if="item.shortcut"
+              class="ml-auto border-1 surface-border border-round surface-100 text-xs p-1"
+              >{{ item.shortcut }}</span
+            > -->
+              <i
+                v-if="hasSubmenu"
+                :class="[
+                  'pi pi-angle-down',
+                  {
+                    'pi-angle-down ml-2': root,
+                    'pi-angle-right ml-auto': !root,
+                  },
+                ]"
+              ></i>
+            </router-link>
+          </template>
+          <template v-else>
+            <div
+              v-ripple
+              class="flex item items-center m-2 p-2 cursor-pointer"
+              v-bind="props.action"
             >
-              <div
-                class="h-10 w-10 overflow-hidden rounded-full flex items-center justify-center bg-white"
-              >
-                <img
-                  class="h-full w-full object-cover"
-                  :src="userStore.user?.user_avt"
-                  alt="logo user"
-                />
-              </div>
-              <div class="flex flex-col ml-1">
-                <span
-                  class="truncate font-semibold min-w-[100px] md:min-w-[150px]"
-                >
-                  {{ userStore.user?.name }}
-                </span>
-                <span
-                  class="text-[10px] truncate min-w-[100px] md:min-w-[150px]"
-                >
-                  {{ userStore.user?.email }}
-                </span>
-              </div>
-              <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-
-    <div class="border-1 p-4 rounded-lg shadow flex-1">
+              <span :class="item.icon" />
+              <span class="ml-2 font-semibold">{{ item.label }}</span>
+              <Badge
+                v-if="item.badge"
+                :class="{
+                  'ml-auto bg-green-600 text-white': !root,
+                  'ml-2 text-white': root,
+                }"
+                :value="item.badge"
+              />
+              <i
+                v-if="hasSubmenu"
+                :class="[
+                  {
+                    'pi pi-angle-down ml-2': root,
+                    'pi pi-angle-right ml-auto': !root,
+                  },
+                ]"
+              ></i>
+            </div>
+          </template>
+        </template>
+        <template #end>
+          <div class="flex right-0 items-center justify-end gap-2">
+            <div class="card flex flex-wrap justify-center gap-4"></div>
+            <Avatar
+              image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+              shape="circle"
+            />
+          </div>
+        </template>
+      </Menubar>
+    </header>
+    <!-- content -->
+    <main class="flex-grow border border-gray-200 p-6 z-0">
       <router-view />
-    </div>
+    </main>
+    <footer class="border-t border-gray-200"><Footer /></footer>
   </div>
 </template>

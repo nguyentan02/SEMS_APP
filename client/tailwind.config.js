@@ -7,8 +7,10 @@ export default {
     'node_modules/flowbite/**/*.{js,jsx,ts,tsx}'
   ],
   theme: {
-    extend: {},
+    extend: {
+      
+    },
   },
-  plugins: [require('flowbite/plugin')],
+  plugins: [require('flowbite/plugin', "tailwindcss-primeui")],
 }
 

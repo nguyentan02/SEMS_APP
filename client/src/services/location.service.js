@@ -9,6 +9,10 @@ class locationService {
         let parameter = createQueryString(data)
         return (await this.api.get(`/${parameter}`)).data
     }
+    async getUsageInfo(data) {
+        let parameter = createQueryString(data)
+        return (await this.api.get(`/usage/${parameter}`)).data
+    }
     async createDepartment(token,data) {
         return (await this.api.post('cre-department',data, {
             headers: {

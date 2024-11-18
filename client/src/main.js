@@ -7,7 +7,11 @@ import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ToastService from 'primevue/toastservice';
-import StyleClass from "primevue/styleclass";
+import Lara from "@/presets/lara";
+import Ripple from 'primevue/ripple';
+
+import BadgeDirective from 'primevue/badgedirective';
+
 
 import './assets/main.css'
 import './assets/index.css'
@@ -15,7 +19,8 @@ import './assets/index.css'
 import 'vue-toast-notification/dist/theme-sugar.css';
 import '../node_modules/flowbite-vue/dist/index.css'
 import "@fortawesome/fontawesome-free/css/all.min.css"
-import 'primevue/resources/themes/aura-light-green/theme.css';
+import 'primevue/resources/themes/lara-light-green/theme.css'
+// import 'primevue/resources/primevue.min.css'; // Core CSS
 
 import App from './App.vue'
 dayjs.extend(localizedFormat)
@@ -26,4 +31,4 @@ const pinia = createPinia()
 
 
 pinia.use(piniaPluginPersistedstate)
-createApp(App).use(pinia).use(router).use(PrimeVue).use(ToastService).directive('styleclass', StyleClass).mount('#app')
+createApp(App).use(pinia).use(router).use(PrimeVue, {  ripple: true }).use(ToastService).directive('ripple', Ripple).directive('badge', BadgeDirective).mount('#app')

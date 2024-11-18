@@ -11,7 +11,6 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@handsontable/vue3": "^14.6.1",
-    "@headlessui/vue": "^1.7.23",
     "@primevue/themes": "^4.2.1",
     "axios": "^1.7.7",
     "dayjs": "^1.11.13",
@@ -25,7 +24,9 @@
     "jspdf": "^2.5.2",
     "pinia": "^2.2.4",
     "pinia-plugin-persistedstate": "^4.1.1",
+    "primeicons": "^7.0.0",
     "primevue": "^3.50.0",
+    "tailwindcss-primeui": "^0.3.4",
     "vee-validate": "^4.13.2",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5",
