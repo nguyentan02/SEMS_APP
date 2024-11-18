@@ -13,7 +13,10 @@ export class LocationController {
     get(@Query() option: { page: number, key: string }) {
         return this.locationService.get(option)
     }
-
+    @Get('/usage')
+    getUsageInfo(@Query() option: { page: number, key: string }) {
+        return this.locationService.getUsageInfo(option)
+    }
     @Post('cre-department')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.ADMIN)

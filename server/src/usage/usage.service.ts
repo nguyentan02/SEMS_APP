@@ -92,19 +92,40 @@ export class UsageService {
     }
     async getUsageById(id: number) {
         try {
-            const usage = await this.prismaService.usageInformation.findFirst({
+            const usages = await this.prismaService.usageInformation.findMany({
                 where: {
-                    id: id
+                    roomId: id,
+                    isDeleted:false
                 }
             })
-            if (!usage) return new ResponseData<any>(null, 400, "Thiết bị không tồn tại")
-            const data = await this.prismaService.usageInformation.findFirst({
-                where: { id: id },
-                include: {
-                    Device: true
+            if (!usages) return new ResponseData<any>(null, 400, "Thiết bị không tồn tại")
+                let dataTotal: any[] = []; // Sử dụng mảng để lưu trữ tất cả dữ liệu
+
+            for (const usage of usages) {
+                const data = await this.prismaService.usageInformation.findFirst({
+                    where: { deviceId: usage.deviceId },
+                    include: {
+                        Device: {
+                            select: {
+                                id: true,
+                                serialNumber:true,
+                                name: true,
+                                statusDevice: true,
+                                image:true,
+                                category:true
+                            }
+                        },
+                        room:true
+                    }
+                });
+            
+                if (data) {
+                    dataTotal.push(data); 
                 }
-            })
-            return new ResponseData<any>(data, 200, "Tìm thấy thiết bị")
+            }
+            
+            return new ResponseData<any>(dataTotal, 200, "Tìm thấy thiết bị");
+            
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
@@ -145,7 +166,7 @@ export class UsageService {
                     },
                     data: {
                         roomId: createUsageDto.roomId,
-                        statusDevice: 'ACTIVE'
+                        statusDevice: 'ĐANG HOẠT ĐỘNG'
                     }
                 })
             }

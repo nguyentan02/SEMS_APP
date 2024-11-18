@@ -86,7 +86,7 @@ model Device {
   qrCode                String?
   image                 String                  @default("https://res.cloudinary.com/dnhndgzes/image/upload/v1728122320/frdlrynketnd07okysmg.png")
   lastMaintenanceDate   DateTime?
-  statusDevice          String                  @default("INACTIVE")
+  statusDevice          String                  @default("KHÔNG HOẠT ĐỘNG")
   categoryId            Int
   roomId                Int?
   isDelete              Boolean                 @default(false)
