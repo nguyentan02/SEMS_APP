@@ -41,6 +41,7 @@ const createDepartment = async () => {
   data.categoryName = "";
   data.description = "";
   data.attributes = [];
+  attributesName.value = [];
   await categoryStore.getCategory({ name: "", page: 1 });
   manageStore.closeAddCategoryModal();
 };

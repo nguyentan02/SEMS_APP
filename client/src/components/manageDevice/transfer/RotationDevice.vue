@@ -7,7 +7,7 @@ import { useLocationStore } from "@/stores/location.store";
 import { useToast } from "vue-toast-notification";
 import { useRoute } from "vue-router";
 import { useUsageStore } from "@/stores/usage.store";
-const props = defineProps(["selectedDevices"]);
+const props = defineProps(["selectedDevices", "currentRoomName"]);
 
 const data = reactive({
   deviceId: [],
@@ -63,7 +63,10 @@ watch(
         <div class="flex items-center text-lg">Luân chuyển thiết bị</div>
       </template>
       <template #body>
-        <span>Bạn muốn luân chuyển các thiết bị vừa chọn từ phòng {{}}</span>
+        <span class="font-semibold"
+          >Bạn muốn luân chuyển các thiết bị vừa chọn từ phòng
+          {{ props.currentRoomName }} sang:</span
+        >
         <h3>Chọn khoa:</h3>
         <Field
           as="select"
@@ -114,11 +117,10 @@ watch(
       </template>
       <template #footer>
         <div class="flex justify-between">
-          <fwb-button color="green"> Luân chuyển </fwb-button>
-          <fwb-button
-            @click="rotationStore.closeRotationDevice"
-            color="alternative"
-          >
+          <fwb-button color="green">
+            Luân chuyển <i class="fa-solid fa-arrow-right"></i>
+          </fwb-button>
+          <fwb-button @click="rotationStore.closeRotationDevice" color="red">
             Huỷ
           </fwb-button>
         </div>

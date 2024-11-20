@@ -8,6 +8,9 @@ import { FwbBreadcrumb, FwbBreadcrumbItem } from "flowbite-vue";
 import Tag from "primevue/tag";
 import Column from "primevue/column";
 import RotationDevice from "../transfer/RotationDevice.vue";
+import { FilterMatchMode, FilterOperator } from "primevue/api";
+import IconField from "primevue/iconfield";
+import InputIcon from "primevue/inputicon";
 import { useToast } from "vue-toast-notification";
 import Dialog from "primevue/dialog";
 import { useRouter } from "vue-router";
@@ -19,16 +22,19 @@ import Loading from "@/components/common/Loading.vue";
 import Toolbar from "primevue/toolbar";
 import AddUsageModal from "./AddUsageModal.vue";
 import { useRotationDevice } from "@/stores/rotation.store";
-
+import { useDeviceStore } from "@/stores/device.store";
+import InputText from "primevue/inputtext";
 const usageStore = useUsageStore();
 const currentUsage = ref(null);
 const currentDevice = ref(null);
+const currentRoomName = ref(null);
 const usageId = ref(null);
 const route = useRoute();
 const router = useRouter();
+const deviceStore = useDeviceStore();
 const roomId = route.params.id;
+const roomName = route.query.roomName;
 const rotationStore = useRotationDevice();
-
 onMounted(async () => {
   await usageStore.getUsageByIdRoom(roomId);
 });
@@ -51,7 +57,9 @@ const getSeverity = (status) => {
       return null;
   }
 };
+
 const deleteUsage = async (id) => {
+  console.log(id);
   await usageStore.deleteUsage(id);
   if (usageStore.err) {
     $toast.error(usageStore.err, { position: "top-right" });
@@ -59,6 +67,7 @@ const deleteUsage = async (id) => {
   }
   $toast.success(usageStore.result.message, { position: "top-right" });
   await usageStore.getUsageByIdRoom(roomId);
+  await deviceStore.getDevicesByUsage();
   visible.value = false;
 };
 const viewDeviceDetails = (event) => {
@@ -68,6 +77,36 @@ const viewDeviceDetails = (event) => {
     params: { id: deviceId },
   });
 };
+const filters = ref();
+const initFilters = () => {
+  filters.value = {
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    usage_start: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+    },
+    price: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+    },
+  };
+};
+initFilters();
+const dt = ref();
+const exportCSV = () => {
+  dt.value.exportCSV();
+};
+const statuses = ref(["ĐANG HOẠT ĐỘNG", "ĐANG BẢO TRÌ"]);
+const formatDate = (value) => {
+  return dayjs(value).format("DD/MM/YYYY HH:MM:ss");
+};
+// const formatDate = (value) => {
+//   return value.toLocaleDateString("en-US", {
+//     day: "2-digit",
+//     month: "2-digit",
+//     year: "numeric",
+//   });
+// };
 </script>
 <style scoped></style>
 
@@ -84,11 +123,11 @@ const viewDeviceDetails = (event) => {
     >
       Trở về
     </fwb-breadcrumb-item>
-    <fwb-breadcrumb-item> Phòng{{ deviceEdit?.name }} </fwb-breadcrumb-item>
+    <fwb-breadcrumb-item> Phòng {{ roomName }} </fwb-breadcrumb-item>
   </fwb-breadcrumb>
   <div>
     <h1 class="text-2xl font-bold mb-10 text-[#25861e]">
-      Danh sách thiết bị của phòng {{}}
+      Danh sách thiết bị của phòng {{ roomName }}
     </h1>
   </div>
   <Toolbar class="mb-4 px-2 py-3 rounded-md">
@@ -105,25 +144,33 @@ const viewDeviceDetails = (event) => {
           }
         "
       />
-      <button
+      <Button
+        icon="pi pi-send"
         :disabled="selectedDevices.length === 0"
         class="mr-2 px-4 py-1 bg-[#3089dd] text-white rounded-lg"
         @click="
           () => {
             rotationStore.showRotationDevice();
-            currentDevice = selectedDevices.map((device) => device.id);
+            currentRoomName = roomName;
+            currentDevice = selectedDevices.map((device) => device.deviceId);
           }
         "
-      >
-        <i class="fa-solid fa-dolly"></i>
-      </button>
+      />
     </template>
     <template #end>
-      <Button label="Export" icon="pi pi-upload" severity="help" />
+      <Button
+        label="Xuất tập tin"
+        @click="exportCSV($event)"
+        icon="pi pi-upload"
+        severity="help"
+      />
     </template>
   </Toolbar>
   <div v-if="!usageStore.isLoading" class="card background-manage">
     <DataTable
+      ref="dt"
+      v-model:filters="filters"
+      :globalFilterFields="['Device.name', 'Device.serialNumber']"
       :value="usageStore.usages"
       paginator
       :rows="10"
@@ -132,12 +179,29 @@ const viewDeviceDetails = (event) => {
       v-model:selection="selectedDevices"
       @row-click="viewDeviceDetails"
     >
+      <template #header>
+        <div class="flex flex-wrap gap-2 items-center justify-between">
+          <h4 class="p-3">Danh sách thiết bị</h4>
+          <IconField class="border border-gray-300 rounded mr-2">
+            <InputIcon class="relative">
+              <i class="pi pi-search ml-4" />
+            </InputIcon>
+            <InputText
+              v-model="filters['global'].value"
+              class="p-1 border-none w-[200px]"
+              placeholder="Tìm kiếm..."
+            />
+          </IconField>
+        </div>
+      </template>
       <Column
         selectionMode="multiple"
         headerStyle="width: 3rem"
         class="p-2"
       ></Column>
-      <template #empty> No customers found. </template>
+      <template #empty>
+        <div class="text-center">Không có thiết bị</div>
+      </template>
       <div class="">
         <Column
           header="Name"
@@ -153,15 +217,14 @@ const viewDeviceDetails = (event) => {
           field="Device.serialNumber"
           style="min-width: 6rem"
           class="p-2 border-b border-gray-400"
-          frozen
         >
         </Column>
         <Column
           header="Loại"
+          sortable
           field="Device.category.categoryName"
           style="min-width: 8rem"
           class="p-2 border-b border-gray-400"
-          frozen
         >
         </Column>
         <Column
@@ -177,14 +240,14 @@ const viewDeviceDetails = (event) => {
         </Column>
         <Column
           header="Ngày bắt đầu"
-          sortable
           field="usage_start"
+          sortable
           style="min-width: 12rem"
           class="border-b border-gray-400"
-          filter-field=""
+          filterField="usage_start"
         >
           <template #body="{ data }">
-            {{ dayjs(data.usage_start).format("DD/MM/YYYY HH:MM:ss") }}
+            {{ formatDate(data.usage_start) }}
           </template>
         </Column>
         <Column
@@ -200,7 +263,7 @@ const viewDeviceDetails = (event) => {
         </Column>
         <Column
           header="Ghi chú"
-          style="min-width: 10rem"
+          style="min-width: 8rem"
           class="border-b border-gray-400"
         >
           <template #body="{ data }">
@@ -213,7 +276,9 @@ const viewDeviceDetails = (event) => {
           sortable
           style="min-width: 5rem"
           class="border-b border-gray-400"
+          field="Device.statusDevice"
         >
+          >
           <template #body="{ data }">
             <Tag
               class="p-1"
@@ -295,6 +360,9 @@ const viewDeviceDetails = (event) => {
     <Loading />
   </div>
   <AddUsageModal />
-  <RotationDevice :selectedDevices="currentDevice" />
+  <RotationDevice
+    :selectedDevices="currentDevice"
+    :currentRoomName="currentRoomName"
+  />
   <EditUsageModal :currentUsage="currentUsage" />
 </template>

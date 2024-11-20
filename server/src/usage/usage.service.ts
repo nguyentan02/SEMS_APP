@@ -92,18 +92,19 @@ export class UsageService {
     }
     async getUsageByIdRoom(id: number) {
         try {
-            const usages = await this.prismaService.usageInformation.findMany({
+            const exist = await this.prismaService.usageInformation.findMany({
                 where: {
                     roomId: id,
                     isDeleted:false
                 }
-            })
-            if (!usages) return new ResponseData<any>(null, 400, "Thiết bị không tồn tại")
-                let dataTotal: any[] = []; // Sử dụng mảng để lưu trữ tất cả dữ liệu
 
-            for (const usage of usages) {
-                const data = await this.prismaService.usageInformation.findFirst({
-                    where: { deviceId: usage.deviceId },
+            })
+            if (!exist) return new ResponseData<any>(null, 400, "Bản ghi không tồn tại")
+                const data = await this.prismaService.usageInformation.findMany({
+                    where: {
+                        roomId: id,
+                        isDeleted:false
+                    },
                     include: {
                         Device: {
                             select: {
@@ -117,14 +118,9 @@ export class UsageService {
                         },
                         room:true
                     }
-                });
-            
-                if (data) {
-                    dataTotal.push(data); 
-                }
-            }
-            
-            return new ResponseData<any>(dataTotal, 200, "Tìm thấy thiết bị");
+    
+                })
+            return new ResponseData<any>(data, 200, "Tìm thấy thiết bị");
             
         } catch (error) {
             this.logger.error(error.message)
@@ -198,7 +194,6 @@ export class UsageService {
                     isDeleted: false
                 }
             })
-            console.log(id);
             if (!exist) return new ResponseData<any>(null, 400, "Thông tin không tồn tại")
             await this.prismaService.usageInformation.update({
                 where: { id: id },
@@ -216,27 +211,28 @@ export class UsageService {
     }
     async deleteUsage(id: number) {
         try {
+            console.log(id);
             const exist = await this.prismaService.usageInformation.findFirst({
                 where: {
                     id: id
                 }
             })
             if (!exist) return new ResponseData<any>(null, 400, "Thông tin không tồn tại")
+             await this.prismaService.device.update({
+                    where: {
+                        id: exist.deviceId
+                    },
+                    data: {
+                        statusDevice:"KHÔNG HOẠT ĐỘNG",
+                        roomId: null
+                    }
+                })
             await this.prismaService.usageInformation.update({
                 where: {
-                    id: id
+                    id: exist.id
                 }, data: {
                     isDeleted: true,
                     end: new Date()
-                }
-            })
-            await this.prismaService.device.update({
-                where: {
-                    id: exist.deviceId
-                },
-                data: {
-                    statusDevice:"KHÔNG HOẠT ĐỘNG",
-                    roomId: null
                 }
             })
             return new ResponseData<any>(null, 200, "Xoá thành công")

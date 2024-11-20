@@ -35,12 +35,11 @@ const formSchemaUsage = yup.object().shape({
 
 onMounted(async () => {
   await deviceStore.getDevicesByUsage();
-  device.value = deviceStore.result;
 });
 
 const confirmSelection = () => {
   newUsage.deviceId = selectedDevices.value.map((device) => device.id);
-  dialogVisible.value = false; // Đóng dialog
+  dialogVisible.value = false;
 };
 const addUsage = async () => {
   await usageStore.createUsage(newUsage);
@@ -53,8 +52,15 @@ const addUsage = async () => {
   } else {
     $toast.success(usageStore.result.message, { position: "top-right" });
   }
-  await usageStore.getUsageByIdRoom(roomIdTest);
+
+  newUsage.deviceId = [];
+  newUsage.usage_start = "";
+  newUsage.usage_end = "";
+  newUsage.purpose = "";
+  selectedDevices.value = [];
   usageStore.closeAddUsage();
+  await usageStore.getUsageByIdRoom(roomIdTest);
+  await deviceStore.getDevicesByUsage();
 };
 </script>
 
@@ -73,7 +79,7 @@ const addUsage = async () => {
         <Button
           label="Chọn thiết bị"
           icon="pi pi-external-link"
-          class="p-1 bg-[#25861e]"
+          class="p-1 bg-[#1d7517]"
           @click="dialogVisible = true"
         />
         <div class="mt-2">
@@ -124,7 +130,7 @@ const addUsage = async () => {
       <template #footer>
         <div class="flex justify-between">
           <fwb-button color="green"> Thêm mới </fwb-button>
-          <fwb-button @click="usageStore.closeAddUsage" color="alternative"
+          <fwb-button @click="usageStore.closeAddUsage" color="red"
             >Hủy</fwb-button
           >
         </div>
@@ -139,7 +145,7 @@ const addUsage = async () => {
       :contentStyle="{ height: '500px' }"
     >
       <DataTable
-        :value="device"
+        :value="deviceStore.result"
         size="small"
         dataKey="id"
         removableSort

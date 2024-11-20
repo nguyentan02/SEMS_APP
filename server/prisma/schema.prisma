@@ -30,7 +30,7 @@ model User {
 
   Feedback        Feedback[]
   ActualQuantity  ActualQuantity[]
-  maintenancePlan maintenancePlan[]
+  maintenancePlan MaintenancePlan[]
 }
 
 // model Position {
@@ -94,7 +94,7 @@ model Device {
   category              Category                @relation(fields: [categoryId], references: [id])
   UsageInformation      UsageInformation[]
   RotationDevice        RotationDevice[]
-  maintenancePlan       maintenancePlan[]
+  maintenancePlan       MaintenancePlan[]
   DeviceAttributeValues DeviceAttributeValues[]
 
   @@map("device")
@@ -177,16 +177,20 @@ enum PriorityLevel {
   LOW
 }
 
-model maintenancePlan {
-  id                Int               @id @default(autoincrement())
-  deviceId          Int
-  userId            Int
-  requestDate       DateTime
-  startDate         DateTime
-  endDate           Int
+model MaintenancePlan {
+  id          Int      @id @default(autoincrement())
+  title       String
+  deviceId    Int
+  userId      Int
+  requestDate DateTime @default(now())
+  startDate   DateTime
+  endDate     DateTime
+
   priority          PriorityLevel     @default(LOW)
   maintenanceStatus StatusMaintenance @default(PENDING)
+  cost              Decimal?          @default(0.00)
   descriptionPlan   String?
+  isDeleted         Boolean           @default(false)
   User              User              @relation(fields: [userId], references: [id])
   Device            Device            @relation(fields: [deviceId], references: [id])
 }
@@ -266,14 +270,3 @@ model OrderItem {
   price      Float
   totalPrice Float    @default(0)
 }
-
-// model CategoryAttribyutes {
-//   categoryId   Int
-//   attribyuteId Int
-
-//   category   Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-//   attribyute Attribyutes_category @relation(fields: [attribyuteId], references: [id], onDelete: Cascade)
-
-//   @@id([categoryId, attribyuteId])
-//   @@map("category_attribyutes")
-// }

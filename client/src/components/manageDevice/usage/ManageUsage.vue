@@ -2,17 +2,19 @@
 import { ref, onMounted } from "vue";
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
+import { useDeviceStore } from "@/stores/device.store";
 import Column from "primevue/column";
 import { useRouter } from "vue-router";
 import Badge from "primevue/badge";
 import Tag from "primevue/tag";
 import { useLocationStore } from "@/stores/location.store";
 const locationStore = useLocationStore();
+const deviceStore = useDeviceStore();
+
 const usagesInfo = ref();
 onMounted(async () => {
   await locationStore.getUsageInfo({ key: "", page: "" });
   usagesInfo.value = locationStore.usages;
-  console.log(usagesInfo.value);
 });
 
 const router = useRouter();
@@ -121,6 +123,7 @@ const expandedRows = ref([]);
                         router.push({
                           name: 'detailUsage',
                           params: { id: slotProps.data.id },
+                          query: { roomName: slotProps.data.roomName },
                         });
                       }
                     "

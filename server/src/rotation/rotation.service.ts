@@ -15,15 +15,11 @@ export class RotationService {
             const devices = await this.prismaService.device.findMany({
                 where: { id: { in: deviceId } },
             });
-    
-            
-            const existingDeviceIds = devices.map((d) => d.id);
+                const existingDeviceIds = devices.map((d) => d.id);
             const nonExistingDevices = deviceId.filter((id) => !existingDeviceIds.includes(id));
-    
             if (nonExistingDevices.length > 0) {
                 throw new Error(`Thiết bị không tồn tại: ${nonExistingDevices.join(", ")}`);
             }
-    
            const existingRoom = await this.prismaService.room.findUnique({
             where:{
                 id:newLocationId
@@ -33,7 +29,7 @@ export class RotationService {
             const devicesAtNewLocation = devices.filter((d) => d.roomId === newLocationId);
             if (devicesAtNewLocation.length > 0) {
                 const deviceNames = devicesAtNewLocation.map((d) => d.name || d.id).join(", ");
-                return new ResponseData<any>(null, 401, `Thiết bị đã ở phòng này: ${deviceNames}`);
+                return new ResponseData<any>(null, 401, `Thiết bị ${deviceNames} đã ở phòng này`);
             }
             await this.prismaService.$transaction([
                 this.prismaService.rotationDevice.createMany({

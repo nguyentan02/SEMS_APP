@@ -42,6 +42,10 @@ const createDepartment = async () => {
     return;
   }
   $toast.success(locationStore.result.message, { position: "top-right" });
+  data.deparmentName = "";
+  data.roomName = [];
+  data.symbol = "";
+  roomName.value = [];
   await locationStore.getLocations({ key: "", page: 1 });
   manageStore.closeAddLocationModal();
 };
@@ -112,7 +116,7 @@ const removeRoom = (index) => {
               :id="'room-' + room.id"
               :name="'room-' + index"
               v-model="room.name"
-              class="w-auto input-form my-1"
+              class="w-auto input-form my-1 text-black"
               placeholder="Tên phòng"
             />
             <button

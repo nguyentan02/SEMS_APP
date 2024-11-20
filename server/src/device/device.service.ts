@@ -106,7 +106,7 @@ export class DeviceService {
                     purchaseDate: 'asc'  // Default to 'asc' if not specified
                 }
             })
-            const total= data.length
+           
             return new ResponseData<any>(data, 200, "Tìm các thiết bị thành công")
         } catch (error) {
             this.logger.error(error.message)

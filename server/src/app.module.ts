@@ -16,6 +16,7 @@ import { UsageModule } from './usage/usage.module';
 import { RotationModule } from './rotation/rotation.module';
 import { MaterialModule } from './material/material.module';
 import { StorageModule } from './storage/storage.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
 
 
 @Module({
@@ -27,7 +28,7 @@ import { StorageModule } from './storage/storage.module';
       }),
     }),
     ScheduleModule.forRoot(),
-    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule, UsageModule, RotationModule, MaterialModule, StorageModule
+    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule, UsageModule, RotationModule, MaterialModule, StorageModule, MaintenanceModule
   ],
 
 })
