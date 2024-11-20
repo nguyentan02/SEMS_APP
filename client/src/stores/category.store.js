@@ -43,7 +43,7 @@ const category =ref(null)
             
             if (res.statusCode !== 200) throw new Error(res.message)
             result.value = res.data.AttribyutesCategory
-        category.value = result.value
+          category.value = result.value
 
         } catch (error) {
             err.value = error.message
@@ -95,7 +95,7 @@ const category =ref(null)
         } catch (error) {
             err.value = error.message
             code.value= error.statusCode
-            console.log(code.value);
+            
         } finally {
             isLoading.value = false
         }

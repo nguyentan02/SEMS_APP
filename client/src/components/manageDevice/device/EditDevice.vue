@@ -134,7 +134,7 @@ const updateDevice = async () => {
   // device.categoryId = "";
   // device.attributes = [];
   // selectedFile.value = null;
-  // url.value = null;
+  selectedFile.value = null;
 };
 </script>
 <template>

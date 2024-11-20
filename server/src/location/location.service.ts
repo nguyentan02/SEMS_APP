@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDeparmentDto, UpdateDeparmentDto, CreateRoomDto, UpdateRoomDto } from './dto';
 import { PAGE_SIZE, ResponseData } from '../global';
+import { Room } from '@prisma/client';
 
 
 
@@ -174,7 +175,25 @@ export class LocationService {
             return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau")
         }
     }
-
+    async getLocationById(id:number){
+        try {
+            const exit = await this.prismaService.deparment.findUnique({
+                where:{
+                    id:id
+                }
+            })
+            if (!exit) return new ResponseData<any>(null, 400, "Không tồn tại địa điểm")
+                const data = await this.prismaService.room.findMany({
+            where:{
+                deparmentId:id
+            },
+        })
+        return new ResponseData<Room[]>(data, 200, "Lấy dữ liệu thành công")
+        } catch (error) {
+            this.logger.error(error.message)
+            return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau")
+        }
+    }
     async createDeparment(createDeparmentDto: CreateDeparmentDto) {
         try {
             const deparment = await this.prismaService.deparment.findFirst({

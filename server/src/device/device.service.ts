@@ -88,6 +88,31 @@ export class DeviceService {
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
+    async getAllDeviceByUsage() {
+        try {
+            const data = await this.prismaService.device.findMany({
+                where: {
+                    statusDevice:"KHÔNG HOẠT ĐỘNG",
+                    isDelete:false
+                },
+                include:{
+                    category:{
+                        select:{
+                            categoryName:true
+                        }
+                    },
+                }
+                , orderBy: {
+                    purchaseDate: 'asc'  // Default to 'asc' if not specified
+                }
+            })
+            const total= data.length
+            return new ResponseData<any>(data, 200, "Tìm các thiết bị thành công")
+        } catch (error) {
+            this.logger.error(error.message)
+            return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
+        }
+    }
     async getDeviceById(id: number) {
         try {
             const device = await this.prismaService.device.findFirst({

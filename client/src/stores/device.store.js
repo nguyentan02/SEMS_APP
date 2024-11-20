@@ -45,6 +45,20 @@ export const useDeviceStore = defineStore('device', ()=>{
              isLoading.value= false
         }
     }
+    const getDevicesByUsage = async()=>{
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await deviceService.getDevicesByUsage(authStore.token)
+            if (res.statusCode !== 200) throw new Error(res.message)
+                result.value = res.data
+        } catch (error) {
+                err.value = error.message
+        }finally{
+             isLoading.value= false
+        }
+    }
     const createDevice = async (data) => {
         err.value = null
         result.value = null
@@ -116,5 +130,5 @@ export const useDeviceStore = defineStore('device', ()=>{
     //         isLoading.value = false
     //     }
     // }
-    return {err,result,isLoading,key,devices,device,totalCount,sortByDate,totalPages,currentPage,categoryId,groupByCategory,createDevices,getDevices,showQrCodeModal,closeQrCodeModal,isShow,createDevice,getDeviceById,updateDevice}
+    return {err,result,isLoading,key,devices,device,totalCount,sortByDate,totalPages,currentPage,categoryId,groupByCategory,createDevices,getDevices,showQrCodeModal,closeQrCodeModal,isShow,createDevice,getDeviceById,updateDevice,getDevicesByUsage}
 })

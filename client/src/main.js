@@ -9,9 +9,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import ToastService from 'primevue/toastservice';
 import Lara from "@/presets/lara";
 import Ripple from 'primevue/ripple';
-
 import BadgeDirective from 'primevue/badgedirective';
-
 
 import './assets/main.css'
 import './assets/index.css'
@@ -20,7 +18,7 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 import '../node_modules/flowbite-vue/dist/index.css'
 import "@fortawesome/fontawesome-free/css/all.min.css"
 import 'primevue/resources/themes/lara-light-green/theme.css'
-// import 'primevue/resources/primevue.min.css'; // Core CSS
+import 'primevue/resources/primevue.min.css'; 
 
 import App from './App.vue'
 dayjs.extend(localizedFormat)

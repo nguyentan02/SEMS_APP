@@ -13,6 +13,9 @@ class locationService {
         let parameter = createQueryString(data)
         return (await this.api.get(`/usage/${parameter}`)).data
     }
+    async getLocationById(id) {
+        return (await this.api.get(`/${id}`)).data
+    }
     async createDepartment(token,data) {
         return (await this.api.post('cre-department',data, {
             headers: {

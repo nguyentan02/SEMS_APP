@@ -3,35 +3,36 @@ import { onMounted, ref } from "vue";
 import { useUsageStore } from "@/stores/usage.store";
 import { useRoute } from "vue-router";
 import DataTable from "primevue/datatable";
-import { FilterMatchMode, FilterOperator } from "primevue/api";
-import Dialog from "primevue/dialog";
+import EditUsageModal from "./EditUsageModal.vue";
+import { FwbBreadcrumb, FwbBreadcrumbItem } from "flowbite-vue";
 import Tag from "primevue/tag";
 import Column from "primevue/column";
+import RotationDevice from "../transfer/RotationDevice.vue";
+import { useToast } from "vue-toast-notification";
+import Dialog from "primevue/dialog";
+import { useRouter } from "vue-router";
+const visible = ref(false);
+const $toast = useToast();
 import Button from "primevue/button";
 import dayjs from "dayjs";
 import Loading from "@/components/common/Loading.vue";
-import SpeedDial from "primevue/speeddial";
 import Toolbar from "primevue/toolbar";
+import AddUsageModal from "./AddUsageModal.vue";
+import { useRotationDevice } from "@/stores/rotation.store";
+
 const usageStore = useUsageStore();
-
+const currentUsage = ref(null);
+const currentDevice = ref(null);
+const usageId = ref(null);
 const route = useRoute();
+const router = useRouter();
 const roomId = route.params.id;
-let interval = ref(null);
-const elapsedTime = (startTime) => {
-  const now = dayjs();
-  const start = dayjs(startTime);
-  const duration = now.diff(start, "second");
+const rotationStore = useRotationDevice();
 
-  const hours = Math.floor(duration / 3600);
-  const minutes = Math.floor((duration % 3600) / 60);
-  const seconds = duration % 60;
-
-  return `${hours}h:${minutes}m:${seconds}s`;
-};
 onMounted(async () => {
   await usageStore.getUsageByIdRoom(roomId);
 });
-
+const selectedDevices = ref([]);
 const getSeverity = (status) => {
   switch (status) {
     case "unqualified":
@@ -50,33 +51,73 @@ const getSeverity = (status) => {
       return null;
   }
 };
-const products = ref();
-const productDialog = ref(false);
-const deleteProductDialog = ref(false);
-const deleteProductsDialog = ref(false);
-const product = ref({});
-const openNew = () => {
-  product.value = {};
-  submitted.value = false;
-  productDialog.value = true;
+const deleteUsage = async (id) => {
+  await usageStore.deleteUsage(id);
+  if (usageStore.err) {
+    $toast.error(usageStore.err, { position: "top-right" });
+    return;
+  }
+  $toast.success(usageStore.result.message, { position: "top-right" });
+  await usageStore.getUsageByIdRoom(roomId);
+  visible.value = false;
+};
+const viewDeviceDetails = (event) => {
+  const deviceId = event.data.Device.id;
+  router.push({
+    name: "detailDeivce",
+    params: { id: deviceId },
+  });
 };
 </script>
+<style scoped></style>
+
 <template>
+  <fwb-breadcrumb>
+    <fwb-breadcrumb-item
+      home
+      href="#"
+      @click="
+        () => {
+          router.back();
+        }
+      "
+    >
+      Trở về
+    </fwb-breadcrumb-item>
+    <fwb-breadcrumb-item> Phòng{{ deviceEdit?.name }} </fwb-breadcrumb-item>
+  </fwb-breadcrumb>
   <div>
     <h1 class="text-2xl font-bold mb-10 text-[#25861e]">
-      Danh sách thiết của phòng {{}}
+      Danh sách thiết bị của phòng {{}}
     </h1>
   </div>
   <Toolbar class="mb-4 px-2 py-3 rounded-md">
     <template #start>
       <Button
-        label="New"
+        label="Mới"
         icon="pi pi-plus"
-        class="mr-2 p-2 bg-[#25861e] text-white"
-        @click="openNew"
+        outlined
+        class="mr-2 px-2 py-1 bg-[#25861e] text-white"
+        @click="
+          () => {
+            usageStore.showAddUsage();
+            currentRoomId = roomId;
+          }
+        "
       />
+      <button
+        :disabled="selectedDevices.length === 0"
+        class="mr-2 px-4 py-1 bg-[#3089dd] text-white rounded-lg"
+        @click="
+          () => {
+            rotationStore.showRotationDevice();
+            currentDevice = selectedDevices.map((device) => device.id);
+          }
+        "
+      >
+        <i class="fa-solid fa-dolly"></i>
+      </button>
     </template>
-
     <template #end>
       <Button label="Export" icon="pi pi-upload" severity="help" />
     </template>
@@ -88,17 +129,14 @@ const openNew = () => {
       :rows="10"
       dataKey="id"
       filterDisplay="menu"
+      v-model:selection="selectedDevices"
+      @row-click="viewDeviceDetails"
     >
-      <!-- <template #header>
-        <div class="flex justify-content-between border-b border-gray-500">
-          <Button
-            type="button"
-            icon="pi pi-filter-slash"
-            label="Clear"
-            outlined
-          />
-        </div>
-      </template> -->
+      <Column
+        selectionMode="multiple"
+        headerStyle="width: 3rem"
+        class="p-2"
+      ></Column>
       <template #empty> No customers found. </template>
       <div class="">
         <Column
@@ -140,13 +178,13 @@ const openNew = () => {
         <Column
           header="Ngày bắt đầu"
           sortable
-          field="usage_end"
+          field="usage_start"
           style="min-width: 12rem"
           class="border-b border-gray-400"
           filter-field=""
         >
           <template #body="{ data }">
-            {{ dayjs(data.usage_start).format("DD/MM/YYYY HH:mm:ss") }}
+            {{ dayjs(data.usage_start).format("DD/MM/YYYY HH:MM:ss") }}
           </template>
         </Column>
         <Column
@@ -157,18 +195,9 @@ const openNew = () => {
           class="border-b border-gray-400"
         >
           <template #body="{ data }">
-            {{ dayjs(data.usage_end).format("DD/MM/YYYY HH:mm:ss") }}
+            {{ dayjs(data.usage_end).format("DD/MM/YYYY HH:MM:ss") }}
           </template>
         </Column>
-        <!-- <Column
-          header="Thời gian đã sử dụng"
-          style="min-width: 10rem"
-          class="border-b border-gray-400"
-        >
-          <template #body="{ data }">
-            {{ elapsedTime(data.usage_start) }}
-          </template>
-        </Column> -->
         <Column
           header="Ghi chú"
           style="min-width: 10rem"
@@ -199,16 +228,29 @@ const openNew = () => {
           style="min-width: 2rem"
           class="border-b border-gray-400"
         >
-          <template #body="slotProps">
+          <template #body="{ data }">
             <div class="flex">
               <Button
                 icon="pi pi-pencil"
                 outlined
                 rounded
                 class="text-emerald-600 border border-emerald-600 size-9 mr-1"
+                @click="
+                  () => {
+                    usageStore.showEditUsage();
+                    currentUsage = data;
+                  }
+                "
               />
+
               <Button
                 icon="pi pi-trash"
+                @click="
+                  () => {
+                    visible = true;
+                    usageId = data.id;
+                  }
+                "
                 outlined
                 rounded
                 class="text-red-600 border border-red-600 size-9"
@@ -216,139 +258,43 @@ const openNew = () => {
             </div>
           </template>
         </Column>
+        <Dialog
+          v-model:visible="visible"
+          modal
+          position="top"
+          header="Xoá"
+          class="mt-2"
+          :style="{ width: '20rem' }"
+        >
+          <span class="text-surface-500 dark:text-surface-400 block mb-8 p-2"
+            ><i class="fa-solid fa-triangle-exclamation"></i>Bạn có muốn xóa bản
+            ghi này không?</span
+          >
+
+          <div class="flex justify-end gap-2 m-2">
+            <Button
+              type="button"
+              label="Trở về"
+              severity="secondary"
+              class="px-2"
+              @click="visible = false"
+            ></Button>
+            <Button
+              type="button"
+              label="Xoá"
+              severity="danger"
+              class="px-4"
+              @click="deleteUsage(usageId)"
+            ></Button>
+          </div>
+        </Dialog>
       </div>
     </DataTable>
-    <Dialog
-      v-model:visible="productDialog"
-      :style="{ width: '450px' }"
-      header="Product Details"
-      :modal="true"
-      class="p-fluid"
-    >
-      <img
-        v-if="product.image"
-        :src="`https://primefaces.org/cdn/primevue/images/product/${product.image}`"
-        :alt="product.image"
-        class="block m-auto pb-3"
-      />
-      <div class="field">
-        <label for="name">Name</label>
-        <InputText
-          id="name"
-          v-model.trim="product.name"
-          required="true"
-          autofocus
-          :invalid="submitted && !product.name"
-        />
-        <small class="p-error" v-if="submitted && !product.name"
-          >Name is required.</small
-        >
-      </div>
-      <div class="field">
-        <label for="description">Description</label>
-        <Textarea
-          id="description"
-          v-model="product.description"
-          required="true"
-          rows="3"
-          cols="20"
-        />
-      </div>
-
-      <div class="field">
-        <label for="inventoryStatus" class="mb-3">Inventory Status</label>
-        <Dropdown
-          id="inventoryStatus"
-          v-model="product.inventoryStatus"
-          :options="statuses"
-          optionLabel="label"
-          placeholder="Select a Status"
-        >
-          <template #value="slotProps">
-            <div v-if="slotProps.value && slotProps.value.value">
-              <Tag
-                :value="slotProps.value.value"
-                :severity="getStatusLabel(slotProps.value.label)"
-              />
-            </div>
-            <div v-else-if="slotProps.value && !slotProps.value.value">
-              <Tag
-                :value="slotProps.value"
-                :severity="getStatusLabel(slotProps.value)"
-              />
-            </div>
-            <span v-else>
-              {{ slotProps.placeholder }}
-            </span>
-          </template>
-        </Dropdown>
-      </div>
-
-      <div class="field">
-        <label class="mb-3">Category</label>
-        <div class="formgrid grid">
-          <div class="field-radiobutton col-6">
-            <RadioButton
-              id="category1"
-              name="category"
-              value="Accessories"
-              v-model="product.category"
-            />
-            <label for="category1">Accessories</label>
-          </div>
-          <div class="field-radiobutton col-6">
-            <RadioButton
-              id="category2"
-              name="category"
-              value="Clothing"
-              v-model="product.category"
-            />
-            <label for="category2">Clothing</label>
-          </div>
-          <div class="field-radiobutton col-6">
-            <RadioButton
-              id="category3"
-              name="category"
-              value="Electronics"
-              v-model="product.category"
-            />
-            <label for="category3">Electronics</label>
-          </div>
-          <div class="field-radiobutton col-6">
-            <RadioButton
-              id="category4"
-              name="category"
-              value="Fitness"
-              v-model="product.category"
-            />
-            <label for="category4">Fitness</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="formgrid grid">
-        <div class="field col">
-          <label for="price">Price</label>
-          <InputNumber
-            id="price"
-            v-model="product.price"
-            mode="currency"
-            currency="USD"
-            locale="en-US"
-          />
-        </div>
-        <div class="field col">
-          <label for="quantity">Quantity</label>
-          <InputNumber id="quantity" v-model="product.quantity" integeronly />
-        </div>
-      </div>
-      <template #footer>
-        <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-        <Button label="Save" icon="pi pi-check" text @click="saveProduct" />
-      </template>
-    </Dialog>
   </div>
   <div v-else class="absolute right-[47%]">
     <Loading />
   </div>
+  <AddUsageModal />
+  <RotationDevice :selectedDevices="currentDevice" />
+  <EditUsageModal :currentUsage="currentUsage" />
 </template>

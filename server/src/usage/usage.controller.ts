@@ -18,11 +18,20 @@ export class UsageController {
     ) {
         return this.usageService.getAllUsage(option)
     }
+    @Get('/room/:id')
+    @UseGuards(MyJWTGuard, JwtStrategy)
+    @Roles(USER_TYPES.USER)
+    getUsageByIdRoom(
+        @Param('id', ParseIntPipe) id: number
+    ) {
+        return this.usageService.getUsageByIdRoom(id)
+    }
     @Get('/:id')
     @UseGuards(MyJWTGuard, JwtStrategy)
     @Roles(USER_TYPES.USER)
     getUsageById(
         @Param('id', ParseIntPipe) id: number
+       
     ) {
         return this.usageService.getUsageById(id)
     }
@@ -41,6 +50,7 @@ export class UsageController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updateUsageDto: UpdateUsageDto
     ) {
+        console.log(updateUsageDto.usage_start);
         return this.usageService.updateUsage(id, updateUsageDto)
     }
 

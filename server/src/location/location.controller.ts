@@ -13,9 +13,14 @@ export class LocationController {
     get(@Query() option: { page: number, key: string }) {
         return this.locationService.get(option)
     }
+ 
     @Get('/usage')
     getUsageInfo(@Query() option: { page: number, key: string }) {
         return this.locationService.getUsageInfo(option)
+    }
+    @Get('/:id')
+    getById(@Param('id', ParseIntPipe) id: number) {
+        return this.locationService.getLocationById(id)
     }
     @Post('cre-department')
     @UseGuards(MyJWTGuard, RolesGuard)

@@ -10,8 +10,6 @@ import { UpdateStorageDto } from './dto/update.dto';
 @Controller('storage')
 export class StorageController {
     constructor(private storageService: StorageService) { }
-
-
     @Post()
     @UseGuards(MyJWTGuard, JwtStrategy)
     @Roles(USER_TYPES.ADMIN)

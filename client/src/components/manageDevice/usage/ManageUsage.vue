@@ -1,30 +1,20 @@
 <script setup>
 import { ref, onMounted } from "vue";
-// import { ProductService } from "@/service/ProductService";
 import Button from "primevue/button";
-import { useToast } from "primevue/usetoast";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import { useRouter } from "vue-router";
-
-import ColumnGroup from "primevue/columngroup"; // optional
-import Row from "primevue/row"; // optional
 import Badge from "primevue/badge";
 import Tag from "primevue/tag";
 import { useLocationStore } from "@/stores/location.store";
 const locationStore = useLocationStore();
 const usagesInfo = ref();
-const totalDevice = ref(0);
 onMounted(async () => {
   await locationStore.getUsageInfo({ key: "", page: "" });
   usagesInfo.value = locationStore.usages;
   console.log(usagesInfo.value);
 });
-// const calculateTotalDevice = ()=>{
-//   usagesInfo.value =
-// }
-const roomName = ref(null);
-const toast = useToast();
+
 const router = useRouter();
 const expandedRows = ref([]);
 </script>

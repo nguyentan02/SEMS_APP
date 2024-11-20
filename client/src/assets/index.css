@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer tailwind-base {
+    @tailwind base;
+}
+
+
+
 .input-custom {
   @apply w-9/12 block bg-transparent border-b border-gray-300 focus:outline-none focus:border-gray-500 text-black text-base py-2 rounded-lg;
 }
@@ -30,6 +36,14 @@
 .smiling_face {
   @apply w-[120px] h-[140px] bg-transparent bg-no-repeat bg-center;
 }
+/* .checkbox-custom {
+  @apply w-5 h-5 border border-gray-300 rounded bg-white text-blue-600 focus:ring-blue-500 focus:ring-2;
+}
+
+.checkbox-custom:checked {
+  @apply bg-blue-600 border-blue-600 text-white;
+} */
+
 @layer base {
   :root {
     --color-primary: 61 61 78;

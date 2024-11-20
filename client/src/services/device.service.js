@@ -18,6 +18,15 @@ class deviceService{
             }
         })).data
     }
+    async getDevicesByUsage(token) {
+        return (await this.api.get('/byUsage', {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
     async createService(token, data) {
         return (await this.api.postForm('/create', data, {
             headers: {

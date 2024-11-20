@@ -9,7 +9,12 @@ import { MyJWTGuard } from '../auth/guard';
 @Controller('rotation')
 export class RotationController {
     constructor(private rotationService: RotationService) { }
-
+    @Get()
+    @UseGuards(MyJWTGuard, JwtStrategy)
+    @Roles(USER_TYPES.ADMIN)
+    getRotation() {
+        return this.rotationService.getRotationHistory()
+    }
     @Post()
     @UseGuards(MyJWTGuard, JwtStrategy)
     @Roles(USER_TYPES.ADMIN)
@@ -18,10 +23,5 @@ export class RotationController {
     ) {
         return this.rotationService.rotationDevice(createRotationDto)
     }
-    @Get()
-    @UseGuards(MyJWTGuard, JwtStrategy)
-    @Roles(USER_TYPES.ADMIN)
-    getRotation() {
-        return this.rotationService.getRotationHistory()
-    }
+    
 }

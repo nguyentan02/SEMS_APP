@@ -10,43 +10,54 @@ export class RotationService {
     private readonly logger = new Logger(RotationService.name)
     async rotationDevice(createRotationDto: CreateRotationDto) {
         try {
-            const device = await this.prismaService.device.findUnique({
-                where: { id: createRotationDto.deviceId },
+            const {deviceId,newLocationId,reason} = createRotationDto
+            console.log(createRotationDto);
+            const devices = await this.prismaService.device.findMany({
+                where: { id: { in: deviceId } },
             });
-
-            if (!device) {
-                throw new Error('Thiết bị không tồn tại');
+    
+            
+            const existingDeviceIds = devices.map((d) => d.id);
+            const nonExistingDevices = deviceId.filter((id) => !existingDeviceIds.includes(id));
+    
+            if (nonExistingDevices.length > 0) {
+                throw new Error(`Thiết bị không tồn tại: ${nonExistingDevices.join(", ")}`);
             }
-            if (device && device.roomId === createRotationDto.newLocationId) {
-                return new ResponseData<any>(null, 400, 'Thiết bị đang ở phòng này')
+    
+           const existingRoom = await this.prismaService.room.findUnique({
+            where:{
+                id:newLocationId
             }
-            await this.prismaService.rotationDevice.create({
-                data: {
-                    deviceId: createRotationDto.deviceId,
-                    oldLocationId: device.roomId,
-                    newLocationId: createRotationDto.newLocationId,
-                    reason: createRotationDto.reason,
-                    transferDate: new Date()
-                }
-            })
-            await this.prismaService.device.update({
-                where: {
-                    id: createRotationDto.deviceId
-                },
-                data: {
-                    roomId: createRotationDto.newLocationId
-                }
-            })
-            await this.prismaService.usageInformation.updateMany({
-                where: {
-                    deviceId: createRotationDto.deviceId,
-                    isDeleted: false
-                },
-                data: {
-                    roomId: createRotationDto.newLocationId
-                }
-            })
-            return new ResponseData<any>(null, 200, "Luân chuyển thiết bị thành công")
+           })
+           if(!existingRoom) return new ResponseData<any>(null, 400, "Phòng mới không tồn tại");
+            const devicesAtNewLocation = devices.filter((d) => d.roomId === newLocationId);
+            if (devicesAtNewLocation.length > 0) {
+                const deviceNames = devicesAtNewLocation.map((d) => d.name || d.id).join(", ");
+                return new ResponseData<any>(null, 401, `Thiết bị đã ở phòng này: ${deviceNames}`);
+            }
+            await this.prismaService.$transaction([
+                this.prismaService.rotationDevice.createMany({
+                    data: devices.map((device) => ({
+                        deviceId: device.id,
+                        oldLocationId: device.roomId,
+                        newLocationId: newLocationId,
+                        reason: reason,
+                    
+                    })),
+                }),
+            
+                this.prismaService.device.updateMany({
+                    where: { id: { in: deviceId } },
+                    data: { roomId: newLocationId },
+                }),
+            
+                this.prismaService.usageInformation.updateMany({
+                    where: { deviceId: { in: deviceId }, isDeleted: false },
+                    data: { roomId: newLocationId },
+                }),
+            ]);
+    
+            return new ResponseData<any>(null, 200, "Luân chuyển thiết bị thành công");
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')

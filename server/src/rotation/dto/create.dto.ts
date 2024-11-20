@@ -1,20 +1,14 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 
 export class CreateRotationDto {
-    @IsNumber()
-    @IsNotEmpty()
-    deviceId: number
-
-    // @IsNumber()
-    // @IsNotEmpty()
-    // oldLocationId: number
-
+    @IsArray()
+    @IsNumber({}, { each: true })
+    deviceId: number[]
     @IsNumber()
     @IsNotEmpty()
     newLocationId: number
-
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     reason: string
 }

@@ -85,6 +85,7 @@ const routes = [
             {
                 path: '/usageroom/:id',
                 name: 'detailUsage',
+          
                 component: () => import('../components/manageDevice/usage/DetailUsageRoom.vue'),
                 meta: { title: 'Danh sách thiết bị sử dụng' },
                 beforeEnter: async (to, from, next) => {
@@ -108,7 +109,7 @@ const routes = [
             {
                 path: '/transfer',
                 name: 'transfer',
-                component: () => import('../components/manageDevice/transfer/test.vue'),
+                component: () => import('../components/manageDevice/transfer/RotationDevice.vue'),
                 meta: { title: 'Thông tin cá nhân' },
          
             },

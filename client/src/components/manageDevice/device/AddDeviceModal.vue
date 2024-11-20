@@ -94,6 +94,7 @@ watch(
   async (newCategoryId) => {
     if (newCategoryId) {
       await categoryStore.getCategoryById(newCategoryId);
+
       device.attributes = categoryStore.category.map((attr) => ({
         id: attr.id,
         value: "",

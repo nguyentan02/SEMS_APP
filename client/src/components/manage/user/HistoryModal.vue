@@ -4,7 +4,6 @@ import { useManageStore } from "../../../stores/manage.store";
 import dayjs from "dayjs";
 
 const manageStore = useManageStore();
-
 const props = defineProps(["user"]);
 </script>
 
