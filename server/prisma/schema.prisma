@@ -157,9 +157,11 @@ model RotationDevice {
 }
 
 model Notification {
-  id        Int      @id @default(autoincrement())
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id            Int             @id @default(autoincrement())
+  read          Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  maintenanceId Int
+  Maintenance   MaintenancePlan @relation(fields: [maintenanceId], references: [id])
 
   @@map("notification")
 }
@@ -167,8 +169,9 @@ model Notification {
 enum StatusMaintenance {
   PENDING
   APPROVED
-  REJECTED
+  CANCEL
   COMPLETED
+  LATE
 }
 
 enum PriorityLevel {
@@ -178,14 +181,13 @@ enum PriorityLevel {
 }
 
 model MaintenancePlan {
-  id          Int      @id @default(autoincrement())
-  title       String
-  deviceId    Int
-  userId      Int
-  requestDate DateTime @default(now())
-  startDate   DateTime
-  endDate     DateTime
-
+  id                Int               @id @default(autoincrement())
+  title             String
+  deviceId          Int
+  userId            Int
+  requestDate       DateTime          @default(now())
+  startDate         DateTime
+  endDate           DateTime
   priority          PriorityLevel     @default(LOW)
   maintenanceStatus StatusMaintenance @default(PENDING)
   cost              Decimal?          @default(0.00)
@@ -193,6 +195,7 @@ model MaintenancePlan {
   isDeleted         Boolean           @default(false)
   User              User              @relation(fields: [userId], references: [id])
   Device            Device            @relation(fields: [deviceId], references: [id])
+  Notification      Notification[]
 }
 
 model ListMaterials {

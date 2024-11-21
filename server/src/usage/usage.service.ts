@@ -4,6 +4,7 @@ import { CreateUsageDto } from './dto';
 import e from 'express';
 import { DEVICE_STATUS, PAGE_SIZE, ResponseData } from 'src/global';
 import { UpdateUsageDto } from './dto/update.dto';
+import { StatusMaintenance } from '@prisma/client';
 
 @Injectable()
 export class UsageService {
@@ -233,6 +234,20 @@ export class UsageService {
                 }, data: {
                     isDeleted: true,
                     end: new Date()
+                }
+            })
+           const maintenancePlan=  await this.prismaService.maintenancePlan.findFirst({
+                where:{
+                    deviceId: exist.deviceId,
+                    isDeleted: false
+                }
+            })
+            if(!maintenancePlan)  return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
+            await this.prismaService.maintenancePlan.update({
+                where: {
+                  id:maintenancePlan.id
+                }, data: {
+                    maintenanceStatus:StatusMaintenance.CANCEL
                 }
             })
             return new ResponseData<any>(null, 200, "Xoá thành công")

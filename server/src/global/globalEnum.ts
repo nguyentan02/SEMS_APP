@@ -1,6 +1,6 @@
 export enum USER_TYPES {
-    USER = 1,
     ADMIN = 0,
+    USER = 1,
     TECHNICAL = 2,
     WAREHOUSE = 3
 

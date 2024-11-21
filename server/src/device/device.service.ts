@@ -30,7 +30,6 @@ export class DeviceService {
                     }
                 }]
               
-                
             }
             if (categoryId) {
                 where.categoryId = Number(categoryId)
@@ -107,6 +106,36 @@ export class DeviceService {
                 }
             })
            
+            return new ResponseData<any>(data, 200, "Tìm các thiết bị thành công")
+        } catch (error) {
+            this.logger.error(error.message)
+            return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
+        }
+    }
+    async getAllDeviceByMaintenance() {
+        try {
+            const data = await this.prismaService.device.findMany({
+                where: {
+                    statusDevice:"ĐANG HOẠT ĐỘNG",
+                    isDelete:false
+                },
+                include:{
+                    category:{
+                        select:{
+                            categoryName:true
+                        }
+                    },
+                    room:{
+                        include:{
+                            deparment:true
+                        }
+                    }
+                }
+                , orderBy: {
+                    purchaseDate: 'asc' 
+                }
+            })
+            if(data.length == 0) return new ResponseData<any>(null,300,"Không có thiết bị")
             return new ResponseData<any>(data, 200, "Tìm các thiết bị thành công")
         } catch (error) {
             this.logger.error(error.message)

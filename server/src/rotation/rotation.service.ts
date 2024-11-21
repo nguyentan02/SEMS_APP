@@ -20,6 +20,26 @@ export class RotationService {
             if (nonExistingDevices.length > 0) {
                 throw new Error(`Thiết bị không tồn tại: ${nonExistingDevices.join(", ")}`);
             }
+             // Kiểm tra trạng thái bảo trì của các thiết bị
+        const devicesUnderMaintenance = await this.prismaService.device.findMany({
+            where: {
+                id: { in: deviceId },
+                statusDevice: { not: 'ĐANG HOẠT ĐỘNG' }, 
+            }
+        });
+
+        if (devicesUnderMaintenance.length > 0) {
+            const underMaintenanceIds = devicesUnderMaintenance.map((d) => d.id);
+            const underMaintenanceNames = devices
+                .filter((d) => underMaintenanceIds.includes(d.id))
+                .map((d) => d.name || d.id)
+                .join(", ");
+            return new ResponseData<any>(
+                null,
+                401,
+                `Thiết bị đang bảo trì, không thể luân chuyển: ${underMaintenanceNames}`
+            );
+        }
            const existingRoom = await this.prismaService.room.findUnique({
             where:{
                 id:newLocationId

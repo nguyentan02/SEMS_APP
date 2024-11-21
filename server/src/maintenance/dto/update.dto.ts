@@ -1,24 +1,24 @@
 import { PriorityLevel, StatusMaintenance } from "@prisma/client";
 import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
-export class CreateMaintenancePlanDto {
-    @IsNotEmpty()
+export class UpdateMaintenanceDto {
+    @IsOptional()
     @IsString()
     title: string;
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     deviceId: number;
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     userId: number;
     @IsOptional()
     @IsEnum(PriorityLevel)
     priority?: PriorityLevel;
     @IsDateString()
-    @IsNotEmpty()
+    @IsOptional()
     startDate: string;
     @IsDateString()
-    @IsNotEmpty()
+    @IsOptional()
     endDate: string;
     @IsString()
     descriptionPlan?: string;

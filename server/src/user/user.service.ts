@@ -105,6 +105,29 @@ export class UserService {
             return new ResponseData<User>(null, 500, "Lỗi dịch vụ, thử lại sau")
         }
     }
+    async getTechnical(){
+        try {
+            const user = await this.prismaService.user.findMany({
+                where:{
+                    role:2,
+                    isBan:false
+                },
+                select:{
+                    id:true,
+                    name:true,
+                    employeeId:true,
+                    email:true
+                }
+            })
+            if(user.length === 0){
+                return new ResponseData<any>(null,501,"Không tìm thấy dữ liệu")
+            }
+            return new ResponseData<any>(user,200,"Tìm thấy các người dùng")
+        } catch (error) {
+            this.logger.error(error.message)
+            return new ResponseData<User>(null, 500, "Lỗi dịch vụ, thử lại sau")
+        }
+    }
     async updateAvatar(userId: number, user_avt: Express.Multer.File){
         try {
 

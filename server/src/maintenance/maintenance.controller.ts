@@ -1,21 +1,67 @@
-import { Body, Controller, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { MaintenanceService } from './maintenance.service';
-import { MyJWTGuard } from 'src/auth/guard';
-import { Roles } from 'src/auth/decoractor';
-import { USER_TYPES } from 'src/global';
-import { JwtStrategy } from 'src/auth/strategy';
-import { CreateMaintenancePlanDto } from './dto';
+import { USER_TYPES } from '../global';
+import { GetUser, Roles } from '../auth/decoractor';
+import { MyJWTGuard, RolesGuard } from '../auth/guard';
+import { CreateMaintenancePlanDto, UpdateMaintenanceDto } from './dto';
 @Controller('maintenance')
 export class MaintenanceController {
 
     constructor(private maintenanceService: MaintenanceService) { }
-
-    @Post()
-    @UseGuards(MyJWTGuard, JwtStrategy)
+    @Get()
+    @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.USER)
-    createStorage(
+    getMaintenance(@Query()option:{key?:string,status?:string,groupByUser?: boolean; groupByStatus?: boolean }) {
+        return this.maintenanceService.getMaintenance(option)
+    }
+    @Get('/byTech')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.TECHNICAL)
+    getMaintenanceByTech(@Query()option:{key?:string,status?:string},   @GetUser() user: { id: number; role: number },) {
+        return this.maintenanceService.getMaintenanceByUser(option,user)
+    }
+ 
+    @Get('/:id')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER,USER_TYPES.TECHNICAL)
+    getMaintenanceById(  @Param('id', ParseIntPipe) id: number, ) {
+        return this.maintenanceService.getMaintenanceById(id)
+    }
+    @Post()
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER)
+    createMaitenance(
         @Body() createMaintenancePlanDto: CreateMaintenancePlanDto
     ) {
         return this.maintenanceService.createMaintenance(createMaintenancePlanDto)
     }
+    @Patch('/:id')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER)
+    UpdateMaintenance(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateMaintenanceDto: UpdateMaintenanceDto
+    ) {
+        return this.maintenanceService.updateMaintenance(id,updateMaintenanceDto)
+    }
+    @Delete('/:id')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER)
+    deleteMaintenance(
+        @Param('id', ParseIntPipe) id: number,
+   
+    ) {
+        return this.maintenanceService.deleteMaintenance(id)
+    }
+    @Patch('/res/:id')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER)
+    resMainance(
+        @Param('id', ParseIntPipe) id: number,
+   
+    ) {
+        return this.maintenanceService.resfreshMaintenance(id)
+    }
 }
+ 
+

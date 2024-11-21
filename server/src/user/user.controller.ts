@@ -31,6 +31,12 @@ export class UserController {
     getAllUser(@Query() option: { page: number, name: string, role: number, isBan: boolean }) {
         return this.userService.getAllUser(option)
     }
+    @Get('/byTech')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER)
+    getTechnical() {
+        return this.userService.getTechnical()
+    }
     @Patch('update-profile/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.ADMIN, USER_TYPES.USER, USER_TYPES.TECHNICAL, USER_TYPES.WAREHOUSE)

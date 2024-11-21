@@ -25,6 +25,14 @@ export class DeviceController {
     ) {
         return this.deviceService.getAllDeviceByUsage()
     }
+    @Get('/byMaintenance')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER)
+    getDeviceByMaintenance(
+  
+    ) {
+        return this.deviceService.getAllDeviceByMaintenance()
+    }
     @Get('/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.USER)
