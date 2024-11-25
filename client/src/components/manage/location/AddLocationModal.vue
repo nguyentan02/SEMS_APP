@@ -140,12 +140,12 @@ const removeRoom = (index) => {
 
       <template #footer>
         <div class="flex justify-between">
-          <fwb-button color="green"> I accept </fwb-button>
+          <fwb-button color="green"> Thêm </fwb-button>
           <fwb-button
             @click="manageStore.closeAddLocationModal"
             color="alternative"
           >
-            Decline
+            Huỷ
           </fwb-button>
         </div>
       </template>

@@ -3,6 +3,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMaintenancePlanDto, UpdateMaintenanceDto } from './dto';
 import { StatusMaintenance } from '@prisma/client';
 import { ResponseData, USER_TYPES } from 'src/global';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { number } from 'joi';
 
 
 @Injectable()
@@ -14,7 +16,8 @@ export class MaintenanceService {
         try {
             const {key, status, groupByUser, groupByStatus } = option;
             
-            let where: any={}
+            let where: any={isDeleted:false,
+            }
             if(status){
                 where.maintenanceStatus = status
             }
@@ -37,6 +40,11 @@ export class MaintenanceService {
         const maintenancePlans = await this.prismaService.maintenancePlan.findMany({
             where: where,
             include: {
+              Room:{
+                include:{
+                  deparment:true
+                }
+              },
                 User:{select:{
                     id:true,
                     email:true,
@@ -48,11 +56,7 @@ export class MaintenanceService {
                         id:true,
                         name:true,
                         serialNumber:true,
-                        room:{
-                            include:{
-                                deparment:true
-                            }
-                        },
+                      
                     }
                 },
             },
@@ -92,14 +96,13 @@ export class MaintenanceService {
     }
 
   async getMaintenanceByUser(
-    option: { key?: string; status?: string; },    user: { id: number; role: number },
+    option: { key?: string; status?: string; }, user: { id: number; role: number },
   ) {
     try {
       const { key, status } = option;
       const { id: userId, role } = user;
-        console.log(role);
         let where: any = {
-            maintenanceStatus:"APPROVED"
+            maintenanceStatus:{ notIn: ['PENDING', 'CANCEL']}
           };
 
       if (status) {
@@ -115,13 +118,19 @@ export class MaintenanceService {
             title: {
               contains: key,
               mode: 'insensitive',
-            },
-          }
+            } 
+          },
+        
         ];
       }
       const maintenancePlans = await this.prismaService.maintenancePlan.findMany({
         where: where,
         include: {
+          Room:{
+            include:{
+              deparment:true
+            }
+          },
           User: {
             select: {
               id: true,
@@ -135,11 +144,6 @@ export class MaintenanceService {
               id: true,
               name: true,
               serialNumber: true,
-              room: {
-                include: {
-                  deparment: true,
-                },
-              },
             },
           },
         },
@@ -153,26 +157,29 @@ export class MaintenanceService {
     async createMaintenance(createMaintenanceDto:CreateMaintenancePlanDto){
         const {title,deviceId,userId,startDate,endDate,descriptionPlan} = createMaintenanceDto
         try {
-            console.log(createMaintenanceDto);
+         
             if(!deviceId){
                 return new ResponseData<any>(null,400,"Vui lòng chọn thiết bị bảo trì")
             }
             const exit = await this.prismaService.maintenancePlan.findFirst({
                 where:{
                     deviceId:deviceId,
-      
                     maintenanceStatus:{
-                        not:StatusMaintenance.COMPLETED
+                        notIn:[StatusMaintenance.COMPLETED,StatusMaintenance.CANCEL]
                     }
                 }
             })
             if(exit) return new ResponseData<any>(null,400,"Thiết bị đã có kế hoạch bảo trì")
-
+              const roomIdDevice = await this.prismaService.device.findUnique({
+            where:{
+              id:deviceId
+            }})
             await this.prismaService.maintenancePlan.create({
                 data:{
                     title:title,
                     deviceId:deviceId,
                     userId:userId,
+                    roomId:roomIdDevice.roomId,
                     startDate:new Date(startDate),
                     endDate:new Date(endDate),
                     maintenanceStatus:StatusMaintenance.PENDING,
@@ -215,6 +222,13 @@ export class MaintenanceService {
                 },data:{statusDevice:"ĐANG HOẠT ĐỘNG"}
             })
           }
+          const newEndDate = new Date(endDate);
+          const currentDate = new Date();
+          let newStatusMaintenance =undefined;
+      
+          if (newEndDate > currentDate && maintenance.endDate !== newEndDate) {
+            newStatusMaintenance = StatusMaintenance.APPROVED;
+          }
           await this.prismaService.maintenancePlan.update({
             where: { id },
             data: {
@@ -222,13 +236,14 @@ export class MaintenanceService {
               userId:userId,
               deviceId:deviceId,
               startDate: new Date(startDate),
-              endDate: new Date(endDate),
+              endDate: newEndDate,
               priority:priority,
+              maintenanceStatus:newStatusMaintenance,
               descriptionPlan:descriptionPlan,
             },
           });
        
-          return new ResponseData<any>(null, 200, "Cập nhật kế hoạch thành công");
+          return new ResponseData<any>(maintenance.userId, 200, "Cập nhật kế hoạch thành công");
         } catch (error) {
           this.logger.error(error.message);
           return new ResponseData<string>(null, 500, "Lỗi dịch vụ, thử lại sau");
@@ -239,28 +254,50 @@ export class MaintenanceService {
         try {
           const maintenance = await this.prismaService.maintenancePlan.findUnique({
             where: { id: maintenanceId },
+            select:{
+              Device:{
+                  select:{
+                      name:true,
+                      serialNumber:true,
+                      room:{
+                        select:{
+                          roomName:true,
+                          deparment:true
+                        }
+                      }
+                  }
+              },
+              userId:true
+          }
           });
       
           if (!maintenance) {
             return new ResponseData<any>(null, 404, "Kế hoạch bảo trì không tồn tại");
           }
-      
+          await this.prismaService.maintenancePlan.update({
+            where:{
+              id:maintenanceId
+            },
+            data:{
+              maintenanceStatus:StatusMaintenance.APPROVED
+            }
+          })
           await this.prismaService.notification.create({
             data: {
               read: false,
+              message: `Có thiết bị ${maintenance.Device.name} ở   ${maintenance.Device.room.deparment.deparmentName}/${maintenance.Device.room.deparment.symbol} cần bảo trì.`,
               maintenanceId:maintenanceId,
               createdAt: new Date(),
             },
           });
-      
-          return new ResponseData<any>(null, 200, "Thông báo đã được gửi");
+          return new ResponseData<any>(maintenance.userId, 200, "Yêu cầu đã được gửi");
         } catch (error) {
           this.logger.error(error.message);
           return new ResponseData<string>(null, 500, "Lỗi dịch vụ, thử lại sau");
         }
       }
             
-      async updateStatus(id:number,status:StatusMaintenance){
+      async updateStatus(id:number,status:string){
         try {
             const exit = await this.prismaService.maintenancePlan.findUnique({
                 where:{
@@ -268,18 +305,45 @@ export class MaintenanceService {
                 }
             })
             if(!exit){return new ResponseData<any>(null, 404, "Kế hoạch bảo trì không tồn tại");}
-    
-            await this.prismaService.maintenancePlan.update({
+            console.log(status,StatusMaintenance.COMPLETED);
+            if(status && status == StatusMaintenance.COMPLETED){
+              await this.prismaService.maintenancePlan.update({
                 where:{
                     id:id
                 },data:{
-                    maintenanceStatus:status
+                    maintenanceStatus:StatusMaintenance.COMPLETED
                 }
             })
+              await this.prismaService.device.update({
+                where:{
+                    id:exit.deviceId
+                },data:{
+                  statusDevice:"ĐANG HOẠT ĐỘNG"
+                }
+            })
+            
+            }else{
+              await this.prismaService.maintenancePlan.update({
+                where:{
+                    id:id
+                },data:{
+                    maintenanceStatus:StatusMaintenance.APPROVED
+                }
+            }) 
+              await this.prismaService.device.update({
+                where:{
+                    id:exit.deviceId
+                },data:{
+                  statusDevice:"ĐANG BẢO TRÌ"
+                }
+            })
+            
+            }
+          
             return new ResponseData<any>(
                 null,
                 200,
-                "Cập nhật trạng thái kế hoạch bảo trì thành công"
+                "Cập nhật trạng thái thành công"
               );
         } catch (error) {
             this.logger.error(error.message);
@@ -292,6 +356,15 @@ export class MaintenanceService {
                     where:{id:id,isDeleted:false}
                 })
                 if(!exit) return new ResponseData<any>(null,400,'Không tìm thấy kế hoạch')
+                  if(exit.maintenanceStatus == StatusMaintenance.APPROVED)
+                    await this.prismaService.notification.create({
+                      data: {
+                        read: false,
+                        message: `Kế hoạch bảo trì #${exit.id} đã bị huỷ.`,
+                        maintenanceId:exit.id,
+                        createdAt: new Date(),
+                      },
+                    });
             await this.prismaService.maintenancePlan.update({
                 where:{
                     id:id
@@ -306,7 +379,7 @@ export class MaintenanceService {
             }
         })
         return new ResponseData<any>(
-            null,
+            exit.userId,
             200,
             "Huỷ kế hoạch thành công"
           );
@@ -322,13 +395,21 @@ export class MaintenanceService {
                 })
                 if(!exit) return new ResponseData<any>(null,400,'Không tìm thấy kế hoạch')
             
-            await this.prismaService.maintenancePlan.update({
-                where:{
-                    id:id
-                },data:{
-                    maintenanceStatus:StatusMaintenance.PENDING
-                }
-        })
+                 const findDevice = await this.prismaService.maintenancePlan.findFirst({
+                  where:{
+                    deviceId:exit.deviceId,
+                    maintenanceStatus: { notIn:[StatusMaintenance.CANCEL,StatusMaintenance.COMPLETED]  },
+                  }
+                 })
+                 if(findDevice) {return new ResponseData<string>(null,400,"Thiết bị đã tồn tại lịch bảo trì")} 
+                 await this.prismaService.maintenancePlan.update({
+                  where:{
+                      id:id
+                  },data:{
+                      maintenanceStatus:StatusMaintenance.PENDING
+                  }
+          })
+                 
         await this.prismaService.device.update({
             where:{id:exit.deviceId},data:{
                 statusDevice:"ĐANG BẢO TRÌ"
@@ -337,7 +418,7 @@ export class MaintenanceService {
         return new ResponseData<any>(
             null,
             200,
-            "Tạo lại hoạch thành công"
+            "Mở lại hoạch thành công"
           );
             } catch (error) {
                 this.logger.error(error.message);
@@ -355,6 +436,11 @@ export class MaintenanceService {
                 id:exit.id
             },
             include:{
+              Room:{
+                include:{
+                  deparment:true
+                }
+              },
                 Device:{
                     include:{
                         category:{
@@ -377,6 +463,27 @@ export class MaintenanceService {
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
+        }
+    }
+    
+    @Cron('*/30 * * * *')
+    async autoUpdate() {
+        try {
+            await this.prismaService.maintenancePlan.updateMany({
+                where: {
+                    isDeleted: false,
+                    maintenanceStatus:StatusMaintenance.APPROVED,
+                    endDate: {
+                        lte: new Date()
+                    }
+                },
+                data: {
+                    maintenanceStatus:StatusMaintenance.LATE
+                }
+            })
+            this.logger.log('Cập nhật trạng thái các kế hoạch thành công')
+        } catch (error) {
+            this.logger.error(error.message)
         }
     }
 }

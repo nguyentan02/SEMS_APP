@@ -23,12 +23,10 @@ const formatDate = (date) => {
 // });
 const data = reactive({
   usage_start: "",
-  usage_end: "",
   purpose: "",
 });
 const formSchemaUsage = yup.object().shape({
   usage_start: yup.string().required("Vui lòng chọn ngày."),
-  usage_end: yup.string().required("Vui lòng chọn ngày."),
 });
 const editUsage = async () => {
   console.log(data);
@@ -131,7 +129,7 @@ const getSeverity = (status) => {
               <ErrorMessage name="usage_start" class="error" />
             </div>
           </div>
-          <div class="flex items-center mb-4">
+          <!-- <div class="flex items-center mb-4">
             <label for="usage_end" class="label-custom mr-2 mt-2"
               >Ngày hết hạn:</label
             >
@@ -146,7 +144,7 @@ const getSeverity = (status) => {
               </Field>
               <ErrorMessage name="usage_end" class="error" />
             </div>
-          </div>
+          </div> -->
           <fwb-textarea
             v-model="data.purpose"
             :rows="4"

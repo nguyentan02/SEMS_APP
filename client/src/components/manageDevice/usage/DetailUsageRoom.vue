@@ -37,6 +37,7 @@ const roomName = route.query.roomName;
 const rotationStore = useRotationDevice();
 onMounted(async () => {
   await usageStore.getUsageByIdRoom(roomId);
+  console.log(usageStore.usages);
 });
 const selectedDevices = ref([]);
 const getSeverity = (status) => {
@@ -50,7 +51,7 @@ const getSeverity = (status) => {
     case "ĐANG HOẠT ĐỘNG":
       return "success";
 
-    case "negotiation":
+    case "ĐANG BẢO TRÌ":
       return "warning";
 
     case "renewal":
@@ -63,6 +64,7 @@ const deleteUsage = async (id) => {
   await usageStore.deleteUsage(id);
   if (usageStore.err) {
     $toast.error(usageStore.err, { position: "top-right" });
+    visible.value = false;
     return;
   }
   $toast.success(usageStore.result.message, { position: "top-right" });
@@ -96,7 +98,6 @@ const dt = ref();
 const exportCSV = () => {
   dt.value.exportCSV();
 };
-const statuses = ref(["ĐANG HOẠT ĐỘNG", "ĐANG BẢO TRÌ"]);
 const formatDate = (value) => {
   return dayjs(value).format("DD/MM/YYYY HH:MM:ss");
 };
@@ -178,6 +179,7 @@ const formatDate = (value) => {
       filterDisplay="menu"
       v-model:selection="selectedDevices"
       @row-click="viewDeviceDetails"
+      :row-hover="true"
     >
       <template #header>
         <div class="flex flex-wrap gap-2 items-center justify-between">
@@ -239,6 +241,18 @@ const formatDate = (value) => {
           </template>
         </Column>
         <Column
+          header="Loại thiết bị"
+          field="usage_start"
+          sortable
+          style="min-width: 12rem"
+          class="border-b border-gray-400"
+          filterField="usage_start"
+        >
+          <template #body="{ data }">
+            {{ data.Device.category.categoryName }}
+          </template>
+        </Column>
+        <Column
           header="Ngày bắt đầu"
           field="usage_start"
           sortable
@@ -247,20 +261,10 @@ const formatDate = (value) => {
           filterField="usage_start"
         >
           <template #body="{ data }">
-            {{ formatDate(data.usage_start) }}
+            {{ dayjs(data.usage_start).format("DD-MM-YYYY HH:mm:ss") }}
           </template>
         </Column>
-        <Column
-          header="Ngày hết hạn"
-          field="usage_end"
-          sortable
-          style="min-width: 12rem"
-          class="border-b border-gray-400"
-        >
-          <template #body="{ data }">
-            {{ dayjs(data.usage_end).format("DD/MM/YYYY HH:MM:ss") }}
-          </template>
-        </Column>
+
         <Column
           header="Ghi chú"
           style="min-width: 8rem"

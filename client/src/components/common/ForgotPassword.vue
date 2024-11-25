@@ -147,7 +147,7 @@ const validationSchema = yup.object({
               type="password"
               name="newPassword"
               id="newPassword"
-              class="input-custom shadow-lg"
+              class="input-custom shadow-lg pl-2"
               v-model="data.newPassword"
             />
             <ErrorMessage name="newPassword" class="error" />
@@ -160,14 +160,14 @@ const validationSchema = yup.object({
               name="confirmPassword"
               type="password"
               id="confirmPassword"
-              class="input-custom shadow-lg"
+              class="input-custom shadow-lg pl-2"
             />
             <ErrorMessage name="confirmPassword" class="error" />
           </div>
 
           <div class="card flex flex-col">
             <label class="block text-sm text-gray-500">Nhập OTP</label>
-            <InputOtp v-model="data.code" :length="5" integerOnly>
+            <InputOtp v-model="data.code" :length="6" integerOnly>
               <template #default="{ attrs, events }">
                 <input
                   type="text"
@@ -202,9 +202,8 @@ const validationSchema = yup.object({
       <div v-if="timeout == false && !userStore.isLoading">
         <div class="flex justify-between">
           <button
-            type="submit"
+            @click="sendVerityCode"
             class="w-full bg-blue-700 text-white cursor-pointer py-2 px-4 rounded-md hover:bg-blue-600"
-            :disabled="!forgot.email"
           >
             NHẬN MÃ XÁC MINH
           </button>
@@ -220,7 +219,7 @@ const validationSchema = yup.object({
         </div>
       </div>
       <button
-        type="submit"
+        @click="resetPassword"
         v-else-if="timeout == true"
         class="w-full bg-blue-700 cursor-pointer text-white py-2 px-4 rounded-md hover:bg-blue-600"
       >

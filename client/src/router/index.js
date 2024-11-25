@@ -6,12 +6,7 @@ const routes = [
         path: '/',
         redirect: '/home',
     },
- {   path: '/home-tesst',
-    name: 'home-test',
-    component: () => import('../views/Hometesst.vue'),
-    meta: { title: 'Quản lý thiết bị' },
-    
-},
+
     {
         path: '/home',
         name: 'home',
@@ -25,7 +20,7 @@ const routes = [
         },
         children: [
             {
-                path: '/device',
+                path: 'device',
                 name: 'device',
                 component: () => import('../components/manageDevice/device/DeviceManage.vue'),
                 meta: { title: 'Danh sách thiết bị' },
@@ -36,7 +31,7 @@ const routes = [
                 },
             },
             {
-                path: '/test',
+                path: 'test',
                 name: 'test',
                 component: () => import('../components/manageDevice/device/Test.vue'),
                 meta: { title: 'Danh sách thiết bị' },
@@ -47,16 +42,23 @@ const routes = [
                 },
             },
             {
-                path: '/profile/:id',
-                name: 'home-profile',
+                path: 'chat',
+                name: 'chat-home',
+                component: () => import('../views/ChatView.vue'),
+                meta: { title: 'Nhắn tin' },
+                
+            },
+            {
+                path: 'profile/:id',
+                name: 'home1-profile',
                 component: () => import('../components/common/ProfileView.vue'),
                 meta: { title: 'Thông tin cá nhân' },
-                // beforeEnter: async (to, from, next) => {
-                //     const userStore = useUserStore()
-                //     await  userStore.getMe()
-                //     if (!userStore.user?.id) next('login')
-                //     else next()
-                // },
+                beforeEnter: async (to, from, next) => {
+                    const userStore = useUserStore()
+                    await  userStore.getMe()
+                    if (!userStore.user?.id) next('login')
+                    else next()
+                },
             },
             {
                 path: '/device/:id',
@@ -71,7 +73,7 @@ const routes = [
                 },
             },
             {
-                path: '/usage',
+                path: 'usage',
                 name: 'usage',
                 props:true,
                 component: () => import('../components/manageDevice/usage/ManageUsage.vue'),
@@ -85,7 +87,6 @@ const routes = [
             {
                 path: '/usageroom/:id',
                 name: 'detailUsage',
-          
                 component: () => import('../components/manageDevice/usage/DetailUsageRoom.vue'),
                 meta: { title: 'Danh sách thiết bị sử dụng' },
                 beforeEnter: async (to, from, next) => {
@@ -100,6 +101,41 @@ const routes = [
                 component: () => import('../components/manageDevice/device/AddExcelDevice.vue'),
                 props: true,
                 meta: { title: 'Nhập một tệp' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/maintenance',
+                name: 'maintenance',
+                component: () => import('../components/maintenance/MaintenanceManage.vue'),
+                props: true,
+                meta: { title: 'Bảo trì' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/maintenance/new',
+                name: 'newmaintenance',
+                component: () => import('../components/maintenance/NewMaintanceManage.vue'),
+                props: true,
+                meta: { title: 'Bảo trì' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/maintenance/:id',
+                name: 'editmaintenance',
+                component: () => import('../components/maintenance/EditMaintenance.vue'),
+                meta: { title: '{d}' },
                 beforeEnter: async (to, from, next) => {
                     const authStore = useAuthStore()
                     if (authStore.token === null)  next('login')
@@ -163,6 +199,17 @@ const routes = [
                 // },
             },
             {
+                path: 'chat',
+                name: 'chat-view',
+                component: () => import('../views/ChatView.vue'),
+                meta: { title: 'Nhắn tin' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token == null)  next('login')
+                    else next()
+                },
+            },
+            {
                 path: 'users',
                 name: 'user-manage',
         meta: { title: 'Quản lý thành viên' },
@@ -187,7 +234,63 @@ const routes = [
                 component: () => import('../components/manage/location/ManageLocation.vue'),
             }
         ]
+    },
+    {
+        path: '/techno',
+        name: 'techno',
+        component: () => import('../views/TechView.vue'),
+        meta: { title: 'Quản lý' },
+        // beforeEnter: async (to, from, next) => {
+        //     const userStore = useUserStore()
+        //     await  userStore.getMe()
+        //     if (userStore.user?.role !== 2) next('login')
+        //     else next()
+        // },
+        children:[
+            {
+                path: '/profile/:id',
+                name: 'home-profile',
+                component: () => import('../components/common/ProfileView.vue'),
+                meta: { title: 'Thông tin cá nhân' },
+                beforeEnter: async (to, from, next) => {
+                    const userStore = useUserStore()
+                    await  userStore.getMe()
+                    if (!userStore.user?.id) next('login')
+                    else next()
+                },
+            },
+            {
+                path: 'chat',
+                name: 'chat',
+                component: () => import('../views/ChatView.vue'),
+                meta: { title: 'Nhắn tin' },
+            },
+            {
+                path: '/calendar',
+                name: 'calendar',
+                component: () => import('../components/maintenance/techno/CalendarMaintance.vue'),
+                meta: { title: 'Lịch bảo trì' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token == null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: '/viewmaintenance',
+                name: 'view-maintenance',
+                component: () => import('../components/maintenance/techno/MaintenaceView.vue'),
+                meta: { title: 'Yêu cầu bảo trì' },
+                beforeEnter: async (to, from, next) => {
+                    const userStore = useUserStore()
+                    await  userStore.getMe()
+                    if (!userStore.user?.id) next('login')
+                    else next()
+                },
+            },
+        ]
     }
+
 ]
 const router = createRouter({
     history: createWebHistory(),

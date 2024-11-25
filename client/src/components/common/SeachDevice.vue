@@ -16,7 +16,7 @@ const removeCategory = () => {
 </script>
 
 <template>
-  <div class="px-3 flex items-center gap-1">
+  <div class="px-5 py-1 flex items-center gap-1">
     <i class="fa-solid fa-magnifying-glass"></i>
     <Chip
       v-if="props.categoryName"
@@ -29,7 +29,7 @@ const removeCategory = () => {
       type="text"
       :placeholder="props.title"
       v-model="key"
-      class="rounded-xl bg-gray-100 border-0 flex-1 text-xs md:text-sm border-transparent focus:border-transparent focus:ring-0"
+      class="rounded-xl py-1 bg-gray-100 border-0 flex-1 text-xs md:text-sm border-transparent focus:border-transparent focus:ring-0"
     />
   </div>
 </template>

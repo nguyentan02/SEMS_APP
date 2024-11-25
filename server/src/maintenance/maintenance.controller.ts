@@ -4,6 +4,7 @@ import { USER_TYPES } from '../global';
 import { GetUser, Roles } from '../auth/decoractor';
 import { MyJWTGuard, RolesGuard } from '../auth/guard';
 import { CreateMaintenancePlanDto, UpdateMaintenanceDto } from './dto';
+import { StatusMaintenance } from '@prisma/client';
 @Controller('maintenance')
 export class MaintenanceController {
 
@@ -20,7 +21,6 @@ export class MaintenanceController {
     getMaintenanceByTech(@Query()option:{key?:string,status?:string},   @GetUser() user: { id: number; role: number },) {
         return this.maintenanceService.getMaintenanceByUser(option,user)
     }
- 
     @Get('/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.USER,USER_TYPES.TECHNICAL)
@@ -37,12 +37,21 @@ export class MaintenanceController {
     }
     @Patch('/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.USER)
+    @Roles(USER_TYPES.USER,)
     UpdateMaintenance(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateMaintenanceDto: UpdateMaintenanceDto
     ) {
         return this.maintenanceService.updateMaintenance(id,updateMaintenanceDto)
+    }
+    @Patch('/status/:id')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER,USER_TYPES.TECHNICAL)
+    updateStatus(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() body: { status: string }
+    ) {
+        return this.maintenanceService.updateStatus(id,body.status)
     }
     @Delete('/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
@@ -52,6 +61,15 @@ export class MaintenanceController {
    
     ) {
         return this.maintenanceService.deleteMaintenance(id)
+    }
+    @Patch('/send/:id')
+    @UseGuards(MyJWTGuard, RolesGuard)
+    @Roles(USER_TYPES.USER)
+    sendMaintenace(
+        @Param('id', ParseIntPipe) id: number,
+   
+    ) {
+        return this.maintenanceService.sendMaintenance(id)
     }
     @Patch('/res/:id')
     @UseGuards(MyJWTGuard, RolesGuard)

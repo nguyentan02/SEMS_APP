@@ -67,7 +67,7 @@ const submitUpdatePassword = async () => {
       </template>
       <template #body>
         <div class="w-full" v-if="!userStore.isLoading">
-          <label for="currentPassword" class="text-lg mx-2 text-black"
+          <label for="currentPassword" class="text-lg text-black"
             >Mật khẩu hiện tại:</label
           >
           <div class="mb-3">
@@ -75,13 +75,13 @@ const submitUpdatePassword = async () => {
               name="currentPassword"
               type="password"
               id="currentPassword"
-              class="rounded-md w-full text-black"
+              class="rounded-md w-full pl-2 h-[40px] text-black"
               placeholder="Nhập mật khẩu hiển tại"
               v-model="data.oldPassword"
             />
             <ErrorMessage name="currentPassword" class="error" />
           </div>
-          <label for="newPassword" class="text-lg mx-2 text-black"
+          <label for="newPassword" class="text-lg text-black"
             >Mật khẩu mới:</label
           >
           <div class="mb-3">
@@ -89,13 +89,13 @@ const submitUpdatePassword = async () => {
               name="newPassword"
               type="password"
               id="newPassword"
-              class="rounded-md w-full text-black"
+              class="rounded-md w-full pl-2 h-[40px] text-black"
               placeholder="Nhập mật khẩu mới"
               v-model="data.newPassword"
             />
             <ErrorMessage name="newPassword" class="error" />
           </div>
-          <label for="confirmPassword" class="text-lg mx-2 text-black"
+          <label for="confirmPassword" class="text-lg text-black"
             >Xác nhận mật khẩu mới:</label
           >
           <div class="mb-3">
@@ -103,7 +103,7 @@ const submitUpdatePassword = async () => {
               name="confirmPassword"
               type="password"
               id="confirmPassword"
-              class="rounded-md w-full text-black"
+              class="rounded-md w-full pl-2 h-[40px] text-black"
               placeholder="Nhập xác nhận mật khẩu mới"
               v-model="data.confirmPassword"
             />
@@ -120,7 +120,7 @@ const submitUpdatePassword = async () => {
           <fwb-button v-if="!userStore.isLoading" color="blue">
             Xác nhận
           </fwb-button>
-          <fwb-button v-else color="blue" disabled> Xác nhận </fwb-button>
+          <fwb-button v-else color="blue" disabled> Đổi mật khẩu </fwb-button>
           <fwb-button
             v-if="!userStore.isLoading"
             @click="userStore.closeUpdatePasswordModal"

@@ -5,6 +5,7 @@ import e from 'express';
 import { DEVICE_STATUS, PAGE_SIZE, ResponseData } from 'src/global';
 import { UpdateUsageDto } from './dto/update.dto';
 import { StatusMaintenance } from '@prisma/client';
+import { exit } from 'process';
 
 @Injectable()
 export class UsageService {
@@ -26,21 +27,8 @@ export class UsageService {
                 where.usage_start = {
                     gte: startDate
                 }
-            } else if (endDate) {
-                where.usage_start = {
-                    lte: endDate
-                }
-            }
-            // const roomWhere: any = {}
-            // if (roomId) {
-            //     roomWhere.id = roomId
-            // }
-            // if (departmentId) {
-            //     roomWhere.deparment = {
-            //         id: departmentId
-            //     }
-            // }
-
+            } 
+          
             if (roomId || departmentId) {
                 where.room = {};
                 if (roomId) {
@@ -80,7 +68,7 @@ export class UsageService {
                     Device: true,
                     room: {
                         include: {
-                            deparment: true,  // Lấy thông tin khoa của phòng
+                            deparment: true, 
                         },
                     },
                 },
@@ -162,8 +150,7 @@ export class UsageService {
                 const data = await this.prismaService.usageInformation.create({
                     data: {
                         deviceId: id,
-                        usage_start: new Date(createUsageDto.usage_start),
-                        usage_end: new Date(createUsageDto.usage_end),
+                      
                         roomId: createUsageDto.roomId,
                         purpose: createUsageDto.purpose
                     }
@@ -199,8 +186,7 @@ export class UsageService {
             await this.prismaService.usageInformation.update({
                 where: { id: id },
                 data: {
-                    usage_start:new Date(updateUsageDto.usage_start) ,
-                    usage_end: new Date(updateUsageDto.usage_end) ,
+                    usage_start:new Date(updateUsageDto.usage_start),
                     purpose: updateUsageDto.purpose
                 }
             })
@@ -212,42 +198,51 @@ export class UsageService {
     }
     async deleteUsage(id: number) {
         try {
-            console.log(id);
+           
             const exist = await this.prismaService.usageInformation.findFirst({
                 where: {
                     id: id
                 }
             })
             if (!exist) return new ResponseData<any>(null, 400, "Thông tin không tồn tại")
-             await this.prismaService.device.update({
-                    where: {
-                        id: exist.deviceId
-                    },
-                    data: {
-                        statusDevice:"KHÔNG HOẠT ĐỘNG",
-                        roomId: null
-                    }
-                })
-            await this.prismaService.usageInformation.update({
+          
+            const maintenancePlanExist = await this.prismaService.maintenancePlan.findMany({
+                where: { deviceId: exist.deviceId
+                    ,isDeleted:false,
+                    maintenanceStatus:{
+                    notIn:[StatusMaintenance.CANCEL,StatusMaintenance.COMPLETED ]
+                }}
+              });
+
+              console.log(maintenancePlanExist);
+              if(maintenancePlanExist.length > 0){
+                return new ResponseData<any>(null, 400, "Thiết bị đang có bảo trì không thể xoá")
+              }
+              await this.prismaService.maintenancePlan.updateMany({
+                where:{
+                    deviceId:exist.deviceId,
+                    maintenanceStatus:{not:StatusMaintenance.COMPLETED}
+
+                },
+                data:{
+                    isDeleted:true,
+                }
+              })
+              await this.prismaService.device.update({
+                where: {
+                    id: exist.deviceId
+                },
+                data: {
+                    statusDevice:"KHÔNG HOẠT ĐỘNG",
+                    roomId: null
+                }
+            })
+              await this.prismaService.usageInformation.update({
                 where: {
                     id: exist.id
                 }, data: {
                     isDeleted: true,
                     end: new Date()
-                }
-            })
-           const maintenancePlan=  await this.prismaService.maintenancePlan.findFirst({
-                where:{
-                    deviceId: exist.deviceId,
-                    isDeleted: false
-                }
-            })
-            if(!maintenancePlan)  return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
-            await this.prismaService.maintenancePlan.update({
-                where: {
-                  id:maintenancePlan.id
-                }, data: {
-                    maintenanceStatus:StatusMaintenance.CANCEL
                 }
             })
             return new ResponseData<any>(null, 200, "Xoá thành công")

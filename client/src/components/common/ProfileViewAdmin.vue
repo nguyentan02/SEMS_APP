@@ -53,6 +53,7 @@ const data = reactive({
   name: userStore.user.name,
 });
 const updateProflie = async () => {
+  console.log(data);
   await userStore.updateProfile(data, route.params?.id);
   if (userStore.err) {
     $toast.error(userStore.err, { position: "top-right" });
@@ -71,7 +72,7 @@ const updateProflie = async () => {
 </style>
 <template>
   <h1 class="text-2xl font-bold mb-10 text-[#f9faf8]">Thông tin cá nhân</h1>
-  <div class="w-full p-1 lg:w-[80%] mx-auto">
+  <div class="w-full p-1 lg:w-[80%] mx-auto border boder-gray-200 rounded-md">
     <div class="rounded p-4 shadow">
       <div class="flex flex-col">
         <div

@@ -222,7 +222,7 @@ export class LocationService {
                             roomName: name
                         },
                         orderBy: {
-                            createAt: "desc"
+                            createdAt: "desc"
                         }
                     })
                     if (room && room.deparmentId ===deparmentNew.id) return new ResponseData<any>(null, 400, "Phòng đã tồn tại trong khoa")
@@ -242,6 +242,7 @@ export class LocationService {
     }
     async updateDeparment(id: number, updateDeparmentDto: UpdateDeparmentDto) {
         try {
+            console.log(updateDeparmentDto);
             const deparment = await this.prismaService.deparment.findUnique({
                 where: {
                     id: id
@@ -291,13 +292,37 @@ export class LocationService {
     }
     async deleteDeparment(id: number) {
         try {
-            const deparment = await this.prismaService.deparment.findFirst({
+            const deparment = await this.prismaService.deparment.findUnique({
                 where: {
                     id: id
-                }
+                },
+               
             })
             if (!deparment) return new ResponseData<any>(null, 400, "Khoa không tồn tại")
-            await this.prismaService.deparment.delete({
+                const exit = await this.prismaService.deparment.findUnique({
+                    where: {
+                        id: id
+                    },
+                   include:{
+                    rooms:{
+                        include:{
+                            Device:true
+                        }
+                    }
+                   }
+                })
+                console.log(exit);
+                const hasDevices = exit.rooms.some((room) => room.Device.length > 0);
+
+                if (hasDevices) {
+                    return new ResponseData<any>(
+                        null,
+                        400,
+                        "Đang có thiết bị trong các phòng thuộc khoa, không thể xoá!"
+                    );
+                }
+        
+                 await this.prismaService.deparment.delete({
                 where: { id: id }
             })
             return new ResponseData<any>(null, 200, "Xoá thành công")
@@ -337,37 +362,40 @@ export class LocationService {
     //         return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau")
     //     }
     // }
-    async updateRoom(id: number, updateRoomDto: UpdateRoomDto) {
+    async deleteRoom(id: number) {
         try {
-            const room = await this.prismaService.room.findFirst({
+            // Tìm phòng với ID tương ứng
+            const room = await this.prismaService.room.findUnique({
                 where: {
-                    id: id
-                }
-            })
-
-            if (!room) return new ResponseData<any>(null, 400, "Phòng không tồn tại")
-            const duplicateRoom = await this.prismaService.room.findFirst({
-                where: {
-                    roomName: updateRoomDto.roomName,
-                    deparmentId: room.deparmentId,
-                    NOT: { id: id }
-                }
+                    id: id,
+                },
+                include: {
+                    Device: true, // Bao gồm danh sách thiết bị trong phòng
+                },
             });
-
-            if (duplicateRoom) {
-                return new ResponseData<any>(null, 400, "Tên phòng đã tồn tại trong khoa");
+    
+            // Nếu phòng không tồn tại
+            if (!room) {
+                return new ResponseData<any>(null, 400, "Phòng không tồn tại");
             }
-            await this.prismaService.room.update({
-                where: { id: id }
-                , data: {
-                    ...updateRoomDto,
-                    createAt: new Date()
-                }
-            })
-            return new ResponseData<any>(null, 200, "Cập nhật thành công")
+    
+            // Kiểm tra nếu phòng có chứa thiết bị
+            if (room.Device && room.Device.length > 0) {
+                return new ResponseData<any>(null, 400, "Phòng chứa thiết bị, không thể xóa!");
+            }
+    
+            // Xóa phòng
+            await this.prismaService.room.delete({
+                where: {
+                    id: id,
+                },
+            });
+    
+            return new ResponseData<any>(null, 200, "Xóa phòng thành công");
         } catch (error) {
-            this.logger.error(error.message)
-            return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau")
+            this.logger.error(error.message);
+            return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau");
         }
     }
+    
 }

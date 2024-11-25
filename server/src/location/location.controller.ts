@@ -50,25 +50,8 @@ export class LocationController {
     ) {
         return this.locationService.deleteDeparment(id)
     }
-
-    // @Post('cre-room')
-    // @UseGuards(MyJWTGuard, RolesGuard)
-    // @Roles(USER_TYPES.ADMIN)
-    // createRoom(
-    //     @Body() createRoomDto: CreateRoomDto
-
-    // ) {
-    //     return this.locationService.createRoom(createRoomDto)
-    // }
-
-    @Post('up-room/:id')
-    @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
-    updateRoom(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() updateRoomDto: UpdateRoomDto
-
-    ) {
-        return this.locationService.updateRoom(id, updateRoomDto)
-    }
+    @Delete('/room/:id')
+async removeRoom(@Param('id') id: number) {
+    return await this.locationService.deleteRoom(id);
+}
 }

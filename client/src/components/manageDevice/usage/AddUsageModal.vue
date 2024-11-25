@@ -15,9 +15,7 @@ const props = defineProps(["roomId"]);
 const route = useRoute();
 const roomIdTest = route.params.id;
 const newUsage = reactive({
-  deviceId: [], // Lưu danh sách các thiết bị được chọn
-  usage_start: "",
-  usage_end: "",
+  deviceId: [],
   roomId: roomIdTest,
   purpose: "",
 });
@@ -28,10 +26,10 @@ const $toast = useToast();
 const device = ref([]);
 const dialogVisible = ref(false);
 const selectedDevices = ref([]);
-const formSchemaUsage = yup.object().shape({
-  usage_start: yup.string().required("Vui lòng chọn ngày."),
-  usage_end: yup.string().required("Vui lòng chọn ngày."),
-});
+// const formSchemaUsage = yup.object().shape({
+//   usage_start: yup.string().required("Vui lòng chọn ngày."),
+//   usage_end: yup.string().required("Vui lòng chọn ngày."),
+// });
 
 onMounted(async () => {
   await deviceStore.getDevicesByUsage();
@@ -54,8 +52,6 @@ const addUsage = async () => {
   }
 
   newUsage.deviceId = [];
-  newUsage.usage_start = "";
-  newUsage.usage_end = "";
   newUsage.purpose = "";
   selectedDevices.value = [];
   usageStore.closeAddUsage();
@@ -68,7 +64,6 @@ const addUsage = async () => {
   <Form
     v-if="usageStore.isShow.addUsage"
     @submit="addUsage"
-    :validation-schema="formSchemaUsage"
     v-slot="{ setFieldValue }"
   >
     <fwb-modal @close="usageStore.closeAddUsage" :persistent="true">
@@ -86,39 +81,6 @@ const addUsage = async () => {
           <p class="py-2">
             Số thiết bị đã chọn: {{ selectedDevices.length }} thiết bị
           </p>
-
-          <div class="flex items-center mb-4">
-            <label for="usage_start" class="label-custom mr-2 mt-2"
-              >Ngày bắt đầu:</label
-            >
-            <div class="w-[70%]">
-              <Field
-                type="date"
-                name="usage_start"
-                id="usage_start"
-                class="w-auto input-edit"
-                v-model="newUsage.usage_start"
-              >
-              </Field>
-              <ErrorMessage name="usage_start" class="error" />
-            </div>
-          </div>
-          <div class="flex items-center mb-4">
-            <label for="usage_end" class="label-custom mr-2 mt-2"
-              >Ngày hết hạn:</label
-            >
-            <div class="w-[70%]">
-              <Field
-                type="date"
-                name="usage_end"
-                id="usage_end"
-                class="w-auto input-edit"
-                v-model="newUsage.usage_end"
-              >
-              </Field>
-              <ErrorMessage name="usage_end" class="error" />
-            </div>
-          </div>
           <fwb-textarea
             v-model="newUsage.purpose"
             :rows="4"

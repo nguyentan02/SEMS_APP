@@ -75,7 +75,7 @@ const removeRoom = (index) => {
   >
     <fwb-modal @close="manageStore.closeAddCategoryModal" :persistent="true">
       <template #header>
-        <div class="flex items-center text-lg">Thêm danh mục</div>
+        <div class="flex items-center text-lg text-black">Thêm danh mục</div>
       </template>
       <template #body>
         <div v-if="!categoryStore.isLoading" class="w-full">
@@ -136,12 +136,12 @@ const removeRoom = (index) => {
 
       <template #footer>
         <div class="flex justify-between">
-          <fwb-button color="green"> I accept </fwb-button>
+          <fwb-button color="green"> Thêm </fwb-button>
           <fwb-button
             @click="manageStore.closeAddCategoryModal"
             color="alternative"
           >
-            Decline
+            Huỷ
           </fwb-button>
         </div>
       </template>

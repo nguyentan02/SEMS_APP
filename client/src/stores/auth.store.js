@@ -8,7 +8,11 @@ export const useAuthStore = defineStore('auth', () => {
     const result = ref(null)
     const isLoading = ref(false)
     const token = ref(null)
-
+    const isShow = reactive({
+        feedback: false
+    })
+    const closeFeedbackModal = () => { isShow.feedback = false }
+    const showFeedbackModal = () => { isShow.feedback = true }
     const login = async data => {
         err.value = null
         result.value = null
@@ -47,7 +51,7 @@ export const useAuthStore = defineStore('auth', () => {
             isLoading.value = false
         }
     }
-    return { err, result, isLoading, token, login,register }
+    return { err, result, isShow,isLoading,closeFeedbackModal,showFeedbackModal, token, login,register }
 
 },
     {

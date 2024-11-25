@@ -10,6 +10,7 @@ import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { UpdatePasswordDto, UpdateUserDto, UpdateProfileDto, ForgotPasswordDto, VerifyCodeDto, CheckCodeDto } from "./dto";
 import { BanUserDto } from "./dto/ban-user.dto";
 import { MailerService } from '@nestjs-modules/mailer';
+import { number } from "joi";
 
 @Injectable()
 
@@ -26,6 +27,31 @@ export class UserService {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
+    }
+
+    async getAllUsernotMe(userId:number){
+            try {
+                const users = await this.prismaService.user.findMany({
+                    where:{
+                        id:{
+                            not:userId
+                        }
+                    },
+                    select:{
+                        user_avt:true,
+                        id:true,
+                        name:true,
+                        email:true,
+                        employeeId:true
+                    }
+                })
+                if(users.length ===0 )
+                    return new ResponseData<any>(null,403,"Không tìm thấy")
+                return new ResponseData<any>(users,200,"Tìm thấy các người dùng")
+            } catch (error) {
+                this.logger.error(error.message)
+                return new ResponseData<User>(null, 500, "Lỗi dịch vụ, thử lại sau")
+            }
     }
     async getProfileUser(id: number) {
         try {

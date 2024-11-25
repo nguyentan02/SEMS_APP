@@ -4,15 +4,7 @@ export class CreateUsageDto {
 
     @IsArray()
     @IsNumber({}, { each: true })
-    deviceId: number[]
-
-    @IsDateString()
-    @IsNotEmpty()
-    usage_start: string
-    @IsDateString()
-    @IsNotEmpty()
-    usage_end: string
-    
+    deviceId: number[] 
     @IsNumber()
     @IsNotEmpty()
     roomId: number

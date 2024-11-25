@@ -47,18 +47,18 @@ const sumitFeedback = () => {
               name="name"
               id="name"
               type="text"
-              class="w-9/12 bg-gray-400 border-none rounded-lg"
+              class="w-9/12 bg-gray-400 border-none rounded-lg p-1"
               v-model="props.user.name"
               disabled
             />
           </div>
           <div class="flex gap-2 items-center">
-            <label for="email" class="mr-8 label-custom"> Email: </label>
+            <label for="email" class="mr-7 label-custom"> Email: </label>
             <Field
               name="email"
               id="email"
               type="text"
-              class="w-9/12 bg-gray-400 border-none rounded-lg"
+              class="w-9/12 p-1 bg-gray-400 border-none rounded-lg"
               v-model="props.user.email"
               disabled
             />
@@ -69,7 +69,7 @@ const sumitFeedback = () => {
               as="select"
               name="time"
               id="time"
-              class="input-custom w-auto"
+              class="input-custom w-auto pl-2"
               v-model="time"
             >
               <option :value="1">1 ngày</option>
@@ -84,7 +84,7 @@ const sumitFeedback = () => {
               name="feedback"
               id="feedback"
               as="textarea"
-              class="w-full rounded-md"
+              class="w-full rounded-md text-black p-2"
               placeholder="Nhập lý do khóa"
               v-model="feedback"
               rows="5"

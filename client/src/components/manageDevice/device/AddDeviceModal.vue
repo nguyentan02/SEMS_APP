@@ -82,26 +82,39 @@ const createDevice = async () => {
   device.price = "";
   device.categoryId = "";
   device.attributes = [];
-  selectedFile.value = null;
   url.value = null;
+  isResetting = true;
+
   manageDeviceStore.closeAddDeviceModal();
+  setTimeout(() => {
+    isResetting = false;
+  }, 0);
 };
 onMounted(async () => {
   await categoryStore.getCategory({});
 });
+let isResetting = false; // Cờ trạng thái để kiểm soát việc reset
+
 watch(
   () => device.categoryId,
   async (newCategoryId) => {
-    if (newCategoryId) {
-      await categoryStore.getCategoryById(newCategoryId);
-
-      device.attributes = categoryStore.category.map((attr) => ({
-        id: attr.id,
-        value: "",
-      })); // Khởi tạo các thuộc tính rỗng
-    } else {
-      device.attributes = [];
+    if (isResetting) {
+      // Nếu đang reset, không cần xử lý
+      return;
     }
+
+    if (!newCategoryId) {
+      // Khi categoryId bị xóa hoặc null
+      device.attributes = []; // Xóa thuộc tính
+      return;
+    }
+
+    // Lấy thông tin danh mục mới
+    await categoryStore.getCategoryById(newCategoryId);
+    device.attributes = categoryStore.category.map((attr) => ({
+      id: attr.id,
+      value: "", // Gán giá trị rỗng cho thuộc tính mới
+    }));
   }
 );
 </script>
@@ -231,8 +244,8 @@ watch(
                   </div>
                 </div>
                 <div class="flex items-center mb-4">
-                  <label for="expirationDate" class="label-custom mr-6"
-                    >Ngày mua:</label
+                  <label for="expirationDate" class="label-custom mr-2"
+                    >Ngày hết hạn:</label
                   >
                   <div class="w-[70%]">
                     <Field
@@ -269,7 +282,7 @@ watch(
                   as="select"
                   name="categoryId"
                   id="categoryId"
-                  class="input-custom"
+                  class="input-custom pl-2"
                   v-model="device.categoryId"
                 >
                   <option value="">Loại thiết bị</option>
@@ -284,9 +297,10 @@ watch(
                 </Field>
 
                 <ErrorMessage name="categoryId" class="error" />
-                <div v-if="categoryStore.category?.length" class="mt-4">
+                <div v-if="device.attributes.length" class="mt-4">
                   <h3>Thuộc tính:</h3>
                   <div
+                    v-if="categoryStore.category?.length"
                     v-for="(attribute, index) in categoryStore.category"
                     :key="attribute.id"
                     class="mb-4"

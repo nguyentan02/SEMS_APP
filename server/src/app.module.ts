@@ -17,6 +17,11 @@ import { RotationModule } from './rotation/rotation.module';
 import { MaterialModule } from './material/material.module';
 import { StorageModule } from './storage/storage.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
+import { NotificationModule } from './notification/notification.module';
+import { ConversationModule } from './conversation/conversation.module';
+import { MessageModule } from './message/message.module';
+import {SocketModule} from './socket/socket.module'
+import { DashboardModule } from './dashboard/dashboard.module';
 
 
 @Module({
@@ -27,8 +32,8 @@ import { MaintenanceModule } from './maintenance/maintenance.module';
         PORT: Joi.number().required(),
       }),
     }),
-    ScheduleModule.forRoot(),
-    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule, UsageModule, RotationModule, MaterialModule, StorageModule, MaintenanceModule
+    ScheduleModule.forRoot(),SocketModule,
+    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule, UsageModule, RotationModule, MaterialModule, StorageModule, MaintenanceModule, NotificationModule, ConversationModule, MessageModule, DashboardModule
   ],
 
 })

@@ -31,6 +31,11 @@ export class UserController {
     getAllUser(@Query() option: { page: number, name: string, role: number, isBan: boolean }) {
         return this.userService.getAllUser(option)
     }
+    @Get('/getUserNotMe')
+    @UseGuards(MyJWTGuard)
+    getAllUsernotMe(@GetUser() user:User) {
+        return this.userService.getAllUsernotMe(user.id)
+    }
     @Get('/byTech')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.USER)

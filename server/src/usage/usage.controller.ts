@@ -49,7 +49,6 @@ export class UsageController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updateUsageDto: UpdateUsageDto
     ) {
-        console.log(updateUsageDto.usage_start);
         return this.usageService.updateUsage(id, updateUsageDto)
     }
 

@@ -46,8 +46,9 @@ const deleteLocation = async (id) => {
 </script>
 <template>
   <h1 class="text-2xl font-bold mb-10">Quản lý phòng ban</h1>
-  <div class="flex items-center">
+  <div class="flex items-center justify-between">
     <Seach
+      class="border border-gray-400"
       :title="'Tìm kiếm địa điểm'"
       @key="
         (e) => {
@@ -57,7 +58,7 @@ const deleteLocation = async (id) => {
     />
     <fwb-button
       color="default"
-      class="ml-2"
+      class="ml-2 py-2"
       size="sm"
       @click="
         () => {
@@ -144,7 +145,7 @@ const deleteLocation = async (id) => {
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td class="absolute right-[40%]">
+        <td class="absolute right-[45%]">
           <Loading />
         </td>
       </tr>

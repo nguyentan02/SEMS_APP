@@ -9,7 +9,7 @@ export class UpdateProfileDto {
     @IsString()
     @IsOptional()
     @MaxLength(CONSTANTS_MAX.NAME_LEN)
-    @MinLength(CONSTANTS_MIN.NAME_LEN)
+   
     name: string
 
 

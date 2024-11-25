@@ -8,8 +8,7 @@ import { useCategoryStore } from "@/stores/category.store";
 import AddDeviceModal from "./AddDeviceModal.vue";
 import { useRouter } from "vue-router";
 import { FwbButton, FwbPagination } from "flowbite-vue";
-import Column from "primevue/column";
-import DataTable from "primevue/datatable";
+import { useToast } from "vue-toast-notification";
 import dayjs from "dayjs";
 const manageDeviceStore = useManageDeviceStore();
 // const emit = defineEmits(["currentPage"]);
@@ -26,6 +25,7 @@ function formatPrice(price, currency = "VND") {
   }).format(price);
 }
 const isFilterOpen = ref(false);
+const $toast = useToast();
 const test = ref([]);
 const filterContainer = ref(null);
 const toggleSort = ref("asc");
@@ -43,9 +43,9 @@ const toggleFilter = () => {
   isFilterOpen.value = !isFilterOpen.value;
 };
 const showSide = ref(false);
-const toggleAddDevice = () => {
-  showSide.value = !showSide.value;
-};
+// const toggleAddDevice = () => {
+//   showSide.value = !showSide.value;
+// };
 const toggleSortOrder = () => {
   toggleSort.value = toggleSort.value === "asc" ? "desc" : "asc";
 };
@@ -75,6 +75,23 @@ const handleCategorySelect = () => {
     ? selectedCategory.categoryName
     : "";
 };
+const deleteDevice = async (id) => {
+  const conFirm = confirm("Bạn có chắc chắn muốn xóa?");
+  if (conFirm) {
+    await deviceStore.deleteDevice(id);
+    if (deviceStore.err) {
+      $toast.error(deviceStore.err, { position: "top-right" });
+      return;
+    }
+    $toast.success(deviceStore.result.message, { position: "top-right" });
+    await deviceStore.getDevices({
+      page: deviceStore.currentPage,
+      key: deviceStore.key,
+      categoryId: deviceStore.categoryId,
+      sortByDate: toggleSort.value,
+    });
+  }
+};
 const clearSelectedCategory = () => {
   selectedCategoryName.value = "";
   deviceStore.categoryId = "";
@@ -92,7 +109,7 @@ const clearSelectedCategory = () => {
 <template>
   <h1 class="text-2xl font-bold mb-10 text-[#25861e]">Quản lý thiết bị</h1>
   <div class="flex items-center justify-between">
-    <div class="relative w-[20%]">
+    <div class="flex relative">
       <fwb-button
         color="green"
         size="sm"
@@ -105,30 +122,18 @@ const clearSelectedCategory = () => {
         >Mới
         <i class="fa-solid fa-plus"></i>
       </fwb-button>
-
-      <button @click="toggleAddDevice" class="ml-2">
-        <i class="fa-solid fa-gear"></i>
-      </button>
-      <div
-        v-show="showSide"
-        class="absolute mt-1 -right-8 bg-white flex flex-col gap-2 border border-gray-300 rounded-md"
+      <button
+        class="cursor-pointer px-4 py-2 bg-[#0284c7] text-white hover:opacity-80 rounded-md ml-2"
+        @click="
+          () => {
+            router.push({
+              name: 'import',
+            });
+          }
+        "
       >
-        <span
-          class="cursor-pointer px-4 py-2 hover:bg-gray-200"
-          @click="
-            () => {
-              router.push({
-                name: 'import',
-              });
-            }
-          "
-        >
-          <i class="fa-solid fa-download mr-2"></i>Nhập bản ghi
-        </span>
-        <span class="px-4 py-2"
-          ><i class="fa-solid fa-upload mr-2"></i> Xuất toàn bộ
-        </span>
-      </div>
+        <i class="fa-solid fa-download mr-2"></i>Nhập bản ghi
+      </button>
     </div>
 
     <div
@@ -235,27 +240,28 @@ const clearSelectedCategory = () => {
     </div>
     <table v-else class="table-auto w-full mt-5 rounded-md mx-auto">
       <thead class="font-normal border-b-2 border-black">
-        <tr class="text-left">
+        <tr class="text-center">
           <th class="text-center p-2 w-[10%]">STT</th>
           <th class="p-2">Thiết bị</th>
           <th class="p-2">Hình ảnh</th>
           <th class="p-2">Serial</th>
           <th class="p-2">Nhà sản xuất</th>
-          <th @click="toggleSortOrder" class="p-2 flex">
-            Ngày mua
-            <div>
+          <th class="p-2">Ngày mua</th>
+          <th @click="toggleSortOrder" class="p-2">
+            <div class="flex items-center justify-center">
+              Ngày hết hạn
               <i
                 :class="
                   toggleSort === 'asc'
                     ? 'fa-solid fa-arrow-up-wide-short'
                     : 'fa-solid fa-arrow-down-short-wide'
                 "
-              ></i>
+              >
+              </i>
             </div>
           </th>
           <th class="p-2">Giá</th>
           <th class="p-2 text-center">Loại thiết bị</th>
-
           <th class="p-2 text-center">Tùy chọn</th>
         </tr>
       </thead>
@@ -268,26 +274,29 @@ const clearSelectedCategory = () => {
           <td class="text-center w-[10%]">
             {{ (deviceStore.currentPage - 1) * 10 + i + 1 }}
           </td>
-          <td class="">
+          <td class="text-center">
             {{ device.name }}
           </td>
-          <td class="flex items-center whitespace-nowrap text-center">
+          <td class="flex items-center whitespace-nowrap justify-center">
             <div
               class="w-[40px] h-[40px] overflow-hidden flex items-center justify-center rounded-md m-2"
             >
               <img :src="device.image" alt="logo" />
             </div>
           </td>
-          <td class="">
+          <td class="text-center">
             {{ device.serialNumber }}
           </td>
-          <td class="p-2">
+          <td class="text-center">
             {{ device.manufacturer }}
           </td>
-          <td class="">
+          <td class="text-center">
             {{ dayjs(device.purchaseDate).format("DD/MM/YYYY") }}
           </td>
-          <td class="text-gray-900 font-extrabold">
+          <td class="text-center">
+            {{ dayjs(device.expirationDate).format("DD/MM/YYYY") }}
+          </td>
+          <td class="text-gray-900 font-extrabold text-center">
             {{ formatPrice(device.price) }}
           </td>
           <td class="text-center">
@@ -299,7 +308,7 @@ const clearSelectedCategory = () => {
                 class="p-2 text-red-500 hover:text-red-400 text-xl"
                 @click="
                   async () => {
-                    await de(category.id);
+                    await deleteDevice(device.id);
                   }
                 "
               >

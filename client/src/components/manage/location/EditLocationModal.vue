@@ -1,6 +1,6 @@
 <script setup>
 import { Form, Field, ErrorMessage } from "vee-validate";
-import { ref, reactive, nextTick, watchEffect } from "vue";
+import { ref, reactive, nextTick, watchEffect, computed } from "vue";
 import * as yup from "yup";
 import { FwbButton, FwbModal } from "flowbite-vue";
 import { useManageStore } from "@/stores/manage.store";
@@ -46,12 +46,49 @@ const updateDepartment = async () => {
   await locationStore.getLocations({ key: "", page: 1 });
   manageStore.closeEditLocationModal();
 };
+const allRooms = computed(() => {
+  const uniqueRooms = new Map();
 
+  // Thêm phòng cũ
+  props.location.rooms.forEach((room) => {
+    uniqueRooms.set(room.roomName, {
+      id: room.id,
+      name: room.roomName,
+      isOld: true,
+    });
+  });
+
+  // Thêm phòng mới
+  rooms.value.forEach((room) => {
+    if (!uniqueRooms.has(room.name)) {
+      uniqueRooms.set(room.name, {
+        id: room.id,
+        name: room.name,
+        isOld: false,
+      });
+    }
+  });
+
+  return Array.from(uniqueRooms.values());
+});
 const addRoom = async () => {
+  const existingRoomNames = new Set([
+    ...props.location.rooms.map((room) => room.roomName),
+    ...rooms.value.map((room) => room.name),
+  ]);
+
+  // Không cho phép thêm phòng mới với tên trống
   if (rooms.value.length > 0 && !rooms.value[rooms.value.length - 1].name) {
     rooms.value[rooms.value.length - 1].inputRef?.focus();
     return;
   }
+
+  // Nếu tên phòng bị trùng, không thêm
+  if (existingRoomNames.has("")) {
+    $toast.error("Tên phòng không được để trống!", { position: "top-right" });
+    return;
+  }
+
   rooms.value.push({ id: Date.now(), name: "", inputRef: null });
   await nextTick();
 
@@ -61,13 +98,23 @@ const addRoom = async () => {
 };
 
 const removeRoom = (index, fromExisting = false) => {
-  if (fromExisting) {
-    props.location.rooms.splice(index, 1);
-  } else {
-    rooms.value.splice(index, 1);
-  }
+  rooms.value.splice(index, 1);
 };
 
+const deleteRoom = async (id, index) => {
+  try {
+    await locationStore.deleteRoom(id); // Gọi API xóa phòng
+    if (locationStore.err) {
+      $toast.error(locationStore.err, { position: "top-right" });
+      return;
+    }
+    // Xóa phòng cũ khỏi danh sách
+    props.location.rooms.splice(index, 1);
+    $toast.success("Xóa phòng thành công!", { position: "top-right" });
+  } catch (error) {
+    $toast.error("Đã xảy ra lỗi khi xóa phòng", { position: "top-right" });
+  }
+};
 watchEffect(() => {
   if (props.location) {
     data.deparmentName = props.location.deparmentName;
@@ -115,34 +162,9 @@ watchEffect(() => {
           </Field>
           <ErrorMessage name="symbol" class="error" />
           <label for="rooms" class="label-custom">Phòng:</label>
-
-          <!-- Existing Rooms from props.location -->
-          <!-- <div
-            v-for="(room, index) in props.location.rooms"
-            :key="'existing-' + room.id"
-            class="flex items-center gap-2"
-          >
-            <Field
-              type="text"
-              :id="'room-' + room.id"
-              :name="'room-' + index"
-              v-model="room.roomName"
-              class="w-auto input-form my-1"
-              placeholder="Tên phòng"
-            />
-            <button
-              type="button"
-              @click="removeRoom(index, true)"
-              class="text-red-500"
-            >
-              <i class="fa-regular fa-trash-can"></i>
-            </button>
-          </div> -->
-
-          <!-- New Rooms added in the current session -->
           <div
-            v-for="(room, index) in rooms"
-            :key="'new-' + room.id"
+            v-for="(room, index) in allRooms"
+            :key="'room-' + room.id"
             class="flex items-center gap-2"
           >
             <Field
@@ -150,12 +172,17 @@ watchEffect(() => {
               :id="'room-' + room.id"
               :name="'room-' + index"
               v-model="room.name"
-              class="w-auto input-form my-1 text-black"
+              :class="[
+                'w-auto input-form my-1',
+                room.isOld ? 'text-gray-500' : 'text-black',
+              ]"
               placeholder="Tên phòng"
             />
             <button
               type="button"
-              @click="removeRoom(index)"
+              @click="
+                room.isOld ? deleteRoom(room.id, index) : removeRoom(index)
+              "
               class="text-red-500"
             >
               <i class="fa-regular fa-trash-can"></i>

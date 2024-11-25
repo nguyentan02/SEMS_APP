@@ -33,7 +33,26 @@ class userService {
             }
         })).data
     }
+    async getUserNotMe(token,) {
+        return (await this.api.get('/getUserNotMe', {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
+    async getTechnical(token,option) {
+        return (await this.api.get('/byTech', {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
     async updateProfile(token,id,data) {
+        console.log(data);
         return (await this.api.patch(`update-profile/${id}`,data, {
             headers: {
                 "Content-Type": "application/json",

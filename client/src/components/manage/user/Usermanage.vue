@@ -176,7 +176,6 @@ onMounted(async () => {
           Hoạt động
         </td>
         <td v-else class="whitespace-nowrap text-red-500 text-center">Khóa</td>
-
         <td class="whitespace-nowrap flex items-center justify-center">
           <button
             v-if="!user.isBan"
@@ -213,7 +212,7 @@ onMounted(async () => {
             <i class="fa-solid fa-user-pen"></i>
           </button>
           <button
-            class="p-2 text-gray-500 hover:text-gray-600 text-2xl"
+            class="p-2 text-white hover:text-gray-600 text-2xl"
             @click="
               () => {
                 manageStore.showHistoryModal();
@@ -231,7 +230,7 @@ onMounted(async () => {
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td class="absolute right-[40%]">
+        <td class="absolute right-[45%]">
           <Loading />
         </td>
       </tr>

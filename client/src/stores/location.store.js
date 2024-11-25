@@ -125,5 +125,19 @@ export const useLocationStore = defineStore('location', ()=>{
             isLoading.value = false
         }
     }
-    return {err,result,isLoading,key,locations,usages,totalCount,totalPages,currentPage,rooms,getLocationsById,getLocations,getUsageInfo,createDepartment,updateDepartment,deleteDepartment}
+    const deleteRoom = async (id) => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await locationService.deleteRoom(authStore.token, id)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    return {err,result,isLoading,key,locations,usages,totalCount,totalPages,currentPage,rooms,deleteRoom,getLocationsById,getLocations,getUsageInfo,createDepartment,updateDepartment,deleteDepartment}
 })

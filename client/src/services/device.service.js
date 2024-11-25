@@ -27,6 +27,15 @@ class deviceService{
             }
         })).data
     }
+    async getDevicesByMaintenance(token) {
+        return (await this.api.get('/byMaintenance', {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
     async createService(token, data) {
         return (await this.api.postForm('/create', data, {
             headers: {
@@ -57,6 +66,15 @@ class deviceService{
     }
     async getDeviceById(token,id) {
         return (await this.api.get(`/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
+    async deleteDevice(token,id) {
+        return (await this.api.delete(`/${id}`, {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",

@@ -278,8 +278,8 @@ const updateDevice = async () => {
                 </div>
               </div>
               <div class="flex items-center mb-4">
-                <label for="expirationDate" class="label-custom mr-6"
-                  >Ngày mua:</label
+                <label for="expirationDate" class="label-custom mr-2"
+                  >Ngày hết hạn:</label
                 >
                 <div class="w-[70%]">
                   <Field
@@ -316,7 +316,7 @@ const updateDevice = async () => {
                 as="select"
                 name="categoryId"
                 id="categoryId"
-                class="input-custom"
+                class="input-custom pl-2"
                 v-model="device.categoryId"
               >
                 <option value="">Loại thiết bị</option>

@@ -72,7 +72,7 @@ export class DeviceController {
     }
     @Delete('/:id')
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.ADMIN,USER_TYPES.USER)
     deleteDevice(
         @Param('id', ParseIntPipe) id: number
     ) { return this.deviceService.deleteDevice(id) }

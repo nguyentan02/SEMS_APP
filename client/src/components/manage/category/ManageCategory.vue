@@ -61,6 +61,7 @@ onMounted(async () => {
     />
     <fwb-button
       color="default"
+      class="ml-2 py-2"
       size="sm"
       @click="
         () => {
@@ -98,7 +99,7 @@ onMounted(async () => {
           {{ category.categoryName }}
         </td>
 
-        <td class="">
+        <td class="text-center">
           {{ category.description || "---" }}
         </td>
         <td class="text-center">
@@ -155,7 +156,7 @@ onMounted(async () => {
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td class="absolute right-[40%]">
+        <td class="absolute right-[45%]">
           <Loading />
         </td>
       </tr>

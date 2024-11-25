@@ -43,6 +43,15 @@ class locationService {
             }
         })).data
     }
+    async deleteRoom(token,id) {
+        return (await this.api.delete(`/room/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
     // async createRoom(token,data) {
     //     console.log(data);
     //     return (await this.api.post('cre-room',data, {

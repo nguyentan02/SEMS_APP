@@ -24,7 +24,8 @@ export const useUserStore = defineStore('user', () => {
         updatePassword: false,
         updateAvatar: false,
         forgotPassword:false,
-        resetPassword:false
+        resetPassword:false,
+        
     })
     const closeUpdateAvatarModal = () => { isShow.updateAvatar = false }
     const showUpdateAvatarModal = () => { isShow.updateAvatar = true }
@@ -64,6 +65,36 @@ export const useUserStore = defineStore('user', () => {
             totalPages.value = res.data.totalPages
             totalCount.value = res.data.totalCount
             if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    const getTechnical = async () => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await userService.getTechnical(authStore.token)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+            users.value = res.data
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
+        }
+    }
+    const getUserNotMe = async () => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await userService.getUserNotMe(authStore.token)
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res
+            users.value = res.data
         } catch (error) {
             err.value = error.message
         } finally {
@@ -199,7 +230,7 @@ export const useUserStore = defineStore('user', () => {
             isLoading.value = false
         }
     }
-    return { user, err, result,isShow,isLoading,isLoadingUpdate,users,totalPages, currentPage,key,isBan,name,getMe,role,updateUser,forgotPassword,closeResetPassword,showForgotPassword, updateAvatar,unBanUser,banUser,getAllUser,getProfileUser,updateProfile,closeUpdateAvatarModal,showUpdateAvatarModal,closeUpdatePasswordModal,showUpdatePasswordModal,updatePassword,closeForgotPassword,showForgotPassword,verifyCode}
+    return { user, err, result,isShow,isLoading,isLoadingUpdate,users,totalPages, currentPage,getUserNotMe,key,isBan,name,getMe,getTechnical,role,updateUser,forgotPassword,closeResetPassword,showForgotPassword, updateAvatar,unBanUser,banUser,getAllUser,getProfileUser,updateProfile,closeUpdateAvatarModal,showUpdateAvatarModal,closeUpdatePasswordModal,showUpdatePasswordModal,updatePassword,closeForgotPassword,showForgotPassword,verifyCode}
 }, {
     persist: {
         key: 'user',

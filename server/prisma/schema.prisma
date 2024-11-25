@@ -31,13 +31,34 @@ model User {
   Feedback        Feedback[]
   ActualQuantity  ActualQuantity[]
   maintenancePlan MaintenancePlan[]
+  Conversation    Conversation[]
+  Message         Message[]
 }
 
-// model Position {
-//   id   Int    @id @default(autoincrement())
-//   name String
-//   User User[]
-// }
+model Conversation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  User    User[]
+  Message Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  read      Boolean  @default(false)
+  isImage   Boolean
+  createdAt DateTime @default(now())
+
+  Conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  User           User         @relation(fields: [userId], references: [id])
+  userId         Int
+
+  @@map("messages")
+}
 
 model VerifyCode {
   id        Int      @id @default(autoincrement())
@@ -57,7 +78,9 @@ model Feedback {
 }
 
 model Deparment {
-  id            Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
   deparmentName String
   symbol        String
   rooms         Room[]
@@ -67,28 +90,31 @@ model Room {
   id               Int                @id @default(autoincrement())
   roomName         String
   deparmentId      Int
-  createAt         DateTime           @default(now())
+  createdAt        DateTime           @default(now())
   deparment        Deparment          @relation(fields: [deparmentId], references: [id], onDelete: Cascade)
   Device           Device[]
   oldHistories     RotationDevice[]   @relation("OldRoom")
   newHistories     RotationDevice[]   @relation("NewRoom")
   UsageInformation UsageInformation[]
+  MaintenancePlan  MaintenancePlan[]
 }
 
 model Device {
-  id                    Int                     @id @default(autoincrement())
-  name                  String
-  serialNumber          String
-  manufacturer          String
-  purchaseDate          DateTime
-  expirationDate        DateTime
-  price                 Decimal
-  qrCode                String?
-  image                 String                  @default("https://res.cloudinary.com/dnhndgzes/image/upload/v1728122320/frdlrynketnd07okysmg.png")
-  lastMaintenanceDate   DateTime?
-  statusDevice          String                  @default("KHÔNG HOẠT ĐỘNG")
-  categoryId            Int
-  roomId                Int?
+  id                  Int       @id @default(autoincrement())
+  name                String
+  serialNumber        String
+  manufacturer        String
+  purchaseDate        DateTime
+  expirationDate      DateTime
+  price               Decimal
+  qrCode              String?
+  image               String    @default("https://res.cloudinary.com/dnhndgzes/image/upload/v1728122320/frdlrynketnd07okysmg.png")
+  lastMaintenanceDate DateTime?
+  statusDevice        String    @default("KHÔNG HOẠT ĐỘNG")
+  categoryId          Int
+  roomId              Int?
+
+  expired               Boolean                 @default(false)
   isDelete              Boolean                 @default(false)
   room                  Room?                   @relation(fields: [roomId], references: [id])
   category              Category                @relation(fields: [categoryId], references: [id])
@@ -104,6 +130,7 @@ model Category {
   id                  Int                   @id @default(autoincrement())
   categoryName        String
   description         String?
+  createdAt           DateTime              @default(now())
   devices             Device[]
   AttribyutesCategory AttribyutesCategory[]
 
@@ -135,12 +162,11 @@ model UsageInformation {
   id          Int       @id @default(autoincrement())
   deviceId    Int
   usage_start DateTime  @default(now())
-  usage_end   DateTime
   end         DateTime?
   purpose     String?
   isDeleted   Boolean   @default(false)
   roomId      Int
-  room        Room      @relation(fields: [roomId], references: [id])
+  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
   Device      Device    @relation(fields: [deviceId], references: [id])
 }
 
@@ -159,6 +185,7 @@ model RotationDevice {
 model Notification {
   id            Int             @id @default(autoincrement())
   read          Boolean         @default(false)
+  message       String
   createdAt     DateTime        @default(now())
   maintenanceId Int
   Maintenance   MaintenancePlan @relation(fields: [maintenanceId], references: [id])
@@ -188,11 +215,13 @@ model MaintenancePlan {
   requestDate       DateTime          @default(now())
   startDate         DateTime
   endDate           DateTime
+  roomId            Int
   priority          PriorityLevel     @default(LOW)
   maintenanceStatus StatusMaintenance @default(PENDING)
   cost              Decimal?          @default(0.00)
   descriptionPlan   String?
   isDeleted         Boolean           @default(false)
+  Room              Room              @relation(fields: [roomId], references: [id])
   User              User              @relation(fields: [userId], references: [id])
   Device            Device            @relation(fields: [deviceId], references: [id])
   Notification      Notification[]

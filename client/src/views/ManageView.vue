@@ -1,16 +1,21 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watchEffect } from "vue";
 import Header from "@/components/common/Header.vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth.store";
 import { useUserStore } from "../stores/user.store";
 import { useToast } from "vue-toast-notification";
+import { useMessageStore } from "@/stores/message.store";
+import { useConversationStore } from "@/stores/conversation.store";
+import { useNotificationStore } from "@/stores/notification.store";
 const authStore = useAuthStore();
 const userStore = useUserStore();
-
+const messageStore = useMessageStore();
 const currentPage = ref("dashboard");
 const $toast = useToast();
+const notificationStore = useNotificationStore();
 const router = useRouter();
+const conversationStore = useConversationStore();
 // const name = {
 //   dashboard: "THỐNG KÊ",
 //   profile: "THÔNG TIN CÁ NHÂN",
@@ -33,6 +38,17 @@ const logout = () => {
   $toast.success("Đăng xuất thành công", { position: "top-right" });
   router.push({ name: "login" });
 };
+watchEffect(async () => {
+  if (authStore.token) {
+    await userStore.getMe();
+    await notificationStore.getAllNotificationsByUserId();
+  }
+  if (userStore.user !== null) {
+    console.log("f");
+    messageStore.setupSocket();
+    await conversationStore.fetchConversations();
+  }
+});
 </script>
 <style>
 .active-link {
@@ -49,7 +65,7 @@ const logout = () => {
 }
 </style>
 <template>
-  <div class="flex max-w-screen-xl mx-auto">
+  <div class="flex md:p-0 lg:w-[80%] mx-auto">
     <div
       class="w-64 h-screen border-2 border-gray-600 bg-[rgb(var(--color-primary))]"
     >
@@ -99,7 +115,7 @@ const logout = () => {
               :to="{ name: 'category-manage' }"
               class="block p-5 text-base hover:opacity-70"
             >
-              <i class="fa-solid fa-users"></i>
+              <i class="fa-solid fa-list"></i>
               Danh mục thiết bị
             </router-link>
           </li>
@@ -109,8 +125,18 @@ const logout = () => {
               :to="{ name: 'location-manage' }"
               class="block p-5 text-base hover:opacity-70"
             >
-              <i class="fa-solid fa-house"></i>
+              <i class="fa-solid fa-mountain-city"></i>
               Phòng ban
+            </router-link>
+          </li>
+          <li class="mb-2">
+            <router-link
+              active-class="active-link"
+              :to="{ name: 'chat-view' }"
+              class="block p-5 text-base hover:opacity-70"
+            >
+              <i class="fa-regular fa-message mr-2"></i>
+              Trò chuyện
             </router-link>
           </li>
           <li

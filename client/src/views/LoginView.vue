@@ -7,7 +7,7 @@ import { useUserStore } from "../stores/user.store";
 import { useRouter } from "vue-router";
 import { reactive, onMounted } from "vue";
 import ForgotPassword from "@/components/common/ForgotPassword.vue";
-
+import FeedbackModal from "@/components/login/FeedbackModal.vue";
 const userStore = useUserStore();
 const authStore = useAuthStore();
 const router = useRouter();
@@ -27,14 +27,25 @@ const formSchemaLogin = yup.object().shape({
     .required("Mật khẩu không được bỏ trống.")
     .min(6, "Mật khẩu phải ít nhất 6 ký tự."),
 });
+
 const submitLogin = async () => {
   await authStore.login(user);
   if (authStore.err) {
+    if (authStore.result.statusCode == 403) {
+      authStore.showFeedbackModal();
+    }
     $toast.error(authStore.err, { position: "top-right" });
     return;
   }
   $toast.success("Đăng nhập thành công!", { position: "top-right" });
-  router.push({ name: "test" });
+  await userStore.getMe();
+  if (userStore.user.role === 0) {
+    router.push({ name: "dashboard-manage" });
+  } else if (userStore.user.role === 1) {
+    router.push({ name: "test" });
+  } else if (userStore.user.role === 2) {
+    router.push({ name: "view-maintenance" });
+  }
 };
 </script>
 
@@ -76,8 +87,8 @@ const submitLogin = async () => {
               type="text"
               name="email"
               id="email"
-              class="input-custom shadow-lg"
-              placeholder="Nhập email"
+              class="input-custom shadow-lg pl-2"
+              placeholder="Nhập email "
               v-model="user.email"
             />
             <ErrorMessage name="email" class="error" />
@@ -90,24 +101,23 @@ const submitLogin = async () => {
               name="password"
               type="password"
               id="password"
-              class="input-custom shadow-lg"
+              class="input-custom shadow-lg pl-2"
               placeholder="Nhập mật khẩu"
               v-model="user.password"
             />
             <ErrorMessage name="password" class="error" />
           </div>
-          <div
-            @click="
-              () => {
-                userStore.showForgotPassword();
-              }
-            "
-          >
-            <p
-              class="text-indigo-900 mr-[12rem] underline underline-offset-1 hover:text-indigo-700 cursor-pointer"
+          <div>
+            <a
+              class="text-indigo-900 underline underline-offset-1 hover:text-indigo-700 cursor-pointer"
+              @click="
+                () => {
+                  userStore.showForgotPassword();
+                }
+              "
             >
               Quên mật khẩu ?
-            </p>
+            </a>
           </div>
           <button
             type="submit"
@@ -119,6 +129,6 @@ const submitLogin = async () => {
       </div>
     </div>
   </section>
-
+  <FeedbackModal :feedback="authStore.result?.data?.feedback" />
   <ForgotPassword />
 </template>

@@ -53,6 +53,7 @@ const data = reactive({
   name: userStore.user.name,
 });
 const updateProflie = async () => {
+  console.log(data);
   await userStore.updateProfile(data, route.params?.id);
   if (userStore.err) {
     $toast.error(userStore.err, { position: "top-right" });
@@ -154,7 +155,7 @@ const updateProflie = async () => {
           Cập nhật thông tin
         </button>
       </Form>
-      <div v-else>
+      <div v-else class="absolute right-[37%]">
         <Loading />
       </div>
     </div>

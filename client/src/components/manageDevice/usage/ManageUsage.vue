@@ -9,7 +9,6 @@ import Badge from "primevue/badge";
 import Tag from "primevue/tag";
 import { useLocationStore } from "@/stores/location.store";
 const locationStore = useLocationStore();
-const deviceStore = useDeviceStore();
 
 const usagesInfo = ref();
 onMounted(async () => {

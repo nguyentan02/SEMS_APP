@@ -80,6 +80,7 @@ const submitImage = async () => {
             }
           "
           color="blue"
+          class="mr-3"
         >
           Đổi
         </fwb-button>

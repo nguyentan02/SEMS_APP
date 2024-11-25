@@ -3,10 +3,8 @@
 @tailwind utilities;
 
 @layer tailwind-base {
-    @tailwind base;
+  @tailwind base;
 }
-
-
 
 .input-custom {
   @apply w-9/12 block bg-transparent border-b border-gray-300 focus:outline-none focus:border-gray-500 text-black text-base py-2 rounded-lg;
@@ -14,11 +12,14 @@
 .input-device {
   @apply w-9/12 h-[24px] block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent;
 }
+.input-maintenance {
+  @apply w-9/12 h-[43px] block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent;
+}
 .input-edit {
   @apply w-9/12  block border-0 border-b-2 border-gray-200 hover:border-b-lime-800 focus:border-black focus:outline-none  focus:ring-transparent;
 }
 .label-custom {
-  @apply block mb-2 font-medium text-gray-800;
+  @apply block  font-semibold text-sm text-gray-800;
 }
 .btn-login {
   @apply bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 w-9/12 rounded-full;

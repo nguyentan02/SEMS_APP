@@ -10,13 +10,13 @@ export class RotationController {
     constructor(private rotationService: RotationService) { }
     @Get()
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     getRotation() {
         return this.rotationService.getRotationHistory()
     }
     @Post()
     @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+    @Roles(USER_TYPES.USER)
     rotationDevice(
         @Body() createRotationDto: CreateRotationDto
     ) {

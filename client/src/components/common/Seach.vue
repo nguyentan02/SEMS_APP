@@ -13,7 +13,7 @@ watch(key, (newval, oldval) => {
 
 <template>
   <div
-    class="px-3 bg-[rgb(var(--color-primary))] rounded-xl flex items-center gap-1"
+    class="px-3 py-2 bg-[rgb(var(--color-primary))] rounded-xl flex items-center gap-1"
   >
     <i class="fa-solid fa-magnifying-glass"></i>
     <input
