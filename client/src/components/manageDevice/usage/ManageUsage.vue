@@ -12,8 +12,9 @@ const locationStore = useLocationStore();
 
 const usagesInfo = ref();
 onMounted(async () => {
-  await locationStore.getUsageInfo({ key: "", page: "" });
+  await locationStore.getUsageInfo();
   usagesInfo.value = locationStore.usages;
+  console.log(usagesInfo.value);
 });
 
 const router = useRouter();
@@ -73,25 +74,33 @@ const expandedRows = ref([]);
             <div v-else>
               <Column field="id" header="Id" class="p-2"></Column>
               <Column field="roomName" header="Tên phòng" sortable></Column>
-              <Column header="Số thiết bị hoạt động">
+              <Column
+                field="deviceStatusCounts.active"
+                header="Số thiết bị hoạt động"
+                sortable
+              >
                 <template #body="slotProps">
                   <Badge
-                    class="text-white ml-5"
+                    class="text-white ml-20"
                     :value="slotProps.data.deviceStatusCounts.active ?? 0"
                     severity="success"
                   ></Badge>
                 </template>
               </Column>
-              <Column header="Số thiết đang bảo trì">
+              <Column
+                field="deviceStatusCounts.maintenance"
+                header="Số thiết đang bảo trì"
+                sortable
+              >
                 <template #body="slotProps">
                   <Badge
-                    class="text-white ml-5"
+                    class="text-white ml-20"
                     :value="slotProps.data.deviceStatusCounts.maintenance ?? 0"
                     severity="danger"
                   ></Badge>
                 </template>
               </Column>
-              <Column header="Số thiết cần bảo trì">
+              <!-- <Column header="Số thiết cần bảo trì">
                 <template #body="slotProps">
                   <Badge
                     class="text-white ml-5"
@@ -101,7 +110,7 @@ const expandedRows = ref([]);
                     severity="warning"
                   ></Badge>
                 </template>
-              </Column>
+              </Column> -->
               <Column header="Tổng">
                 <template #body="slotProps">
                   <Badge

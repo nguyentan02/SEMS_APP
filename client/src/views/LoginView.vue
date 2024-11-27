@@ -42,7 +42,7 @@ const submitLogin = async () => {
   if (userStore.user.role === 0) {
     router.push({ name: "dashboard-manage" });
   } else if (userStore.user.role === 1) {
-    router.push({ name: "test" });
+    router.push({ name: "device" });
   } else if (userStore.user.role === 2) {
     router.push({ name: "view-maintenance" });
   }

@@ -22,6 +22,7 @@ import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
 import {SocketModule} from './socket/socket.module'
 import { DashboardModule } from './dashboard/dashboard.module';
+import { HistoryModule } from './history/history.module';
 
 
 @Module({
@@ -33,7 +34,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
       }),
     }),
     ScheduleModule.forRoot(),SocketModule,
-    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule, UsageModule, RotationModule, MaterialModule, StorageModule, MaintenanceModule, NotificationModule, ConversationModule, MessageModule, DashboardModule
+    PrismaModule, AuthModule, UserModule, CloudinaryModule, MailingModule, LocationModule, CategoryModule, DeviceModule, UsageModule, RotationModule, MaterialModule, StorageModule, MaintenanceModule, NotificationModule, ConversationModule, MessageModule, DashboardModule, HistoryModule
   ],
 
 })

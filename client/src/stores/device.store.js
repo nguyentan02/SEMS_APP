@@ -17,13 +17,20 @@ export const useDeviceStore = defineStore('device', ()=>{
      const  groupByCategory = ref(false)
     const sortByDate = ref('asc')
     const isShow = reactive({
-        qrModal:false
+        qrModal:false,
+        barCode:false
     })
     const showQrCodeModal = ()=>{
         isShow.qrModal= true
     }
     const closeQrCodeModal = ()=>{
         isShow.qrModal= false
+    }
+    const showBarCodeModal = ()=>{
+        isShow.barCode= true
+    }
+    const closeBarCodeModal = ()=>{
+        isShow.barCode= false
     }
     const getDevices = async(option)=>{
  
@@ -145,5 +152,6 @@ export const useDeviceStore = defineStore('device', ()=>{
         }
     }
     
-    return {err,result,isLoading,key,devices,device,totalCount,sortByDate,totalPages,currentPage,categoryId,groupByCategory,deleteDevice,createDevices,getDevices,showQrCodeModal,closeQrCodeModal,getDevicesByMaintenance,isShow,createDevice,getDeviceById,updateDevice,getDevicesByUsage}
+    return {err,result,isLoading,key,devices,device,totalCount,sortByDate,totalPages,currentPage,categoryId,groupByCategory,deleteDevice,createDevices,getDevices,showQrCodeModal,
+        closeQrCodeModal,getDevicesByMaintenance,isShow,createDevice,getDeviceById,updateDevice,getDevicesByUsage,showBarCodeModal,closeBarCodeModal}
 })

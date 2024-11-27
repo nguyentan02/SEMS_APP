@@ -34,18 +34,16 @@ export const useLocationStore = defineStore('location', ()=>{
         }
     }
  
-    const getUsageInfo = async(option)=>{
+    const getUsageInfo = async()=>{
         err.value = null
         result.value = null
         isLoading.value = true
         try {
-            let res = await locationService.getUsageInfo(option)
+            let res = await locationService.getUsageInfo()
             if (res.statusCode !== 200) throw new Error(res.message) 
                 result.value = res
               usages.value = res.data.dataWithRoomAndDeviceStatus
-                totalPages.value = res.data.totalPages
-                totalCount.value = res.data.totalCount
-                if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
+         
         } catch (error) {
                 err.value = error.message
         }finally{

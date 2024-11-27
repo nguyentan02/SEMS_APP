@@ -35,12 +35,18 @@ export class CategoryService {
                 },
                include:{
                 AttribyutesCategory:true,
-                devices:true
+                devices:{
+                    where:{
+                        isDelete:false
+                    }
+                }
+                
                    }
             ,
                 skip: next,
                 take: pageSize
             })
+    
             const dataWithDeviceCount = data.map(category => ({
                 ...category,
                 devicesCount: category.devices.length
@@ -129,7 +135,7 @@ export class CategoryService {
                 const existingAttributes = await this.prismaService.attribyutesCategory.findMany({
                     where: { categoryId: id },
                 });
-                console.log(existingAttributes);
+
                 const existingAttributeIds = existingAttributes.map(attr => attr.id);
     
                 const attributesToDelete = existingAttributes.filter(

@@ -61,7 +61,7 @@ const routes = [
                 },
             },
             {
-                path: '/device/:id',
+                path: 'device/:id',
                 name: 'detailDeivce',
                 component: () => import('../components/manageDevice/device/EditDevice.vue'),
               
@@ -85,7 +85,7 @@ const routes = [
                 },
             },
             {
-                path: '/usageroom/:id',
+                path: 'usageroom/:id',
                 name: 'detailUsage',
                 component: () => import('../components/manageDevice/usage/DetailUsageRoom.vue'),
                 meta: { title: 'Danh sách thiết bị sử dụng' },
@@ -96,7 +96,7 @@ const routes = [
                 },
             },
             {
-                path: '/device/import',
+                path: 'device/import',
                 name: 'import',
                 component: () => import('../components/manageDevice/device/AddExcelDevice.vue'),
                 props: true,
@@ -108,7 +108,7 @@ const routes = [
                 },
             },
             {
-                path: '/maintenance',
+                path: 'maintenance',
                 name: 'maintenance',
                 component: () => import('../components/maintenance/MaintenanceManage.vue'),
                 props: true,
@@ -120,7 +120,7 @@ const routes = [
                 },
             },
             {
-                path: '/maintenance/new',
+                path: 'maintenance/new',
                 name: 'newmaintenance',
                 component: () => import('../components/maintenance/NewMaintanceManage.vue'),
                 props: true,
@@ -132,7 +132,19 @@ const routes = [
                 },
             },
             {
-                path: '/maintenance/:id',
+                path: 'history/maintenance',
+                name: 'historymaintenance',
+                component: () => import('../components/manageDevice/history/HistoryMaintenance.vue'),
+                props: true,
+                meta: { title: 'Lịch sử bảo trì' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
+                path: 'maintenance/:id',
                 name: 'editmaintenance',
                 component: () => import('../components/maintenance/EditMaintenance.vue'),
                 meta: { title: '{d}' },
@@ -143,7 +155,7 @@ const routes = [
                 },
             },
             {
-                path: '/transfer',
+                path: 'transfer',
                 name: 'transfer',
                 component: () => import('../components/manageDevice/transfer/RotationDevice.vue'),
                 meta: { title: 'Thông tin cá nhân' },

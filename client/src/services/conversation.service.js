@@ -15,9 +15,7 @@ class conversationService {
         })).data
     }
 
-    async fetchConversations(token) {
-        console.log('>>>>'+token);
-        
+    async fetchConversations(token) {  
         return (await this.api.get('/', {
             headers: {
                 "Content-Type": "application/json",

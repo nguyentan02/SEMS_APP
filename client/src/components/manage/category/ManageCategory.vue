@@ -6,7 +6,7 @@ import AddCategory from "./AddCategory.vue";
 import EditCategoryModal from "./EditCategoryModal.vue";
 import Loading from "@/components/common/Loading.vue";
 import DetailCategory from "./DetailCategory.vue";
-import { FwbButton } from "flowbite-vue";
+import { FwbButton, FwbPagination } from "flowbite-vue";
 import { useToast } from "vue-toast-notification";
 import Seach from "@/components/common/Seach.vue";
 const emit = defineEmits(["currentPage"]);
@@ -71,8 +71,13 @@ onMounted(async () => {
       >Thêm danh mục <i class="fa-solid fa-plus"></i
     ></fwb-button>
   </div>
-
+  <div v-if="!categoryStore.categorys?.length" class="text-center text-xl">
+    <p class="font-semibold text-xl mt-4">
+      Không có tìm thấy danh mục. Hãy thêm một danh mục mới !
+    </p>
+  </div>
   <table
+    v-else
     class="table-auto w-10/12 mt-5 bg-[rgb(var(--color-primary))] rounded-md mx-auto"
   >
     <thead class="font-medium border-b border-black">
@@ -156,12 +161,20 @@ onMounted(async () => {
     </tbody>
     <tbody v-else>
       <tr class="text-center text-red-500 text-xl">
-        <td class="absolute right-[45%]">
+        <td class="absolute right-[40%]">
           <Loading />
         </td>
       </tr>
     </tbody>
   </table>
+  <div class="text-center py-2" v-if="categoryStore.totalPages >= 2">
+    <FwbPagination
+      v-model="categoryStore.currentPage"
+      :total-pages="categoryStore.totalPages"
+      :show-icons="true"
+      :show-labels="false"
+    />
+  </div>
   <AddCategory />
   <DetailCategory :category="currentCategory" />
   <EditCategoryModal :category="currentCategory" />

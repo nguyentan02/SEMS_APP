@@ -1,35 +1,43 @@
 <script setup>
-// import QrcodeVue from "qrcode.vue";
 import JsBarcode from "jsbarcode";
-import { nextTick, ref } from "vue";
-import { FwbButton, FwbModal } from "flowbite-vue";
+import { ref, watch, nextTick, watchEffect } from "vue";
+import { FwbModal, FwbButton } from "flowbite-vue";
 import { useDeviceStore } from "@/stores/device.store";
 import Loading from "@/components/common/Loading.vue";
+
 const deviceStore = useDeviceStore();
 const qr = defineProps(["device"]);
-
-const dataObject = ref({
-  serialNumber: qr.device?.serialNumber,
-});
-
-nextTick(() => {
-  JsBarcode("#barcode")
-    .options({ font: "OCR-B" })
-    .CODE128(dataObject.value.serialNumber, { fontSize: 18, textMargin: 0 })
-    .blank(20)
-    .render();
-});
+// const dataObject = ref({
+//   serialNumber: "",
+// });
+console.log(qr.device);
+watchEffect(() => {});
+watch(
+  () => deviceStore.isShow.qrModal,
+  async (isOpen) => {
+    if (isOpen) {
+      await nextTick(); // Chờ DOM cập nhật xong
+      JsBarcode("#barcode")
+        .options({ font: "OCR-B" })
+        .CODE128(qr.device, {
+          fontSize: 18,
+          textMargin: 0,
+        })
+        .render();
+    }
+  }
+);
 </script>
 <template>
   <fwb-modal
     v-if="deviceStore.isShow.qrModal"
     @close="deviceStore.closeQrCodeModal"
-    size="md"
+    size="sm"
   >
     <template #body>
-      <div v-if="!deviceStore.isLoading" class="w-full">
-        <div class="barcode-container">
-          <h2>Mã vạch từ Dữ liệu</h2>
+      <div v-if="!deviceStore.isLoading" class="">
+        <div class="flex flex-col items-center barcode-container text-center">
+          <h2>Mã vạch thiết bị</h2>
           <svg id="barcode"></svg>
         </div>
       </div>
@@ -37,13 +45,12 @@ nextTick(() => {
         <Loading />
       </div>
     </template>
-    <template #footer>
+    <!-- <template #footer>
       <div class="flex justify-end gap-2">
-        <!-- <fwb-button @click="generatePdf" color="green"> Test </fwb-button> -->
         <fwb-button @click="deviceStore.closeQrCodeModal" color="secondary">
           Đóng
         </fwb-button>
       </div>
-    </template>
+    </template> -->
   </fwb-modal>
 </template>

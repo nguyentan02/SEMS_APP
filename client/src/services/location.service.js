@@ -10,8 +10,7 @@ class locationService {
         return (await this.api.get(`/${parameter}`)).data
     }
     async getUsageInfo(data) {
-        let parameter = createQueryString(data)
-        return (await this.api.get(`/usage/${parameter}`)).data
+        return (await this.api.get('/usage')).data
     }
     async getLocationById(id) {
         return (await this.api.get(`/${id}`)).data

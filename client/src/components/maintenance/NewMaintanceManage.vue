@@ -44,7 +44,7 @@ const data = reactive({
 const formSchemaMaintenance = yup.object().shape({
   title: yup
     .string()
-    .min(10, "Tối thiểu 10 kí tự")
+    .min(5, "Tối thiểu 5 kí tự")
     .required("Không được bỏ trống."),
   userId: yup.string().required("Hãy chọn người phụ trách."),
   startDate: yup.string().required("Vui lòng chọn ngày bắt đầu."),

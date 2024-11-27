@@ -6,6 +6,7 @@ import { PAGE_SIZE, ResponseData } from '../global';
 import { Device, Prisma, StatusMaintenance } from '@prisma/client';
 import { Workbook } from 'exceljs'
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { join } from 'path';
 
 @Injectable()
 export class DeviceService {
@@ -193,7 +194,8 @@ export class DeviceService {
          
             const exist = await this.prismaService.device.findFirst({
                 where: {
-                    serialNumber: createDeviceDto.serialNumber
+                    serialNumber: createDeviceDto.serialNumber,
+                    isDelete:false
                 }
             })
             if (exist) return new ResponseData<any>(null, 400, "Số serial thiết bị đã được sử dụng")
@@ -253,6 +255,7 @@ export class DeviceService {
         const keys = ['name', 'serialNumber', 'manufacturer', 'purchaseDate', 'expirationDate', 'price', 'categoryName', 'attributes'];
         const data = [];
         const deviceErrors = [];
+        const successfulDevices = []; // Mảng để lưu thiết bị thành công
         let devices: CreateDevicesDto[];
     
         try {
@@ -260,18 +263,20 @@ export class DeviceService {
             await workbook.xlsx.load(file.buffer);
             const worksheet = workbook.getWorksheet(1);
             const headerRow = worksheet.getRow(1).values;
+    
+            // Kiểm tra tiêu đề cột có khớp không
             const isEqual = keys.every((key, index) => key === headerRow[index + 1]);
             if (!isEqual) {
-                return new ResponseData<string>(null, 400, 'Không đúng định dạng dữ liệu')
+                return new ResponseData<string>(null, 400, 'Không đúng định dạng dữ liệu');
             }
-            // Extract data rows
+    
+            // Lấy dữ liệu từ các hàng
             worksheet.eachRow((row, rowIndex) => {
                 if (rowIndex !== 1) {
                     data.push(row.values);
                 }
             });
     
-         
             devices = data.map((row) => {
                 const device = {} as CreateDevicesDto;
                 for (let i = 1; i < row.length; i++) {
@@ -279,56 +284,70 @@ export class DeviceService {
                 }
                 return device;
             });
-        
+    
             for (const device of devices) {
                 const categoryValid = await this.prismaService.category.findFirst({
-                    where:{categoryName:device.categoryName}
-                })
-              const isCategoryValid = await this.isCategory(categoryValid.id); 
+                    where: { categoryName: device.categoryName }
+                });
+    
+                if (!categoryValid) {
+                    deviceErrors.push({ ...device, error: 'Danh mục không tồn tại' });
+                    continue;
+                }
+    
                 const exist = await this.prismaService.device.findFirst({
-                    where: {
-                        serialNumber: device.serialNumber
-                    }
-                })
-                if (!isCategoryValid ||exist || isNaN(Number(device.price))) {
-                    deviceErrors.push(device);
-                   
-                } else {
-                    const attributesWithId = [];    
-                        let attribute = await this.prismaService.attribyutesCategory.findMany({
-                            where: {  categoryId: categoryValid.id },
-                        });    
-                        for(const att of attribute){
-                            attributesWithId.push({id:att.id,value:""});
-                        }
-                       
-                    await this.prismaService.device.create({
+                    where: { serialNumber: device.serialNumber, isDelete: false }
+                });
+    
+                if (exist || isNaN(Number(device.price))) {
+                    deviceErrors.push({ ...device, error: 'Thiết bị đã tồn tại hoặc giá không hợp lệ' });
+                    continue;
+                }
+    
+                const attributesWithId = [];
+                const attributes = await this.prismaService.attribyutesCategory.findMany({
+                    where: { categoryId: categoryValid.id }
+                });
+    
+                for (const attr of attributes) {
+                    const attrValue = (device.attributes && device.attributes[attr.name]) || "";
+                    attributesWithId.push({ id: attr.id, value: attrValue });
+                }
+    
+                try {
+                    const newDevice = await this.prismaService.device.create({
                         data: {
-                            name:device.name,
-                            categoryId:categoryValid.id,
-                            serialNumber:device.serialNumber,
-                            manufacturer:device.manufacturer,
-                            purchaseDate:device.purchaseDate,
+                            name: device.name,
+                            categoryId: categoryValid.id,
+                            serialNumber: device.serialNumber,
+                            manufacturer: device.manufacturer,
+                            purchaseDate: device.purchaseDate,
                             expirationDate: device.expirationDate,
-                            price: new Prisma.Decimal(device.price)
-                            ,
-                            DeviceAttributeValues: { create:attributesWithId.map(attr => ({ attributeId: attr.id, value: attr.value || "" })) },
-                        },
+                            price: new Prisma.Decimal(device.price),
+                            DeviceAttributeValues: {
+                                create: attributesWithId.map(attr => ({ attributeId: attr.id, value: attr.value }))
+                            }
+                        }
                     });
+                    successfulDevices.push(newDevice);
+                } catch (error) {
+                    deviceErrors.push({ ...device, error: 'Lỗi khi tạo thiết bị' });
                 }
             }
     
             return new ResponseData<any>({
                 deviceErrors,
-                totalSuccess: devices.length - deviceErrors.length,
+                successfulDevices,
+                totalSuccess: successfulDevices.length,
                 totalError: deviceErrors.length,
             }, 200, 'Tạo thiết bị thành công');
-            
+    
         } catch (error) {
             this.logger.error(error.message);
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau');
         }
     }
+    
     async isCategory(categoryId:number){
         const category = await this.prismaService.category.findFirst({
             where: { id: categoryId },
@@ -441,21 +460,21 @@ export class DeviceService {
                 if (!exist) return new ResponseData<any>(null, 400, "Thiết bị không tồn tại")
                  const maintenancePlanExist = await this.prismaService.maintenancePlan.findFirst({
                         where: { deviceId: id ,maintenanceStatus:{
-                            not:StatusMaintenance.PENDING
+                            notIn:[StatusMaintenance.PENDING,StatusMaintenance.COMPLETED,StatusMaintenance.CANCEL]
                         }}
                       });
-                      console.log(maintenancePlanExist);
+                    
                       if(maintenancePlanExist){
                         return new ResponseData<any>(null, 400, "Thiết bị đang có bảo trì không thể xoá")
-                      }else{
-                        await this.prismaService.maintenancePlan.update({
+                      }
+                        await this.prismaService.maintenancePlan.updateMany({
                             where:{
-                                id:maintenancePlanExist.id
+                                deviceId:exist.id,
                             },data:{
-                                isDeleted:true
+                                isDeleted:true,
+                                maintenanceStatus:StatusMaintenance.CANCEL
                             }
                         })
-                      }
                       await this.prismaService.usageInformation.updateMany({
                         where:{
                             deviceId:exist.id
@@ -478,6 +497,7 @@ export class DeviceService {
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
+   
     @Cron('*/30 * * * *')
     async autoUpdateDevice() {
         try {

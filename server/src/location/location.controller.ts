@@ -15,8 +15,8 @@ export class LocationController {
     }
  
     @Get('/usage')
-    getUsageInfo(@Query() option: { page: number, key: string }) {
-        return this.locationService.getUsageInfo(option)
+    getUsageInfo() {
+        return this.locationService.getUsageInfo()
     }
     @Get('/:id')
     getById(@Param('id', ParseIntPipe) id: number) {

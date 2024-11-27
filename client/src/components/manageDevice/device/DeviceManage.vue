@@ -6,13 +6,17 @@ import Loading from "@/components/common/Loading.vue";
 import { useManageDeviceStore } from "@/stores/manageDevice.store";
 import { useCategoryStore } from "@/stores/category.store";
 import AddDeviceModal from "./AddDeviceModal.vue";
+import CreateQrCode from "./CreateQrCode.vue";
 import { useRouter } from "vue-router";
 import { FwbButton, FwbPagination } from "flowbite-vue";
 import { useToast } from "vue-toast-notification";
+import QrCodeModal from "./QrCodeModal.vue";
 import dayjs from "dayjs";
+import { useDashboardtore } from "@/stores/dashboard.store";
 const manageDeviceStore = useManageDeviceStore();
 // const emit = defineEmits(["currentPage"]);
 const currentDevice = ref(null);
+const dashboardStore = useDashboardtore();
 const deviceStore = useDeviceStore();
 const categoryStore = useCategoryStore();
 const router = useRouter();
@@ -35,17 +39,14 @@ onMounted(async () => {
   await deviceStore.getDevices({ key: "", page: 1 });
   deviceStore.currentPage = 1;
   deviceStore.key = "";
-  test.value = deviceStore.devices;
+  // test.value = deviceStore.devices
   document.addEventListener("click", handleClickOutside);
+  document.addEventListener("click", closeMenuOnClickOutside);
 });
 
 const toggleFilter = () => {
   isFilterOpen.value = !isFilterOpen.value;
 };
-const showSide = ref(false);
-// const toggleAddDevice = () => {
-//   showSide.value = !showSide.value;
-// };
 const toggleSortOrder = () => {
   toggleSort.value = toggleSort.value === "asc" ? "desc" : "asc";
 };
@@ -54,8 +55,10 @@ const handleClickOutside = (event) => {
     isFilterOpen.value = false;
   }
 };
+
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
+  document.removeEventListener("click", closeMenuOnClickOutside);
 });
 watchEffect(async () => {
   await deviceStore.getDevices({
@@ -66,7 +69,9 @@ watchEffect(async () => {
   });
 });
 const selectedCategoryName = ref("");
-
+const exportExcel = async () => {
+  await dashboardStore.downloadExcel();
+};
 const handleCategorySelect = () => {
   const selectedCategory = categoryStore.categorys.find(
     (category) => category.id === deviceStore.categoryId
@@ -96,6 +101,17 @@ const clearSelectedCategory = () => {
   selectedCategoryName.value = "";
   deviceStore.categoryId = "";
 };
+
+const showMenu = ref(false);
+const toggleMenu = (id) => {
+  showMenu.value = { ...showMenu.value, [id]: !showMenu.value[id] };
+};
+
+const closeMenuOnClickOutside = (event) => {
+  if (!event.target.closest(".menu-container")) {
+    showMenu.value = {};
+  }
+};
 </script>
 <style scoped>
 .rotate-180 {
@@ -107,13 +123,13 @@ const clearSelectedCategory = () => {
 }
 </style>
 <template>
-  <h1 class="text-2xl font-bold mb-10 text-[#25861e]">Quản lý thiết bị</h1>
+  <h1 class="text-2xl font-bold mb-10 text-[#25861e]">Danh sách thiết bị</h1>
   <div class="flex items-center justify-between">
     <div class="flex relative">
       <fwb-button
         color="green"
         size="sm"
-        class="font-semibold px-4 py-2"
+        class="font-semibold px-4 py-2 mr-2"
         @click="
           () => {
             manageDeviceStore.showAddDeviceModal();
@@ -122,8 +138,8 @@ const clearSelectedCategory = () => {
         >Mới
         <i class="fa-solid fa-plus"></i>
       </fwb-button>
-      <button
-        class="cursor-pointer px-4 py-2 bg-[#0284c7] text-white hover:opacity-80 rounded-md ml-2"
+      <fwb-button
+        class="mr-2"
         @click="
           () => {
             router.push({
@@ -132,8 +148,12 @@ const clearSelectedCategory = () => {
           }
         "
       >
-        <i class="fa-solid fa-download mr-2"></i>Nhập bản ghi
-      </button>
+        <i class="fa-solid fa-download mr-2"></i>Nhập file
+      </fwb-button>
+      <fwb-button @click="exportExcel" color="blue" outline>
+        Xuất file
+        <i class="fa-solid fa-file-export"></i>
+      </fwb-button>
     </div>
 
     <div
@@ -166,10 +186,10 @@ const clearSelectedCategory = () => {
 
       <div
         v-if="isFilterOpen"
-        class="absolute bg-white border right-0 mt-12 w-[630px] shadow-lg transition-opacity duration-300 ease-in-out rounded-md"
+        class="absolute bg-white border right-0 mt-12 w-[300px] shadow-lg transition-opacity duration-300 ease-in-out rounded-md"
         :class="{ 'opacity-100': isFilterOpen, 'opacity-0': !isFilterOpen }"
       >
-        <div class="grid grid-cols-2 divide-x divide-gray-200">
+        <div class="grid grid-cols-1 divide-x divide-gray-200">
           <div class="p-4">
             <span class="font-semibold text-gray-800 mb-2"
               ><i class="fa-solid fa-filter text-fuchsia-800 mr-2"></i>Bộ
@@ -180,7 +200,7 @@ const clearSelectedCategory = () => {
               <select
                 name=""
                 id="isban"
-                class="rounded-lg p-1"
+                class="rounded-lg p-1 w-auto"
                 v-model="deviceStore.categoryId"
                 @change="handleCategorySelect"
               >
@@ -197,7 +217,7 @@ const clearSelectedCategory = () => {
             </ul>
           </div>
 
-          <div class="p-4">
+          <!-- <div class="p-4">
             <span class="font-semibold text-gray-800 mb-2">
               <i class="fa-solid fa-layer-group text-green-500 mr-2"></i>Nhóm
               theo</span
@@ -213,7 +233,7 @@ const clearSelectedCategory = () => {
                 Danh mục sản phẩm
               </label>
             </ul>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -260,6 +280,7 @@ const clearSelectedCategory = () => {
               </i>
             </div>
           </th>
+          <th class=""></th>
           <th class="p-2">Giá</th>
           <th class="p-2 text-center">Loại thiết bị</th>
           <th class="p-2 text-center">Tùy chọn</th>
@@ -296,6 +317,14 @@ const clearSelectedCategory = () => {
           <td class="text-center">
             {{ dayjs(device.expirationDate).format("DD/MM/YYYY") }}
           </td>
+          <td>
+            <img
+              v-if="device.expired == true"
+              class="w-[30px]"
+              src="/expired.webp"
+              alt=""
+            />
+          </td>
           <td class="text-gray-900 font-extrabold text-center">
             {{ formatPrice(device.price) }}
           </td>
@@ -327,6 +356,46 @@ const clearSelectedCategory = () => {
               >
                 <i class="fa-solid fa-magnifying-glass"></i>
               </button>
+
+              <div class="relative menu-container">
+                <!-- Nút mở menu -->
+                <button
+                  class="p-2 text-black hover:opacity-70 text-xl"
+                  @click.stop="toggleMenu(device.id)"
+                >
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+
+                <!-- Menu thả xuống -->
+                <div
+                  v-if="showMenu[device.id]"
+                  class="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-2"
+                >
+                  <button
+                    class="p-2 w-full hover:bg-gray-100 rounded border-b"
+                    @click="
+                      () => {
+                        deviceStore.showBarCodeModal();
+                        currentDevice = device;
+                      }
+                    "
+                  >
+                    <i class="fa-solid fa-qrcode text-xl"></i>
+                  </button>
+
+                  <button
+                    class="p-2 w-full hover:bg-gray-100 rounded"
+                    @click="
+                      () => {
+                        deviceStore.showQrCodeModal();
+                        currentDevice = device.serialNumber;
+                      }
+                    "
+                  >
+                    <i class="fa-solid fa-barcode text-xl"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </td>
         </tr>
@@ -348,6 +417,7 @@ const clearSelectedCategory = () => {
       />
     </div>
   </div>
-
+  <CreateQrCode :device="currentDevice" />
+  <QrCodeModal :device="currentDevice" />
   <AddDeviceModal />
 </template>

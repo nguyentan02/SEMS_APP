@@ -50,12 +50,19 @@ const renderTable = () => {
 
 const handleFileUpload = async (event) => {
   const uploadedFile = event.target.files[0];
-  if (uploadedFile) {
-    file.value = uploadedFile; // Gán giá trị cho file
-    show.value = true;
-    data.value = await readExcelFile(uploadedFile);
-    renderTable();
+  if (!uploadedFile) {
+    $toast.warning("Vui lòng chọn một tệp để tải lên!", {
+      position: "top-right",
+    });
+    return;
   }
+  file.value = null;
+  data.value = [];
+
+  file.value = uploadedFile;
+  show.value = true;
+  data.value = await readExcelFile(uploadedFile);
+  renderTable();
 };
 
 async function readExcelFile(file) {
@@ -153,32 +160,55 @@ const back = () => {
 
     <div ref="container" style="margin-top: 20px" class=""></div>
     <div v-if="deviceStore.result && show" class="card">
-      <h1 class="p-1 font-semibold">
-        Tổng thiết bị nhập thành công:
-        {{ deviceStore.result.data.totalSuccess }}
-      </h1>
-      <h1 class="p-1 font-semibold">Danh sách các thiết bị nhập lỗi</h1>
-      <DataTable
-        :value="deviceStore.result.data.deviceErrors"
-        tableStyle="min-width: 40rem"
-      >
-        <Column field="name" header="Tên"></Column>
-        <Column field="serialNumber" header="Serial"></Column>
-        <Column field="categoryName" header="Loại"></Column>
-        <Column field="manufacturer" header="Nhà sản xuất"></Column>
-        <Column field="purchaseDate" header="Ngày mua">
-          <template #body="{ data }">
-            {{ dayjs(data.purchaseDate).format("DD-MM-YYYY") }}
-          </template></Column
+      <div v-if="deviceStore.result.data.totalSucces > 0" class="">
+        <h1 class="p-1 font-semibold">
+          Tổng thiết bị nhập thành công:
+          {{ deviceStore.result.data.totalSuccess }}
+        </h1>
+        <DataTable
+          :value="deviceStore.result.data.successfulDevices"
+          tableStyle="min-width: 40rem"
         >
-        <Column field="expirationDate" header="Ngày hết hạn">
-          <template #body="{ data }">
-            {{ dayjs(data.expirationDate).format("DD-MM-YYYY") }}
-          </template></Column
+          <Column field="name" header="Tên"></Column>
+          <Column field="serialNumber" header="Serial"></Column>
+          <Column field="categoryName" header="Loại"></Column>
+          <Column field="manufacturer" header="Nhà sản xuất"></Column>
+          <Column field="purchaseDate" header="Ngày mua">
+            <template #body="{ data }">
+              {{ dayjs(data.purchaseDate).format("DD-MM-YYYY") }}
+            </template></Column
+          >
+          <Column field="expirationDate" header="Ngày hết hạn">
+            <template #body="{ data }">
+              {{ dayjs(data.expirationDate).format("DD-MM-YYYY") }}
+            </template></Column
+          >
+        </DataTable>
+      </div>
+      <div v-else>
+        <h1 class="p-1 font-semibold">Danh sách các thiết bị nhập lỗi</h1>
+        <DataTable
+          :value="deviceStore.result.data.deviceErrors"
+          tableStyle="min-width: 40rem"
         >
-      </DataTable>
+          <Column field="name" header="Tên"></Column>
+          <Column field="serialNumber" header="Serial"></Column>
+          <Column field="categoryName" header="Loại"></Column>
+          <Column field="manufacturer" header="Nhà sản xuất"></Column>
+          <Column field="purchaseDate" header="Ngày mua">
+            <template #body="{ data }">
+              {{ dayjs(data.purchaseDate).format("DD-MM-YYYY") }}
+            </template></Column
+          >
+          <Column field="expirationDate" header="Ngày hết hạn">
+            <template #body="{ data }">
+              {{ dayjs(data.expirationDate).format("DD-MM-YYYY") }}
+            </template></Column
+          >
+        </DataTable>
+      </div>
     </div>
-    <div v-if="!show" class="flex items-center justify-center h-[80vh]">
+    <div v-if="!show" class="flex items-center justify-center h-[60vh]">
       <div class="text-center">
         <div
           class="w-[120px] h-[140px] bg-no-repeat bg-center mx-auto"

@@ -38,11 +38,11 @@ watchEffect(async () => {
   }
 });
 const items = ref([
-  {
-    label: "Thống kê",
-    icon: "fa-solid fa-chart-pie",
-    to: "test", // Đường dẫn router
-  },
+  // {
+  //   label: "Thống kê",
+  //   icon: "fa-solid fa-chart-pie",
+  //   to: "test",
+  // },
   {
     label: "Thiết bị",
     icon: "fa-solid fa-house-laptop",
@@ -67,6 +67,28 @@ const items = ref([
     to: "maintenance",
   },
   {
+    label: "Lịch sử",
+    icon: "fa-solid fa-file-waveform",
+    items: [
+      {
+        label: "Lịch sử sử dụng",
+
+        to: "device",
+      },
+
+      {
+        label: "Lịch sử bảo trì",
+
+        to: "historymaintenance",
+      },
+      {
+        label: "Lịch sử luân chuyển",
+
+        to: "usage",
+      },
+    ],
+  },
+  {
     label: "Trò chuyện",
     icon: "fa-regular fa-message",
     to: "chat-home",
@@ -78,7 +100,7 @@ const items = ref([
   <Header />
   <div class="flex flex-col md:p-0 lg:w-[80%] mx-auto min-h-screen">
     <header class="flex justify-between items-center border bg-white">
-      <Menubar :model="items" class="border-none bg-transparent">
+      <Menubar :model="items" class="border-none bg-transparent z-10">
         <!-- <template #start>
           <div>
             <img class="h-[50px]" src="/logoMain.jpg" alt="" />

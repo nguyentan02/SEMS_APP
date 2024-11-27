@@ -78,45 +78,9 @@ export class LocationService {
             return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau")
         }
     }
-    async getUsageInfo(option: { page: number, key: string }) {
+    async getUsageInfo() {
         try {
-            let { page, key } = option
-            let totalPages = 1
-            let pageSize = undefined
-            let next = undefined
-            let where: any = {}
-            if (key) {
-                where.OR = [
-                    {
-                        deparmentName: {
-                            contains: key,
-                            mode: 'insensitive'
-                        }
-                    },
-                    {
-                        symbol: {
-                            contains: key,
-                            mode: 'insensitive'
-                        }
-                    }
-                ]
-            }
-            let totalCount = 0
-            if (page){   
-                pageSize = PAGE_SIZE.PAGE_LOCATION
-                totalCount = await this.prismaService.deparment.count({
-                    where: where,
-                    orderBy: {
-                        id: "asc"
-                    }
-                })
-              
-                totalPages = Math.ceil(totalCount / pageSize)
-                if (!totalPages) totalPages = 1
-                if (!page || page < 1) page = 1
-                next = (page - 1) * pageSize
-            }
-            
+         
             const data = await this.prismaService.deparment.findMany({
 
                 include:{
@@ -134,9 +98,6 @@ export class LocationService {
                 orderBy: {
                     id: 'asc'
                 },
-                skip: next,
-                take: pageSize,
-                where: where
                
             })
             const dataWithRoomAndDeviceStatus = data.map(department => {
@@ -146,7 +107,7 @@ export class LocationService {
                         (acc, device) => {
                             if (device.statusDevice === 'ĐANG HOẠT ĐỘNG') acc.active++;
                             else if (device.statusDevice === 'ĐANG BẢO TRÌ') acc.maintenance++;
-                            else if (device.statusDevice === 'CẦN BẢO TRÌ') acc.needMaintenance++;
+                            else if (device.expired == true) acc.needMaintenance++;
                             return acc;
                         },
                         { active: 0, maintenance: 0, needMaintenance: 0,total:0 } // Khởi tạo bộ đếm
@@ -169,7 +130,7 @@ export class LocationService {
                     totalDevices // Cập nhật danh sách phòng với thông tin tổng hợp
                 };
             });
-            return new ResponseData<any>({ dataWithRoomAndDeviceStatus,totalPages, totalCount }, 200, 'Tìm thành công')
+            return new ResponseData<any>({ dataWithRoomAndDeviceStatus }, 200, 'Tìm thành công')
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau")
@@ -242,7 +203,7 @@ export class LocationService {
     }
     async updateDeparment(id: number, updateDeparmentDto: UpdateDeparmentDto) {
         try {
-            console.log(updateDeparmentDto);
+       
             const deparment = await this.prismaService.deparment.findUnique({
                 where: {
                     id: id
@@ -259,7 +220,7 @@ export class LocationService {
           
                  if(updateDeparmentDto.roomName && updateDeparmentDto.roomName.length > 0) {
                 for (const name of updateDeparmentDto.roomName) {
-                    console.log(name);
+                
                     const room = await this.prismaService.room.findFirst({
                         where: {
                             roomName: name,
@@ -311,7 +272,7 @@ export class LocationService {
                     }
                    }
                 })
-                console.log(exit);
+            
                 const hasDevices = exit.rooms.some((room) => room.Device.length > 0);
 
                 if (hasDevices) {
@@ -368,23 +329,19 @@ export class LocationService {
             const room = await this.prismaService.room.findUnique({
                 where: {
                     id: id,
+                    Device:{
+                        some:{}
+                    }
                 },
-                include: {
-                    Device: true, // Bao gồm danh sách thiết bị trong phòng
-                },
+      
             });
     
             // Nếu phòng không tồn tại
-            if (!room) {
-                return new ResponseData<any>(null, 400, "Phòng không tồn tại");
-            }
-    
-            // Kiểm tra nếu phòng có chứa thiết bị
-            if (room.Device && room.Device.length > 0) {
+           
+            if (room) {
                 return new ResponseData<any>(null, 400, "Phòng chứa thiết bị, không thể xóa!");
             }
     
-            // Xóa phòng
             await this.prismaService.room.delete({
                 where: {
                     id: id,

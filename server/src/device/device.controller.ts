@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, flatten, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DeviceService } from './device.service';
 import { MyJWTGuard, RolesGuard } from '../auth/guard';
 import { Roles } from 'src/auth/decoractor';
 import { USER_TYPES } from '../global';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateDeviceDto, UpdateDeviceDto } from './dto';
+import type { Response } from 'express'
 
 @Controller('device')
 export class DeviceController {
@@ -41,7 +42,7 @@ export class DeviceController {
     ) {
         return this.deviceService.getDeviceById(id)
     }
-
+ 
     @Post('create')
     @UseGuards(MyJWTGuard, RolesGuard)
     @Roles(USER_TYPES.USER,USER_TYPES.ADMIN)
@@ -76,4 +77,8 @@ export class DeviceController {
     deleteDevice(
         @Param('id', ParseIntPipe) id: number
     ) { return this.deviceService.deleteDevice(id) }
+
+
+    
+
 }
