@@ -91,7 +91,8 @@ const createDevice = async () => {
   }, 0);
 };
 onMounted(async () => {
-  await categoryStore.getCategory({});
+  await categoryStore.getCategoryAll();
+  console.log(categoryStore.categorys);
 });
 let isResetting = false; // Cờ trạng thái để kiểm soát việc reset
 
@@ -118,6 +119,18 @@ watch(
   }
 );
 </script>
+<style scoped>
+.custom-select {
+  max-height: 100px; /* Giới hạn chiều cao */
+  overflow-y: auto; /* Thêm thanh cuộn dọc nếu cần */
+  width: 100%; /* Đảm bảo nó chiếm toàn bộ chiều rộng cần thiết */
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #fff;
+}
+</style>
+
 <template>
   <Form
     v-if="manageDeviceStore.isShow.addDevice"
@@ -132,7 +145,7 @@ watch(
     >
       <template #header class="">
         <div class="flex items-center text-lg text-black">
-          <i class="fa-solid fa-user-plus mr-2"></i>Thêm thiết bị
+          <i class="fa-solid fa-laptop-file mr-2"></i>Thêm thiết bị
         </div>
       </template>
       <template #body>
@@ -287,8 +300,8 @@ watch(
                 >
                   <option value="">Loại thiết bị</option>
                   <option
-                    v-if="categoryStore.categorys?.length"
-                    v-for="category in categoryStore.categorys"
+                    v-if="categoryStore.categoryAll?.length"
+                    v-for="category in categoryStore.categoryAll"
                     :key="category.id"
                     :value="category.id"
                   >

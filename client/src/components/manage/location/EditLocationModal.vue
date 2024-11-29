@@ -166,7 +166,7 @@ watchEffect(() => {
               :id="'room-' + room.id"
               :name="'room-' + index"
               v-model="room.name"
-              class="w-auto input-form my-1 text-black"
+              class="w-auto my-1 pl-1 rounded-lg text-black"
               placeholder="Tên phòng"
             />
             <button

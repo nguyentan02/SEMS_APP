@@ -9,6 +9,9 @@ class categoryService {
         let parameter = createQueryString(data)
         return (await this.api.get(`/${parameter}`)).data
     }
+    async getCategoryAll() {
+        return (await this.api.get('byNot')).data
+    }
     async createCategory(token,data) {
         return (await this.api.post('create-category',data, {
             headers: {

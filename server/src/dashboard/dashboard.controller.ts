@@ -14,6 +14,11 @@ export class DashboardController {
     getStatistical(@Query() option: { type: string, month: string, year: string, to: string, from: string }) {
         return this.dashboardService.getStatistical(option)
     }
+    @Get('chart')
+    @Roles(USER_TYPES.ADMIN)
+    getChart(@Query() option: { type: string, month: string, year: string, to: string, from: string }) {
+        return this.dashboardService.getChart(option)
+    }
     @Get('export-device') 
     async downloadExcel(@Res() res: Response,) {
         const { data } = await this.dashboardService.downloadExcel()

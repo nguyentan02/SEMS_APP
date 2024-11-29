@@ -6,17 +6,16 @@ import { useHistoryStore } from "@/stores/history.store";
 import dayjs from "dayjs";
 import SearchHistory from "@/components/common/SearchHistory.vue";
 const historyStore = useHistoryStore();
-const maintenances = ref();
+const rotations = ref();
 onMounted(async () => {
-  await historyStore.getHistoryMaintenance({});
-  maintenances.value = historyStore.maintenances;
-  console.log(maintenances.value);
+  await historyStore.getRotationHistory({});
+  rotations.value = historyStore.rotations;
 });
 watchEffect(async () => {
-  await historyStore.getHistoryMaintenance({
+  await historyStore.getRotationHistory({
     key: historyStore.key,
   });
-  maintenances.value = historyStore.maintenances;
+  rotations.value = historyStore.rotations;
 });
 const expandedRows = ref([]);
 </script>
@@ -30,9 +29,8 @@ const expandedRows = ref([]);
   <div class="flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold mb-10 text-[#25861e]">
-        Lịch sử bảo trì <i class="fa-solid fa-clock-rotate-left ml-2"></i>
+        Lịch sử luân chuyển <i class="fa-solid fa-clock-rotate-left ml-2"></i>
       </h1>
-      <p class="mb-2 text-red-600">Đây là những bảo trì đã hoàn thành</p>
     </div>
 
     <SearchHistory
@@ -49,7 +47,7 @@ const expandedRows = ref([]);
   <div class="card">
     <DataTable
       v-model:expandedRows="expandedRows"
-      :value="maintenances"
+      :value="rotations"
       dataKey="id"
       scrollable
       scrollHeight="550px"
@@ -65,40 +63,41 @@ const expandedRows = ref([]);
       <template #expansion="slotProps">
         <div class="p-5 border-b border-gray-400">
           <h5>Lịch sử bảo trì {{ slotProps.data.name }}</h5>
-          <DataTable :value="slotProps.data.maintenancePlan" size="small">
+          <DataTable :value="slotProps.data.RotationDevice" size="small">
             <div>
               <Column field="id" header="Id" class="p-2"></Column>
-              <Column field="title" header="Chủ đề" sortable></Column>
-              <Column header="Phòng">
+              <Column header="Phòng cũ">
                 <template #body="slotProps">
                   <span
-                    >{{ slotProps.data.Room.roomName }}/{{
-                      slotProps.data.Room.deparment.symbol
+                    >{{ slotProps.data.OldRoom.roomName }}/{{
+                      slotProps.data.OldRoom.deparment.symbol
                     }}</span
                   >
                 </template>
               </Column>
-              <Column header="Ngày bắt đầu">
+              <Column header="Phòng mới">
                 <template #body="slotProps">
-                  <span>{{
-                    dayjs(slotProps.data.startDate).format("DD/MM/YYYY")
-                  }}</span>
+                  <span
+                    >{{ slotProps.data.NewRoom.roomName }}/{{
+                      slotProps.data.NewRoom.deparment.symbol
+                    }}</span
+                  >
                 </template>
               </Column>
-              <Column header="Ngày hết hạn">
+              <Column header="Thời gian luân chuyển">
                 <template #body="slotProps"
-                  ><span>{{
-                    dayjs(slotProps.data.endDate).format("DD/MM/YYYY")
-                  }}</span>
+                  ><span>
+                    {{
+                      dayjs(slotProps.data.transferDate).format(
+                        "DD/MM/YYYY HH:mm:ss"
+                      )
+                    }}
+                  </span>
                 </template>
               </Column>
-              <Column header="Người phụ trách">
+              <Column header="Lý do">
                 <template #body="slotProps">
-                  <span>
-                    {{ slotProps.data.User.name }}/({{
-                      slotProps.data.User.employeeId
-                    }})
-                  </span>
+                  <span>{{ slotProps.data.reason }} </span>
                 </template>
               </Column>
             </div>

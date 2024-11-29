@@ -9,6 +9,7 @@ export const useCategoryStore = defineStore('category', ()=>{
     const result = ref(null)
     const isLoading = ref(false)
     const categorys = ref(null)
+    const categoryAll= ref(null)
     const totalPages = ref(1)
     const currentPage = ref(1)
     const totalCount = ref(0)
@@ -31,6 +32,21 @@ const category =ref(null)
                 err.value = error.message
         }finally{
             isLoading.value= false
+        }
+    }
+    const getCategoryAll = async () => {
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await categoryService.getCategoryAll()
+            if (res.statusCode !== 200) throw new Error(res.message)
+            result.value = res.data
+            categoryAll.value =res.data
+        } catch (error) {
+            err.value = error.message
+        } finally {
+            isLoading.value = false
         }
     }
     const getCategoryById = async id => {
@@ -100,5 +116,6 @@ const category =ref(null)
             isLoading.value = false
         }
     }
-    return {err,result,code,isLoading,name,category,categorys,totalCount,totalPages,currentPage,getCategory,getCategoryById,createCategory,updateCategory,deleteCategory}
+    return {err,result,code,isLoading,name,category,categorys,totalCount,totalPages,
+        currentPage,getCategory,getCategoryById,createCategory,updateCategory,deleteCategory,getCategoryAll,categoryAll}
 })

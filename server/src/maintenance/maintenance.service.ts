@@ -369,7 +369,6 @@ export class MaintenanceService {
                 where:{
                     id:id
                 },data:{
-                    isDeleted:false,
                     maintenanceStatus:StatusMaintenance.CANCEL
                 }
         })

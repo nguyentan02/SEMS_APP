@@ -37,7 +37,6 @@ const roomName = route.query.roomName;
 const rotationStore = useRotationDevice();
 onMounted(async () => {
   await usageStore.getUsageByIdRoom(roomId);
-  console.log(usageStore.usages);
 });
 const selectedDevices = ref([]);
 const getSeverity = (status) => {

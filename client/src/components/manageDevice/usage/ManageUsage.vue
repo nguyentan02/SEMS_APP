@@ -14,7 +14,6 @@ const usagesInfo = ref();
 onMounted(async () => {
   await locationStore.getUsageInfo();
   usagesInfo.value = locationStore.usages;
-  console.log(usagesInfo.value);
 });
 
 const router = useRouter();

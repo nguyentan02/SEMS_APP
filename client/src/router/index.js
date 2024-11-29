@@ -144,6 +144,18 @@ const routes = [
                 },
             },
             {
+                path: 'history/rotation',
+                name: 'historyrotation',
+                component: () => import('../components/manageDevice/history/HistoryRotation.vue'),
+                props: true,
+                meta: { title: 'Lịch sử luân chuyển' },
+                beforeEnter: async (to, from, next) => {
+                    const authStore = useAuthStore()
+                    if (authStore.token === null)  next('login')
+                    else next()
+                },
+            },
+            {
                 path: 'maintenance/:id',
                 name: 'editmaintenance',
                 component: () => import('../components/maintenance/EditMaintenance.vue'),

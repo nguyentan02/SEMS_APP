@@ -432,6 +432,7 @@ export class DeviceService {
                         price:  price ? new Prisma.Decimal(price) : undefined,
                         image: imgUrl,
                         categoryId: categoryId,
+                        updatedAt:new Date(),
                         DeviceAttributeValues:{
                             deleteMany : { deviceId: id },
                             create:attributeValues.map((attr) =>({

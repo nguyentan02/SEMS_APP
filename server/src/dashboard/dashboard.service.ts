@@ -46,7 +46,7 @@ export class DashboardService {
             const device = await this.prismaService.device.count({
                 where: {
                     isDelete:false,
-                    expirationDate: {
+                    updatedAt: {
                         gte: start,
                         lte: end
                     }
@@ -59,6 +59,97 @@ export class DashboardService {
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
         }
     }
+    async getChart(option: { type: string, month: string, year: string, to: string, from: string }) {
+      let start: any
+      let end: any
+      try {
+          const { type, month, year, to, from } = option
+          switch (type) {
+              case 'month':
+                  start = new Date(Number(year), Number(month) - 1, 1)
+                  end = new Date(Number(year), Number(month), 0);
+                  break;
+              case 'year':
+                  start = new Date(Number(year), 0, 1)
+                  end = new Date(Number(year), 12, 0)
+                  break;
+              case 'any':
+                  const startDate = moment.tz(to, 'Asia/Ho_Chi_Minh');
+                  const endDate = moment.tz(from, 'Asia/Ho_Chi_Minh').endOf('day');
+                  start = new Date(startDate.clone().utc().format())
+                  end = new Date(endDate.clone().utc().format())
+                  break;
+          }
+          const countType = await this.prismaService.device.groupBy({
+              by: ['expired'],
+              _count: true,
+              where: {
+                isDelete:false,
+                  updatedAt: {
+                      gte: start,
+                      lte: end
+                  },
+                 
+              }
+          })
+          const countCategory = await this.prismaService.device.groupBy({
+              by: ['categoryId'],
+              _count: true,
+              orderBy:{
+                  categoryId:'asc'
+              },
+              where: {
+                isDelete:false, 
+                  updatedAt: {
+                      gte: start,
+                      lte: end
+                  },
+                 
+              }
+          })
+          
+          const departments = await this.prismaService.deparment.findMany({
+            include: {
+              rooms: {
+                include: {
+                  _count: {
+                    select: { Device:true }, 
+                  },
+                },
+              },
+            },
+            where:{
+              rooms:{
+                some:{
+                  Device:{
+                    some:{
+                      updatedAt:{
+                        gte:start,
+                        lte:end
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          });
+          
+            const location = departments.map((department) => ({
+              deparmentName: department.deparmentName,
+              symbol: department.symbol,
+              totalDevices: department.rooms.reduce(
+                (sum, room) => sum + room._count.Device, 
+                0
+              ),
+            }));
+         
+          return new ResponseData<any>({ countType,countCategory,location  }, 200, 'Thống kê')
+      } catch (error) {
+          this.logger.error(error.message)
+          return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
+      }
+  }
+
     async downloadExcel() {
         try {
           const devices = await this.prismaService.device.findMany({

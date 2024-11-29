@@ -8,6 +8,7 @@ export const useHistoryStore = defineStore('history', ()=>{
     const result = ref(null)
     const isLoading = ref(false)
     const maintenances = ref(null)
+    const rotations = ref(null)
     const key =ref('')
 
 
@@ -28,7 +29,24 @@ export const useHistoryStore = defineStore('history', ()=>{
         }
     }
  
+    const getRotationHistory = async(option)=>{
+        err.value = null
+        result.value = null
+        isLoading.value = true
+        try {
+            let res = await historyService.getRotationHistory(authStore.token,option)
+            if (res.statusCode !== 200) throw new Error(res.message)
+                result.value = res.data
+            rotations.value = res.data
+            
+        } catch (error) {
+                err.value = error.message
+        }finally{
+            isLoading.value= false
+        }
+    }
+ 
 
    
-    return {err,result,isLoading,key,getHistoryMaintenance,maintenances}
+    return {err,result,isLoading,key,getHistoryMaintenance,maintenances,getRotationHistory,rotations}
 })

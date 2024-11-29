@@ -125,7 +125,7 @@ watchEffect(() => {
               :id="'room-' + attribyute.id"
               :name="'room-' + index"
               v-model="attribyute.name"
-              class="w-auto input-form my-1 text-black"
+              class="w-auto pl-1 rounded-lg my-1 text-black"
               placeholder="Thuộc tính "
             />
             <button

@@ -57,6 +57,17 @@ export class CategoryService {
             return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau")
         }
     }
+    async getCategoryByAll(){
+        try {
+            const categorys = await this.prismaService.category.findMany({
+            })
+            if(!categorys) return new ResponseData<string>(null,400,"Không tìm thấy danh mục")
+            return new ResponseData<any>(categorys,200,"Tìm thấy")
+        } catch (error) {
+            this.logger.error(error.message)
+            return new ResponseData<any>(null, 500, "Lỗi dịch vụ, thử lại sau")
+        }
+    }
     async getCategoryById(id: number) {
         try {
             const category = await this.prismaService.category.findFirst({

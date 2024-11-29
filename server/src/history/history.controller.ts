@@ -15,4 +15,9 @@ export class HistoryController {
     getHistoryMaintenance(@Query() option:{key:string}){
         return this.historyService.getMaintenanceHistory(option)
     }
+    @Get('rotation')
+    getRotationHistory(@Query() option:{key:string}){
+        return this.historyService.getRotationHistory(option)
+    }
 }
+    

@@ -84,7 +84,7 @@ const items = ref([
       {
         label: "Lịch sử luân chuyển",
 
-        to: "usage",
+        to: "historyrotation",
       },
     ],
   },

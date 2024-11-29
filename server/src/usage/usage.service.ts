@@ -187,7 +187,8 @@ export class UsageService {
                 where: { id: id },
                 data: {
                     usage_start:new Date(updateUsageDto.usage_start),
-                    purpose: updateUsageDto.purpose
+                    purpose: updateUsageDto.purpose,
+                    updatedAt:new Date()
                 }
             })
             return new ResponseData<any>(null, 200, "Cập nhật thành công")

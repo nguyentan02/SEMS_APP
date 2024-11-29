@@ -16,6 +16,17 @@ class historyService {
             }
         })).data
     }
+    async getRotationHistory(token,option) {
+        const final = createQueryString(option)
+        
+        return (await this.api.get(`/rotation/${final}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })).data
+    }
 }
 
 export default new historyService()
