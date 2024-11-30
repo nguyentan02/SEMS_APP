@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { StatusMaintenance } from '@prisma/client';
 import { Workbook } from 'exceljs';
 import moment from 'moment-timezone';
 import { join } from 'path';
@@ -43,6 +44,7 @@ export class DashboardService {
                     }
                 }
             })
+        
             const device = await this.prismaService.device.count({
                 where: {
                     isDelete:false,
@@ -52,8 +54,19 @@ export class DashboardService {
                     }
                 }
             })
-
-            return new ResponseData<any>({ user, device }, 200, 'Thống kê thành công')
+            const countType = await this.prismaService.device.groupBy({
+              by: ['expired'],
+              _count: true,
+              where: {
+                isDelete:false,
+                  updatedAt: {
+                      gte: start,
+                      lte: end
+                  },
+                 
+              }
+          })
+            return new ResponseData<any>({ user, device,countType }, 200, 'Thống kê thành công')
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
@@ -80,8 +93,10 @@ export class DashboardService {
                   end = new Date(endDate.clone().utc().format())
                   break;
           }
-          const countType = await this.prismaService.device.groupBy({
-              by: ['expired'],
+
+          
+          const countStatus = await this.prismaService.device.groupBy({
+              by: ['statusDevice'],
               _count: true,
               where: {
                 isDelete:false,
@@ -101,6 +116,19 @@ export class DashboardService {
               where: {
                 isDelete:false, 
                   updatedAt: {
+                      gte: start,
+                      lte: end
+                  },
+                 
+              }
+          })
+          
+          const maintenance = await this.prismaService.maintenancePlan.groupBy({
+              by: ['maintenanceStatus'],
+              _count: true,
+              where: {
+                isDeleted:false,    
+                  requestDate: {
                       gte: start,
                       lte: end
                   },
@@ -135,6 +163,7 @@ export class DashboardService {
           });
           
             const location = departments.map((department) => ({
+              id:department.id,
               deparmentName: department.deparmentName,
               symbol: department.symbol,
               totalDevices: department.rooms.reduce(
@@ -143,7 +172,7 @@ export class DashboardService {
               ),
             }));
          
-          return new ResponseData<any>({ countType,countCategory,location  }, 200, 'Thống kê')
+          return new ResponseData<any>({countCategory,location ,maintenance,countStatus }, 200, 'Thống kê')
       } catch (error) {
           this.logger.error(error.message)
           return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
