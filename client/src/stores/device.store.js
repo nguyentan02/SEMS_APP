@@ -12,6 +12,7 @@ export const useDeviceStore = defineStore('device', ()=>{
     const totalPages = ref(1)
     const currentPage = ref(1)
     const totalCount = ref(0)
+const totalDevice = ref(0)
     const key = ref('')
     const categoryId=ref('')
      const  groupByCategory = ref(false)
@@ -42,6 +43,7 @@ export const useDeviceStore = defineStore('device', ()=>{
             if (res.statusCode !== 200) throw new Error(res.message)
                 result.value = res
                devices.value = res.data.data
+               totalDevice.value = res.data.totalDevice
                 totalPages.value = res.data.totalPages
                 totalCount.value = res.data.totalCount
                 if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
@@ -152,6 +154,6 @@ export const useDeviceStore = defineStore('device', ()=>{
         }
     }
     
-    return {err,result,isLoading,key,devices,device,totalCount,sortByDate,totalPages,currentPage,categoryId,groupByCategory,deleteDevice,createDevices,getDevices,showQrCodeModal,
+    return {err,result,isLoading,key,devices,totalDevice,device,totalCount,sortByDate,totalPages,currentPage,categoryId,groupByCategory,deleteDevice,createDevices,getDevices,showQrCodeModal,
         closeQrCodeModal,getDevicesByMaintenance,isShow,createDevice,getDeviceById,updateDevice,getDevicesByUsage,showBarCodeModal,closeBarCodeModal}
 })

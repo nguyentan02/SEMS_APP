@@ -2,7 +2,7 @@ import { Type } from "class-transformer";
 import { IsArray, IsDate, IsDateString, IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 class DeviceAttributeValueDto {
     @IsNumber()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     id: number;
 
     @IsString()

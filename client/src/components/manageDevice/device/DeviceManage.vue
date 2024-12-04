@@ -123,7 +123,11 @@ const closeMenuOnClickOutside = (event) => {
 }
 </style>
 <template>
-  <h1 class="text-2xl font-bold mb-10 text-[#25861e]">Danh sách thiết bị</h1>
+  <h1 class="text-2xl font-bold mb-2 text-[#25861e]">Danh sách thiết bị</h1> 
+  <div class="mb-5">
+    <span class="text-red-600 font-bold">Tổng thiết bị: {{ deviceStore.totalDevice }}</span>
+  </div>
+
   <div class="flex items-center justify-between">
     <div class="flex relative">
       <fwb-button
@@ -261,7 +265,7 @@ const closeMenuOnClickOutside = (event) => {
     <table v-else class="table-auto w-full mt-5 rounded-md mx-auto">
       <thead class="font-normal border-b-2 border-black">
         <tr class="text-center">
-          <th class="text-center p-2 w-[10%]">STT</th>
+          <th class="text-center p-2 w-[5%]">STT</th>
           <th class="p-2">Thiết bị</th>
           <th class="p-2">Hình ảnh</th>
           <th class="p-2">Serial</th>
@@ -292,7 +296,7 @@ const closeMenuOnClickOutside = (event) => {
           :key="device.id"
           class="border-b border-gray-400 transition duration-300 ease-in-out hover:bg-[#d8d6d6]"
         >
-          <td class="text-center w-[10%]">
+          <td class="text-center w-[5%]">
             {{ (deviceStore.currentPage - 1) * 10 + i + 1 }}
           </td>
           <td class="text-center">
@@ -318,12 +322,11 @@ const closeMenuOnClickOutside = (event) => {
             {{ dayjs(device.expirationDate).format("DD/MM/YYYY") }}
           </td>
           <td>
-            <img
+            <div
               v-if="device.expired == true"
-              class="w-[30px]"
-              src="/expired.webp"
-              alt=""
-            />
+              class=""
+            
+           ><span class="text-red-600">Hết hạn</span></div> 
           </td>
           <td class="text-gray-900 font-extrabold text-center">
             {{ formatPrice(device.price) }}

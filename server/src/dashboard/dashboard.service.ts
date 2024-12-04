@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { StatusMaintenance } from '@prisma/client';
 import { Workbook } from 'exceljs';
-import moment from 'moment-timezone';
+import * as moment from 'moment-timezone';
 import { join } from 'path';
 import { ResponseData } from 'src/global';
 import { PrismaService } from 'src/prisma/prisma.service';

@@ -70,11 +70,7 @@ const items = ref([
     label: "Lịch sử",
     icon: "fa-solid fa-file-waveform",
     items: [
-      {
-        label: "Lịch sử sử dụng",
-
-        to: "device",
-      },
+   
 
       {
         label: "Lịch sử bảo trì",

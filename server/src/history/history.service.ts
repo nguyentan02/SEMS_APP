@@ -14,7 +14,7 @@ export class HistoryService {
         try {
             let {key} = option
             let where: any = { isDelete: false, maintenancePlan:{
-                some:{}
+            some:{  maintenanceStatus: StatusMaintenance.COMPLETED}
             } }
             if (key) {
                 where.OR = [  {
@@ -44,6 +44,7 @@ export class HistoryService {
                         }
                     },
                     maintenancePlan:{
+                       
                         include:{
                             User:{
                                 select:{
@@ -106,6 +107,7 @@ export class HistoryService {
                     },
                     RotationDevice:{
                         select:{
+                            id:true,
                             reason:true,
                             transferDate:true,
                             OldRoom:{

@@ -48,6 +48,7 @@ const expandedRows = ref([]);
 
   <div class="card">
     <DataTable
+
       v-model:expandedRows="expandedRows"
       :value="maintenances"
       dataKey="id"

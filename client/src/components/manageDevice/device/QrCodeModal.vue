@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import { onMounted, ref, watch, nextTick } from "vue";
 import { FwbButton, FwbModal } from "flowbite-vue";
 import { useDeviceStore } from "@/stores/device.store";
-
+import dayjs from "dayjs";
 const deviceStore = useDeviceStore();
 const qr = defineProps(["device"]);
 
@@ -13,10 +13,12 @@ watch(
     if (isOpen) {
       console.log(qr.device);
       const dataObject = ref({
-        serialNumber: qr.device?.serialNumber,
-        name: qr.device?.name,
-        location: qr.device?.location || "Trống",
-        status: qr.device?.statusDevice,
+        "Số serial": qr.device?.serialNumber,
+        "Tên": qr.device?.name,
+        "Địa chỉ": qr.device?.location || "Trống",
+        "Trạng thái": qr.device?.statusDevice,
+        "Ngày hết hạn":dayjs(qr.device?.expirationDate).format("DD/MM/YYYY"),
+        "Giá":qr.device?.price
       });
       await nextTick();
       const jsonData = JSON.stringify(dataObject.value);

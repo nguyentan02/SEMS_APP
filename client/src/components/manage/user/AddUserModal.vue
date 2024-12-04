@@ -132,7 +132,7 @@ const addUser = async (user) => {
             <option value="">Chọn vai trò</option>
             <option :value="1">Nhân viên quản lý</option>
             <option :value="2">Nhân viên kỹ thuật</option>
-            <option :value="3">Nhân viên kho</option>
+          
           </Field>
           <ErrorMessage name="role" class="error" />
         </div>

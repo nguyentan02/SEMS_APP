@@ -31,6 +31,8 @@ const renderTable = () => {
     data: data.value,
     rowHeaders: true,
     colHeaders: true,
+    height: 500, // Chiều cao cố định là 500px
+    width: '100%', 
     columns: data.value[0]?.map((_, index) => ({
       type:
         index === 3 || index === 4 ? "date" : index === 5 ? "numeric" : "text",
@@ -160,7 +162,7 @@ const back = () => {
 
     <div ref="container" style="margin-top: 20px" class=""></div>
     <div v-if="deviceStore.result && show" class="card">
-      <div v-if="deviceStore.result.data.totalSucces > 0" class="">
+      <div v-if="deviceStore.result.data.totalSucces " class="">
         <h1 class="p-1 font-semibold">
           Tổng thiết bị nhập thành công:
           {{ deviceStore.result.data.totalSuccess }}
@@ -185,7 +187,7 @@ const back = () => {
           >
         </DataTable>
       </div>
-      <div v-else>
+      <div v-if="deviceStore.result.data.deviceErrors !=0">
         <h1 class="p-1 font-semibold">Danh sách các thiết bị nhập lỗi</h1>
         <DataTable
           :value="deviceStore.result.data.deviceErrors"

@@ -83,7 +83,7 @@ onUnmounted(() => {
     <div
       v-if="showUsers"
       ref="userListRef"
-      class="mt-2 border p-2 rounded-md absolute bg-white text-black"
+      class="mt-10 border right-[70%] p-2 rounded-md absolute bg-white text-black"
     >
       <div v-if="!userStore.isLoading">
         <div v-if="userStore.users.length > 0" class="space-y-2">

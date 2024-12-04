@@ -10,8 +10,7 @@ import { AuthService } from './auth.service';
 export class AuthController {
     constructor(private authService: AuthService) { }
     @Post('register')
-    @UseGuards(MyJWTGuard, RolesGuard)
-    @Roles(USER_TYPES.ADMIN)
+
     register(@Body() registerDto: RegisterDto) {
         return this.authService.register(registerDto)
     }

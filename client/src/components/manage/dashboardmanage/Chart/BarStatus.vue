@@ -34,7 +34,7 @@ const options = {
   aspectRatio: 2,
   plugins: {
     title: {
-      text: "Biểu đồ thống kê tình trạng bảo trì",
+      text: "Biểu đồ thống kê tình trạng thiết bị",
       display: true,
     },
   },

@@ -104,7 +104,6 @@ onMounted(async () => {
         <option value="null">Tất cả</option>
         <option :value="1">Nhân viên quản lý</option>
         <option :value="2">Nhân viên kỹ thuật</option>
-        <option :value="3">Nhân viên kho</option>
       </select>
     </div>
     <div>

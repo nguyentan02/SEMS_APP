@@ -83,9 +83,13 @@ export class DeviceService {
                     return acc;
                 }, {});
             }
-    
+            const totalDevice = await this.prismaService.device.count({
+                where:{
+                    isDelete:false
+                }
+            })
             const resultData = groupByCategory ? groupedData : data;
-            return new ResponseData<any>({ data:resultData, totalCount, totalPages }, 200, "Tìm các thiết bị thành công")
+            return new ResponseData<any>({ data:resultData, totalCount,totalDevice, totalPages }, 200, "Tìm các thiết bị thành công")
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')

@@ -234,8 +234,8 @@ const formatDate = (value) => {
           class="border-b border-gray-400"
         >
           <template #body="{ data }">
-            <div class="flex align-items-center gap-2">
-              <img alt="flag" :src="data.Device.image" style="width: 50px" />
+            <div class="flex align-items-center gap-2 ">
+              <img alt="flag" :src="data.Device.image" style="width: 50px;height:50px" />
             </div>
           </template>
         </Column>

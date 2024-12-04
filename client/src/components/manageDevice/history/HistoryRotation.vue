@@ -16,6 +16,7 @@ watchEffect(async () => {
     key: historyStore.key,
   });
   rotations.value = historyStore.rotations;
+
 });
 const expandedRows = ref([]);
 </script>
