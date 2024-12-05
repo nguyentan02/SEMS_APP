@@ -32,7 +32,7 @@ watchEffect(async () => {
   // }
   console.log(userStore.user);
   if (userStore.user !== null) {
-    console.log("f");
+ 
     messageStore.setupSocket();
     await conversationStore.fetchConversations();
   }

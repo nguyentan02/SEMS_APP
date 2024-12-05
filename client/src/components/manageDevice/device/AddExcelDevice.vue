@@ -22,7 +22,7 @@ const triggerFileInput = () => {
 };
 const show = ref(false);
 const file = ref(null);
-
+const showDataTable = ref(false); 
 const data = ref([]);
 const container = ref(null);
 
@@ -31,7 +31,7 @@ const renderTable = () => {
     data: data.value,
     rowHeaders: true,
     colHeaders: true,
-    height: 500, // Chiều cao cố định là 500px
+    height: 400, // Chiều cao cố định là 500px
     width: '100%', 
     columns: data.value[0]?.map((_, index) => ({
       type:
@@ -91,7 +91,6 @@ async function readExcelFile(file) {
           }
         });
       });
-
       resolve(jsonData);
     };
     reader.onerror = (err) => reject(err);
@@ -102,7 +101,6 @@ const createDevices = async () => {
   if (!file.value) return;
   const data = new FormData();
   data.append("file", file.value);
-  console.log(data);
   await deviceStore.createDevices(data);
   if (deviceStore.err) {
     $toast.error(deviceStore.err, { position: "top-right" });
@@ -110,6 +108,7 @@ const createDevices = async () => {
   }
   $toast.success(deviceStore.result.message, { position: "top-right" });
   file.value = null;
+  showDataTable.value = true
   // router.back();
 };
 
@@ -161,8 +160,15 @@ const back = () => {
     </div>
 
     <div ref="container" style="margin-top: 20px" class=""></div>
-    <div v-if="deviceStore.result && show" class="card">
-      <div v-if="deviceStore.result.data.totalSucces " class="">
+    <div v-if="!show" class="flex items-center justify-center h-[60vh]">
+      <div class="text-center">
+        <img class="w-[120px] h-[140px] bg-no-repeat bg-center mx-auto" src="/upload.png" alt="">
+        <p class="font-semibold text-xl mt-4">Tải lên tệp Excel để nhập</p>
+
+      </div>
+    </div>
+    <div v-if="showDataTable && deviceStore.result" class="card">
+      <div v-if="deviceStore.result.data.totalSucces != 0" class="">
         <h1 class="p-1 font-semibold">
           Tổng thiết bị nhập thành công:
           {{ deviceStore.result.data.totalSuccess }}
@@ -171,6 +177,9 @@ const back = () => {
           :value="deviceStore.result.data.successfulDevices"
           tableStyle="min-width: 40rem"
         >
+    <template #empty>
+          <div class="text-center">Không có</div>
+        </template>
           <Column field="name" header="Tên"></Column>
           <Column field="serialNumber" header="Serial"></Column>
           <Column field="categoryName" header="Loại"></Column>
@@ -187,12 +196,13 @@ const back = () => {
           >
         </DataTable>
       </div>
-      <div v-if="deviceStore.result.data.deviceErrors !=0">
+      <div v-if="deviceStore.result.data.deviceErrors.length">
         <h1 class="p-1 font-semibold">Danh sách các thiết bị nhập lỗi</h1>
         <DataTable
           :value="deviceStore.result.data.deviceErrors"
           tableStyle="min-width: 40rem"
         >
+    
           <Column field="name" header="Tên"></Column>
           <Column field="serialNumber" header="Serial"></Column>
           <Column field="categoryName" header="Loại"></Column>
@@ -210,25 +220,6 @@ const back = () => {
         </DataTable>
       </div>
     </div>
-    <div v-if="!show" class="flex items-center justify-center h-[60vh]">
-      <div class="text-center">
-        <div
-          class="w-[120px] h-[140px] bg-no-repeat bg-center mx-auto"
-          style="
-            background-image: url('https://emsystem.odoo.com/web/static/img/smiling_face.svg');
-          "
-        ></div>
-        <p class="font-semibold text-xl mt-4">Tải lên tệp Excel để nhập</p>
-        <!-- <div>Cần giúp đỡ?</div>
-        <div
-          class="mt-3 border-2 border-lime-600 p-2 hover:bg-lime-800 hover:text-white cursor-pointer"
-          @click="downloadTemplate"
-        >
-          <span class="font-semibold">
-            <i class="fa-solid fa-download mr-2"></i>Nhập mẫu thiết bị
-          </span>
-        </div> -->
-      </div>
-    </div>
+  
   </div>
 </template>

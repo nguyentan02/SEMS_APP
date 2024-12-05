@@ -115,9 +115,9 @@ const updateDevice = async () => {
     data.append(`attributes[${index}][id]`, attribute.id);
     data.append(`attributes[${index}][value]`, attribute.value);
   });
-  for (const [key, value] of data.entries()) {
-    console.log(`${key}: ${value}`);
-  }
+  // for (const [key, value] of data.entries()) {
+  //   console.log(`${key}: ${value}`);
+  // }
   await deviceStore.updateDevice(route.params?.id, data);
   if (deviceStore.err) {
     $toast.error(deviceStore.err, { position: "top-right" });
@@ -227,8 +227,8 @@ const updateDevice = async () => {
           </div>
           <span class="font-semibold">Thông tin chung:</span>
           <div class="flex justify-between">
-            <div class="grid grid-cols-1 w-1/2">
-              <div class="flex items-center mb-4">
+            <div class="w-1/2">
+              <div class="flex items-center mb-4 p-2">
                 <label for="serialNumber" class="label-custom mr-10"
                   >Số serial:</label
                 >
@@ -245,7 +245,7 @@ const updateDevice = async () => {
                 </div>
               </div>
 
-              <div class="flex items-center mb-4">
+              <div class="flex items-center mb-4 p-2">
                 <label for="manufacturer" class="label-custom mr-2"
                   >Nhà sản xuất:</label
                 >
@@ -261,7 +261,7 @@ const updateDevice = async () => {
                   <ErrorMessage name="manufacturer" class="error" />
                 </div>
               </div>
-              <div class="flex items-center mb-4">
+              <div class="flex items-center mb-4 p-2">
                 <label for="purchaseDate" class="label-custom mr-6"
                   >Ngày mua:</label
                 >
@@ -277,7 +277,7 @@ const updateDevice = async () => {
                   <ErrorMessage name="purchaseDate" class="error" />
                 </div>
               </div>
-              <div class="flex items-center mb-4">
+              <div class="flex items-center mb-4 p-2">
                 <label for="expirationDate" class="label-custom mr-2"
                   >Ngày hết hạn:</label
                 >
@@ -293,7 +293,7 @@ const updateDevice = async () => {
                   <ErrorMessage name="expirationDate" class="error" />
                 </div>
               </div>
-              <div class="flex items-center">
+              <div class="flex items-center p-2">
                 <label for="price" class="label-custom mr-20">Giá:</label>
                 <div class="w-[70%]">
                   <Field

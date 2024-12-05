@@ -325,7 +325,6 @@ const closeMenuOnClickOutside = (event) => {
             <div
               v-if="device.expired == true"
               class=""
-            
            ><span class="text-red-600">Hết hạn</span></div> 
           </td>
           <td class="text-gray-900 font-extrabold text-center">

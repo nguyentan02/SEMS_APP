@@ -104,6 +104,7 @@ const totalDevice = ref(0)
             let res = await deviceService.createServices(authStore.token, data)
             if (res.statusCode !== 200) throw new Error(res.message)
             result.value = res
+            console.log(result.value)
         } catch (error) {
             err.value = error.message
         } finally {
@@ -133,6 +134,7 @@ const totalDevice = ref(0)
             let res = await deviceService.updateDevice(authStore.token, id,data)
             if (res.statusCode !== 200) throw new Error(res.message)
             result.value = res
+        
         } catch (error) {
             err.value = error.message
         } finally {

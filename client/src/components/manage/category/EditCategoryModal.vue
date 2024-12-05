@@ -112,7 +112,7 @@ watchEffect(() => {
           />
 
           <label for="attributesName" class="label-custom"
-            >Thuộc tính danh mục:</label
+            >Thông số danh mục:</label
           >
           <div
             v-if="attributesName.length"
@@ -125,7 +125,7 @@ watchEffect(() => {
               :id="'room-' + attribyute.id"
               :name="'room-' + index"
               v-model="attribyute.name"
-              class="w-auto pl-1 rounded-lg my-1 text-black"
+              class="w-auto pl-1 rounded-md my-1 p-1 text-black"
               placeholder="Thuộc tính "
             />
             <button
@@ -139,7 +139,7 @@ watchEffect(() => {
           <a
             @click="addRoom"
             class="text-blue-500 cursor-pointer hover:text-blue-400"
-            >Thêm thuộc tính</a
+            >Thêm thông số</a
           >
         </div>
         <div v-else>

@@ -15,7 +15,7 @@ const props = defineProps(["category"]);
   >
     <template #header>
       <div class="flex items-center text-lg gap-2 text-black">
-        Thuộc tính danh mục {{ props.category.AttribyutesCategory.name }}
+        Thông số danh mục {{ props.category.AttribyutesCategory.name }}
       </div>
     </template>
     <template #body>

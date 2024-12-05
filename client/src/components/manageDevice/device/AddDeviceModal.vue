@@ -33,7 +33,7 @@ const formSchemaUser = yup.object().shape({
   manufacturer: yup.string().required("Nhà sản xuất không được bỏ trống."),
   purchaseDate: yup.string().required("Vui lòng chọn ngày."),
   expirationDate: yup.date().required("Vui lòng chọn ngày."),
-  price: yup.number().required("Không phải có giá trị."),
+  price: yup.string().required("Không phải có giá trị."),
   categoryId: yup.string().required("Chọn danh mục"),
   attributes: yup.array().of(
     yup.object().shape({
@@ -92,7 +92,7 @@ const createDevice = async () => {
 };
 onMounted(async () => {
   await categoryStore.getCategoryAll();
-  console.log(categoryStore.categorys);
+  
 });
 let isResetting = false; // Cờ trạng thái để kiểm soát việc reset
 

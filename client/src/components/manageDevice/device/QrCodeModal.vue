@@ -15,7 +15,9 @@ watch(
       const dataObject = ref({
         "Số serial": qr.device?.serialNumber,
         "Tên": qr.device?.name,
-        "Địa chỉ": qr.device?.location || "Trống",
+        "Phòng": qr.device?.room.roomName
+        || "Trống",
+        "Khoa":qr.device?.room.deparment.deparmentName ||"Trống",
         "Trạng thái": qr.device?.statusDevice,
         "Ngày hết hạn":dayjs(qr.device?.expirationDate).format("DD/MM/YYYY"),
         "Giá":qr.device?.price

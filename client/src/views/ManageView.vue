@@ -70,7 +70,7 @@ watchEffect(async () => {
       class="w-64 h-screen border-2 border-gray-600 bg-[rgb(var(--color-primary))]"
     >
       <div class="p-4 flex items-center justify-between">
-        <img class="h-[50px]" src="/logoMain.jpg" alt="" />
+        <img class="h-[50px]" src="/header.png" alt="" />
         <!-- <h2 class="text-xl font-bold">EMS</h2> -->
       </div>
       <nav class="flex flex-col px-4">

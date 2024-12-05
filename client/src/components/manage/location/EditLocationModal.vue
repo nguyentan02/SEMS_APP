@@ -32,7 +32,7 @@ const formSchemaLocation = yup.object().shape({
 });
 
 const getRoomNames = () => {
-  console.log("Rooms hiện tại:", rooms.value); // Kiểm tra danh sách phòng trước khi lấy tên
+  console.log("Rooms hiện tại:", rooms.value); 
   return rooms.value.map((room) => room.name).filter((name) => name !== "");
 };
 
@@ -49,58 +49,41 @@ const updateDepartment = async () => {
   manageStore.closeEditLocationModal();
 };
 
-const allRooms = computed(() => {
-  const uniqueRooms = new Map();
 
-  console.log("Rooms từ props:", props.location.rooms); // Kiểm tra dữ liệu phòng từ props
-  (props.location.rooms || []).forEach((room) => {
-    uniqueRooms.set(room.roomName, {
-      id: room.id,
-      name: room.roomName,
-      isOld: true,
-    });
-  });
-
-  rooms.value.forEach((room) => {
-    if (!uniqueRooms.has(room.name)) {
-      uniqueRooms.set(room.name, {
-        id: room.id,
-        name: room.name,
-        isOld: false,
-      });
-    }
-  });
-
-  console.log("All Rooms:", Array.from(uniqueRooms.values())); // Kiểm tra danh sách phòng cuối cùng
-  return Array.from(uniqueRooms.values());
-});
 const addRoom = async () => {
   if (rooms.value.length > 0 && !rooms.value[rooms.value.length - 1].name) {
     $toast.error("Tên phòng không được để trống!", { position: "top-right" });
     return;
   }
 
-  const newRoom = { id: Date.now(), name: "", inputRef: null };
+  const newRoom = { id: Date.now(), name: "", inputRef: null, isNew: true };
   rooms.value.push(newRoom);
-  console.log("Rooms sau khi thêm:", rooms.value); // Kiểm tra sau khi thêm phòng
+  console.log("Rooms sau khi thêm:", rooms.value);
   await nextTick();
 
   const inputRef = document.querySelector(`#room-${newRoom.id}`);
   newRoom.inputRef = inputRef;
   newRoom.inputRef?.focus();
 };
-const removeRoom = (index, fromExisting = false) => {
-  rooms.value.splice(index, 1);
+const removeRoom = (index) => {
+  const room = rooms.value[index];
+  if (room.isNew) {
+    // Nếu là phòng mới thì chỉ cần xoá khỏi danh sách
+    rooms.value.splice(index, 1);
+  } else {
+    // Nếu là phòng cũ, gọi hàm deleteRoom
+    deleteRoom(room.id, index);
+  }
 };
 
 const deleteRoom = async (id, index) => {
   try {
-    await locationStore.deleteRoom(id); // Gọi API xóa phòng
+    await locationStore.deleteRoom(id);
     if (locationStore.err) {
       $toast.error(locationStore.err, { position: "top-right" });
       return;
     }
-    // Xóa phòng cũ khỏi danh sách
+ 
     props.location.rooms.splice(index, 1);
     $toast.success("Xóa phòng thành công!", { position: "top-right" });
   } catch (error) {
@@ -109,14 +92,12 @@ const deleteRoom = async (id, index) => {
 };
 watchEffect(() => {
   if (props.location) {
-    console.log("props.location:", props.location); // Kiểm tra dữ liệu truyền vào
     data.deparmentName = props.location.deparmentName || "";
     data.symbol = props.location.symbol || "";
     rooms.value = (props.location.rooms || []).map((room) => ({
       id: room.id,
       name: room.roomName,
     }));
-    console.log("Khởi tạo rooms:", rooms.value); // Kiểm tra danh sách phòng
   }
 });
 </script>
@@ -157,26 +138,28 @@ watchEffect(() => {
           <ErrorMessage name="symbol" class="error" />
           <label for="rooms" class="label-custom">Phòng:</label>
           <div
-            v-for="(room, index) in rooms"
-            :key="'room-' + room.id"
-            class="flex items-center gap-2"
-          >
-            <Field
-              type="text"
-              :id="'room-' + room.id"
-              :name="'room-' + index"
-              v-model="room.name"
-              class="w-auto my-1 pl-1 rounded-lg text-black"
-              placeholder="Tên phòng"
-            />
-            <button
-              type="button"
-              @click="removeRoom(index)"
-              class="text-red-500"
-            >
-              <i class="fa-regular fa-trash-can"></i>
-            </button>
-          </div>
+  v-for="(room, index) in rooms"
+  :key="'room-' + room.id"
+  class="flex items-center gap-2"
+>
+  <Field
+    type="text"
+    :id="'room-' + room.id"
+    :name="'room-' + index"
+    v-model="room.name"
+    class="w-auto my-1 pl-1 rounded-lg text-black"
+    placeholder="Tên phòng"
+  />
+  <button
+    type="button"
+    @click="removeRoom(index)"
+    class="text-red-500"
+  >
+    <i class="fa-regular fa-trash-can"></i>
+  </button>
+</div>
+
+
           <a
             @click="addRoom"
             class="text-blue-500 cursor-pointer hover:text-blue-400"

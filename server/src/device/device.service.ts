@@ -14,10 +14,10 @@ export class DeviceService {
     private readonly logger = new Logger(DeviceService.name)
 
 
-    async getAllDevice(option: { page: number, key: string, categoryId: number, groupByCategory?: boolean, sortByDate?: 'asc' | 'desc'  }) {
+    async getAllDevice(option: { page: number, key: string, categoryId: number, sortByDate?: 'asc' | 'desc'  }) {
         let pageSize = PAGE_SIZE.PAGE_DEVICE
         try {
-            let { page, key, categoryId,groupByCategory ,sortByDate} = option
+            let { page, key, categoryId ,sortByDate} = option
             let where: any = { isDelete: false }
             if (key) {
                 where.OR = [  {
@@ -54,6 +54,16 @@ export class DeviceService {
                             categoryName:true
                         }
                     },
+                    room:{
+                      select:{
+                        roomName:true,
+                        deparment:{
+                            select:{
+                                deparmentName:true
+                            }
+                        }
+                      }  
+                    },
                     DeviceAttributeValues:{
                         include:{
                             AttribyutesCategory:{
@@ -65,31 +75,17 @@ export class DeviceService {
                     }
                 }
                 , orderBy: {
-                 // Default to 'asc' if not specified
-                    expirationDate: sortByDate || 'asc' , // Default to 'asc' if not specified
+                    expirationDate: sortByDate || 'asc' , 
                 }
             })
-            let groupedData;
-            if (groupByCategory) {
-                groupedData = data.reduce((acc, device) => {
-                    const categoryName = device.category?.categoryName || "Uncategorized";
-                    if (!acc[categoryName]) {
-                        acc[categoryName] = {
-                            categoryName: categoryName,
-                            devices: []
-                        }
-                    }
-                    acc[categoryName].devices.push(device);
-                    return acc;
-                }, {});
-            }
-            const totalDevice = await this.prismaService.device.count({
-                where:{
-                    isDelete:false
-                }
-            })
-            const resultData = groupByCategory ? groupedData : data;
-            return new ResponseData<any>({ data:resultData, totalCount,totalDevice, totalPages }, 200, "Tìm các thiết bị thành công")
+        
+            const totalDevice = categoryId
+            ? await this.prismaService.device.count({
+                where: {categoryId:Number(categoryId), isDelete: false }
+              })
+            : totalCount;
+
+            return new ResponseData<any>({ data:data, totalCount,totalDevice, totalPages }, 200, "Tìm các thiết bị thành công")
         } catch (error) {
             this.logger.error(error.message)
             return new ResponseData<string>(null, 500, 'Lỗi dịch vụ, thử lại sau')
@@ -319,7 +315,7 @@ export class DeviceService {
                 }
     
                 try {
-                    const newDevice = await this.prismaService.device.create({
+                   await this.prismaService.device.create({
                         data: {
                             name: device.name,
                             categoryId: categoryValid.id,
@@ -333,7 +329,7 @@ export class DeviceService {
                             }
                         }
                     });
-                    successfulDevices.push(newDevice);
+                    successfulDevices.push({...device});
                 } catch (error) {
                     deviceErrors.push({ ...device, error: 'Lỗi khi tạo thiết bị' });
                 }
