@@ -99,23 +99,17 @@ const getPriority = (newValue) => {
 </style>
 <template>
   <h1 class="text-2xl font-bold mb-10 text-[#25861e]">Yêu cầu bảo trì</h1>
-  <div class="flex items-center justify-end">
-    <!-- <div class="relative w-[20%]">
-      <fwb-button
-        color="green"
-        size="sm"
-        class="font-semibold px-4 py-2"
-        @click="
-          () => {
-            router.push({
-              name: 'newmaintenance',
-            });
-          }
-        "
-        >Mới
-        <i class="fa-solid fa-plus"></i>
-      </fwb-button>
-    </div> -->
+  <div class="flex items-center justify-between">
+    <div >
+      <router-link
+              active-class="active-link"
+              :to="{ name: 'calendar' }"
+              class="block p-5 text-li hover:opacity-70"
+            >
+              <i class="fa-solid fa-calendar-days mr-2"></i>
+              Lịch bảo trì
+            </router-link>
+    </div>
 
     <div
       class="relative right-0 flex border border-gray-500 rounded-lg"

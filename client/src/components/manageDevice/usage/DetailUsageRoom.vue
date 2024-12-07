@@ -159,6 +159,7 @@ const formatDate = (value) => {
     </template>
     <template #end>
       <Button
+      class="p-1"
         label="Xuất tập tin"
         @click="exportCSV($event)"
         icon="pi pi-upload"
@@ -220,14 +221,14 @@ const formatDate = (value) => {
           class="p-2 border-b border-gray-400"
         >
         </Column>
-        <Column
+        <!-- <Column
           header="Loại"
           sortable
           field="Device.category.categoryName"
           style="min-width: 8rem"
           class="p-2 border-b border-gray-400"
         >
-        </Column>
+        </Column> -->
         <Column
           header="Hình ảnh"
           style="min-width: 8rem"

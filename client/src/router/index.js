@@ -159,7 +159,7 @@ const routes = [
                 path: 'maintenance/:id',
                 name: 'editmaintenance',
                 component: () => import('../components/maintenance/EditMaintenance.vue'),
-                meta: { title: '{d}' },
+                meta: { title: 'Chi tiết yêu cầu' },
                 beforeEnter: async (to, from, next) => {
                     const authStore = useAuthStore()
                     if (authStore.token === null)  next('login')

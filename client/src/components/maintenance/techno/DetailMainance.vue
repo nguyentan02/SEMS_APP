@@ -126,6 +126,10 @@ const updateMaintenanceStatus = async (status) => {
           <strong>Thời gian:</strong> {{ data.startDate }} đến
           {{ data.endDate }}
         </p>
+        <p class="mb-2">
+      <strong>Địa điểm:</strong> Phòng {{ props.maintenanceEdit?.Room.roomName }} /
+          {{ props.maintenanceEdit?.Room.deparment.deparmentName }}
+        </p>
 
         <p class="mb-2">
           <strong>Tiến độ:</strong>

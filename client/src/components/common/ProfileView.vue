@@ -20,8 +20,8 @@ const valueRole =
   userStore.user.role === 0
     ? "Quản trị viên"
     : userStore.user.role === 1
-    ? "Quản lý"
-    : "Không xác định";
+    ? "Nhân viên quản lý"
+    : "Kỹ thuật viên";
 
 const isEditing = ref(false);
 const nameDefault = ref(userStore.user?.name);

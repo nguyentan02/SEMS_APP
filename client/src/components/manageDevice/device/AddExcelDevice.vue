@@ -9,6 +9,7 @@ import Column from "primevue/column";
 import Handsontable from "handsontable";
 import "handsontable/dist/handsontable.full.min.css";
 import * as XLSX from "xlsx";
+import Loading from "@/components/common/Loading.vue";
 import dayjs from "dayjs";
 const router = useRouter();
 const $toast = useToast();
@@ -167,7 +168,8 @@ const back = () => {
 
       </div>
     </div>
-    <div v-if="showDataTable && deviceStore.result" class="card">
+    <div v-if="!deviceStore.isLoading ">
+      <div v-if=" showDataTable && deviceStore.result" class="card">
       <div v-if="deviceStore.result.data.totalSucces != 0" class="">
         <h1 class="p-1 font-semibold">
           Tổng thiết bị nhập thành công:
@@ -220,6 +222,12 @@ const back = () => {
         </DataTable>
       </div>
     </div>
+    </div>
+    <div v-else>
+      <div class="absolute right-[45%]">
+        <Loading/>
+      </div>
   
+    </div>
   </div>
 </template>

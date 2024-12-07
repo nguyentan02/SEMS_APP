@@ -89,6 +89,7 @@ const getPriority = (newValue) => {
     return "Cao";
   }
 };
+const today = ref(new Date().toISOString().split('T')[0]);
 </script>
 <style>
 .vuecal__event {
@@ -131,11 +132,10 @@ const getPriority = (newValue) => {
     </div>
     <vue-cal
       locale="vi"
-      selected-date="2024-11-23"
+      :selected-date="today"
       :time-from="6 * 60"
       :time-to="23 * 60"
       :disable-views="['years']"
-      hide-weekends
       :events="events"
       :on-event-click="showModal"
       style="height: 700px"

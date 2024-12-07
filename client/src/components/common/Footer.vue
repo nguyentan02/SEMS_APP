@@ -3,7 +3,7 @@
     <div class="w-full max-w-screen-xl mx-auto p-2">
       <div class="grid grid-cols-2 md:grid-cols-3">
         <a href="/home/device" class="flex items-center gap-2 p-2">
-          <span class="text-[#f5ffff] text-2xl font-bold">Quản lý thiết bị</span>
+          <span class="text-[#f5ffff] text-2xl font-bold">Quản lý trang thiết bị</span>
         </a>
         <ul
           class="md:col-span-2 flex items-center text-xl md:text-3xl font-medium text-[#f5ffff] justify-end gap-5"
@@ -28,7 +28,7 @@
       <hr class="border-gray-200 mx-auto py-4" />
       <span class="text-[#f5ffff] flex flex-col text-center">
         <p class="md:text-lg font-semibold">
-          © 2024 Hệ thống Quản lý Thiết bị
+          © 2024 Hệ thống Quản lý Trang Thiết bị
         </p>
         <div class="text-xs md:text-sm flex flex-col gap-1 items-center">
           <div>

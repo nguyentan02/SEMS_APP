@@ -16,6 +16,7 @@ export const useMaintenanceStore = defineStore('maintenance', ()=>{
     const maintenance = ref(null)
     const status = ref(false)
     const key = ref('')
+    const groupByUser = ref(false)
     const isShow = reactive({
         detailMaintenance:false
     })
@@ -167,5 +168,5 @@ export const useMaintenanceStore = defineStore('maintenance', ()=>{
         }
     }
     
-    return {err,result,isLoading,status,key,maintenance,isShow,getMaitenances,sendMaintenance,maintenances,createMaitenance,updateStatus,resMaintenance,getMaitenancesByTech,getMaitenanceById,updateMaitenance,deleteMaintenance,closeDetail,showDetail}
+    return {err,result,isLoading,status,key,maintenance,groupByUser,isShow,getMaitenances,sendMaintenance,maintenances,createMaitenance,updateStatus,resMaintenance,getMaitenancesByTech,getMaitenanceById,updateMaitenance,deleteMaintenance,closeDetail,showDetail}
 })

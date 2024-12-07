@@ -43,8 +43,7 @@ export class HistoryService {
                             categoryName:true
                         }
                     },
-                    maintenancePlan:{
-                       
+                    maintenancePlan:{  
                         include:{
                             User:{
                                 select:{

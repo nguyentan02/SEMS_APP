@@ -268,7 +268,7 @@ const closeMenuOnClickOutside = (event) => {
           <th class="text-center p-2 w-[5%]">STT</th>
           <th class="p-2">Thiết bị</th>
           <th class="p-2">Hình ảnh</th>
-          <th class="p-2">Serial</th>
+          <th class="p-2">Serial Number</th>
           <th class="p-2">Nhà sản xuất</th>
           <th class="p-2">Ngày mua</th>
           <th @click="toggleSortOrder" class="p-2">

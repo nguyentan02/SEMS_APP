@@ -74,6 +74,7 @@ export class MaintenanceService {
                 acc[userId].maintenancePlans.push(maintenance);
                 return acc;
             }, {});
+          
         } else if (groupByStatus) {
        
             result = maintenancePlans.reduce((acc, maintenance) => {
@@ -471,7 +472,7 @@ export class MaintenanceService {
             await this.prismaService.maintenancePlan.updateMany({
                 where: {
                     isDeleted: false,
-                    maintenanceStatus:StatusMaintenance.APPROVED,
+                    maintenanceStatus:{in:[StatusMaintenance.APPROVED]},
                     endDate: {
                         lte: new Date()
                     }

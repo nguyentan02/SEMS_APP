@@ -130,7 +130,7 @@ const getPriority = (newValue) => {
           "
         />
       </div>
-      <button
+      <!-- <button
         @click="toggleFilter"
         class="px-4 border-l border-l-gray-500"
         :class="{ background: isFilterOpen }"
@@ -139,13 +139,13 @@ const getPriority = (newValue) => {
           class="fa-solid fa-caret-down transition-transform duration-300 ease-in-out"
           :class="{ 'rotate-180': isFilterOpen }"
         ></i>
-      </button>
-      <div
+      </button> -->
+      <!-- <div
         v-if="isFilterOpen"
-        class="absolute bg-white border right-0 mt-10 w-[630px] z-10 shadow-lg transition-opacity duration-300 ease-in-out rounded-md"
+        class="absolute bg-white border right-0 mt-10 w-[330px] z-10 shadow-lg transition-opacity duration-300 ease-in-out rounded-md"
         :class="{ 'opacity-100': isFilterOpen, 'opacity-0': !isFilterOpen }"
       >
-        <div class="grid grid-cols-2 divide-x divide-gray-200">
+        <div class="grid grid-cols-1 divide-x divide-gray-200">
           <div class="p-4">
             <span class="font-semibold text-gray-800 mb-2"
               ><i class="fa-solid fa-filter text-fuchsia-800 mr-2"></i>Bộ
@@ -160,13 +160,13 @@ const getPriority = (newValue) => {
             >
             <ul class="text-gray-600 space-y-2">
               <label class="cursor-pointer hover:text-blue-600">
-                <input type="checkbox" class="mr-2" />
+                <input  type="checkbox" class="mr-2" />
                 Phân công cho
               </label>
             </ul>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
   <div v-if="!maintenanceStore.isLoading" class="card mt-8">
@@ -231,6 +231,7 @@ const getPriority = (newValue) => {
           /> </template
       ></Column>
     </DataTable>
+    
   </div>
   <div v-else class="absolute top-[30%] right-[47%]">
     <Loading />

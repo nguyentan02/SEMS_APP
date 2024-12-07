@@ -123,14 +123,14 @@ watchEffect(async () => {
             </router-link>
           </li>
           <li class="mb-2">
-            <router-link
+            <!-- <router-link
               active-class="active-link"
               :to="{ name: 'calendar' }"
               class="block p-5 text-li hover:opacity-70"
             >
               <i class="fa-solid fa-calendar-days mr-2"></i>
               Lịch bảo trì
-            </router-link>
+            </router-link> -->
           </li>
           <li class="mb-2">
             <router-link

@@ -22,7 +22,7 @@ const $toast = useToast();
 const formSchemaUser = yup.object().shape({
   name: yup
     .string()
-    .required("Tên phải có giá trị.")
+    .required("Tên không được bỏ trống.")
     .min(8, "Tên phải ít nhất 8 ký tự.")
     .max(50, "Tên có nhiều nhất 50 ký tự."),
   email: yup
@@ -86,7 +86,7 @@ const addUser = async (user) => {
             type="text"
             name="email"
             id="email"
-            class="input-custom w-auto"
+            class="input-custom w-auto pl-2"
             v-model="user.email"
           >
           </Field>
@@ -96,7 +96,7 @@ const addUser = async (user) => {
             type="text"
             name="name"
             id="name"
-            class="input-custom w-auto"
+            class="input-custom w-auto pl-2"
             v-model="user.name"
           >
           </Field>
@@ -106,7 +106,7 @@ const addUser = async (user) => {
             type="text"
             name="employeeId"
             id="employeeId"
-            class="input-custom w-auto"
+            class="input-custom w-auto pl-2"
             v-model="user.employeeId"
           >
           </Field>
@@ -116,7 +116,7 @@ const addUser = async (user) => {
             type="password"
             name="password"
             id="password"
-            class="input-custom w-auto"
+            class="input-custom w-auto pl-2"
             v-model="user.password"
           >
           </Field>
@@ -126,7 +126,7 @@ const addUser = async (user) => {
             as="select"
             name="role"
             id="role"
-            class="input-custom w-auto"
+            class="input-custom w-auto pl-2"
             v-model="user.role"
           >
             <option value="">Chọn vai trò</option>

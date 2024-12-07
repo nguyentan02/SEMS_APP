@@ -3,14 +3,13 @@ import { PrismaService } from "../prisma/prisma.service";
 import { User } from "@prisma/client";
 import { ResponseData } from "../global/globalClass";
 import { PAGE_SIZE } from "src/global";
-
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import * as argon2 from 'argon2';
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { UpdatePasswordDto, UpdateUserDto, UpdateProfileDto, ForgotPasswordDto, VerifyCodeDto, CheckCodeDto } from "./dto";
 import { BanUserDto } from "./dto/ban-user.dto";
 import { MailerService } from '@nestjs-modules/mailer';
-import { number } from "joi";
 
 @Injectable()
 
@@ -424,5 +423,25 @@ export class UserService {
         const randomNumber = Math.floor(Math.random() * 1000000);
         const paddedNumber = randomNumber.toString().padStart(6, '0');
         return paddedNumber;
+    }
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async autoUnBan() {
+        try {
+            await this.prismaService.user.updateMany({
+                where: {
+                    isBan: true,
+                    banUntil: {
+                        lte: new Date()
+                    }
+                },
+                data: {
+                    isBan: false,
+                    banUntil: null
+                }
+            })
+            this.logger.log('Mở khóa thành công các tài khoản bị khóa')
+        } catch (error) {
+            this.logger.error(error.message)
+        }
     }
 }
