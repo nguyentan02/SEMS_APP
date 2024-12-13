@@ -313,6 +313,12 @@ const routes = [
                 },
             },
         ]
+    },
+    {
+        path: "/:pathMatch(.*)",
+        name: "notfound",
+        component: () => import("../views/NotFoundView.vue"),
+        meta: { title: 'Không tìm thấy trang' }
     }
 
 ]

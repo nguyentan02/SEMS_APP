@@ -134,7 +134,7 @@ const formatDate = (value) => {
     <template #start>
       <Button
         label="Mới"
-        icon="pi pi-plus"
+        icon="pi pi-plus mr-2"
         outlined
         class="mr-2 px-2 py-1 bg-[#25861e] text-white"
         @click="
@@ -145,7 +145,8 @@ const formatDate = (value) => {
         "
       />
       <Button
-        icon="pi pi-send"
+        label="Luân chuyển"
+        icon="pi pi-send mr-2"
         :disabled="selectedDevices.length === 0"
         class="mr-2 px-4 py-1 bg-[#3089dd] text-white rounded-lg"
         @click="

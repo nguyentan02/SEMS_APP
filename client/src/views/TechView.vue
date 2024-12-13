@@ -82,7 +82,10 @@ watchEffect(async () => {
   <div class="flex md:p-0 lg:w-[80%] mx-auto background-manage">
     <div class="w-64 h-screen">
       <div class="p-4 flex items-center justify-between">
-        <img class="h-[50px]" src="/logoMain.jpg" alt="" />
+        <div class="p-4 flex items-center ">
+        <img class="h-[50px]" src="/header.png" alt="" />
+        <h2 class="text-4xl font-bold ml-4 text-green-700">EMS</h2>
+      </div>
         <div class="relative text-2xl">
           <div
             @click="showNotifications = !showNotifications"

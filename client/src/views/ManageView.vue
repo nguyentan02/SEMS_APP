@@ -69,9 +69,9 @@ watchEffect(async () => {
     <div
       class="w-64 h-screen border-2 border-gray-600 bg-[rgb(var(--color-primary))]"
     >
-      <div class="p-4 flex items-center justify-between">
+      <div class="p-4 flex items-center ">
         <img class="h-[50px]" src="/header.png" alt="" />
-        <!-- <h2 class="text-xl font-bold">EMS</h2> -->
+        <h2 class="text-4xl font-bold ml-4">EMS</h2>
       </div>
       <nav class="flex flex-col px-4">
         <ul>
